@@ -7,65 +7,76 @@
 
 | Qué | Convención | Ejemplo |
 |-----|-----------|---------|
-| Carpetas | kebab-case, plural | `src/components/`, `src/styles/` |
-| Archivos `.astro` | PascalCase | `Cards.astro`, `Layout.astro` |
-| Archivos `.css` | kebab-case, nombre del componente | `card-glow.css`, `navbar.css` |
-| Archivos `.ts` | PascalCase para clases/entidades, camelCase para utilidades | `Card.ts`, `CardsRepository.ts` |
-| Archivos de `scripts/` | kebab-case, prefijo de verbo, ruta `scripts/<slug>.mjs` | `scripts/check-format.mjs`, `scripts/audit-design-tokens.mjs` |
-| Tipos e interfaces | PascalCase | `Card`, `CardColor` |
-| Funciones | camelCase, verbo primero | `getCards()`, `parseCard()` |
-| Errores | Clase PascalCase + sufijo `Error`, nombre en español | `CardDataError` |
-| Custom properties | `--grupo-nombre`, kebab-case | `--color-tomate`, `--shadow-card` |
-| Clases CSS | BEM ligero: bloque, `--` para variantes | `.card`, `.card-icon--red` |
-| Mensajes de error/UI | Español | `cards.json: la card "x" tiene un color inválido` |
+| Carpetas | kebab-case | `src/domain/use-cases/`, `src-tauri/src/infrastructure/` |
+| Archivos `.tsx` (componentes React) | PascalCase, uno por componente | `AccountList.tsx`, `AppLayout.tsx` |
+| Archivos `.ts` | PascalCase para clases/entidades/puertos, camelCase para utilidades | `Account.ts`, `AccountRepository.ts`, `formatAmount.ts` |
+| Archivos `.rs` | Rust estándar: `snake_case` para módulos y funciones, `PascalCase` para tipos y traits | `account.rs`, `account_repository.rs`, trait `AccountStore` |
+| Archivos `.css` | kebab-case, nombre del componente | `account-list.css`, `app-layout.css` |
+| Archivos de `scripts/` | kebab-case, prefijo de verbo, ruta `scripts/<slug>.mjs` | `scripts/check-format.mjs` |
+| Tipos e interfaces TS | PascalCase | `Account`, `MovementKind` |
+| Traits Rust | PascalCase, sustantivo de capacidad | `AccountStore`, `RateProvider` |
+| Funciones | camelCase en TS / snake_case en Rust, verbo primero | `getAccounts()` / `get_accounts()` |
+| Errores | Clase/variante PascalCase + sufijo `Error`, nombre en español | `AccountDataError` |
+| Custom properties | `--grupo-nombre`, kebab-case | `--color-accent`, `--shadow-card` |
+| Clases CSS | BEM ligero: bloque, `--` para variantes | `.account-list`, `.account-list__item--active` |
+| Mensajes de error/UI | Español | `accounts.json: la cuenta "x" tiene un saldo inválido` |
 
-## Estructura
+## Estructura hexagonal de carpetas
 
-- **Un componente = un archivo `.astro` + una o más hojas en `src/styles/`**.
-- **Una entidad = un archivo** en `src/domain/entities/`.
-- **Un repositorio = un archivo** en `src/domain/repositories/`, una única
-  responsabilidad (una fuente de datos).
-- **Un dato = una entrada** en `src/data/*.json`, tipada por su entidad.
-- **Un script = un archivo** en `scripts/`, nombrado `scripts/<slug>.mjs` (kebab-case con
-  prefijo de verbo). Verbos admitidos (lista cerrada): `check-`, `validate-`, `generate-`,
-  `build-`, `deploy-`, `audit-`. Un verbo nuevo se añade a esta lista y a la auditoría de
-  la convención como extensión de contrato, nunca en silencio. Todo script nuevo se
-  declara en la spec de la feature con su ruta completa y acceptance (nunca ad-hoc en
-  implementación).
+Frontend (`src/`) — dependencias siempre hacia el dominio:
+
+- `src/domain/entities/` — una entidad = un archivo.
+- `src/domain/ports/` — un puerto = una interfaz; definidos por el núcleo.
+- `src/domain/use-cases/` — un caso de uso = un archivo; orquesta vía puertos.
+- `src/adapters/` — implementa puertos; el adapter Tauri IPC es el único sitio
+  que usa `invoke()`.
+- `src/components/` — UI `.tsx`; cada uno importa su hoja de `src/styles/`.
+- `src/styles/` — `tokens.css` + una hoja por componente.
+
+Backend (`src-tauri/src/`) — dependencias siempre hacia el dominio:
+
+- `src-tauri/src/domain/` — entidades y traits-puerto en Rust puro (sin
+  dependencia de `tauri`); testeable aislado con `cargo test`.
+- `src-tauri/src/application/` — casos de uso que orquestan el dominio.
+- `src-tauri/src/infrastructure/` — adapters de salida que implementan puertos.
+- `src-tauri/src/commands/` — handlers `#[tauri::command]` finos que delegan
+  en application.
+- `src-tauri/src/lib.rs` — composition root: construye adapters e inyecta
+  dependencias.
+
+Otras reglas de estructura:
+
+- **Un script = un archivo** en `scripts/`, nombrado `scripts/<slug>.mjs`
+  (kebab-case con prefijo de verbo). Verbos admitidos (lista cerrada):
+  `check-`, `validate-`, `generate-`, `build-`, `deploy-`, `audit-`. Un verbo
+  nuevo se añade a esta lista como extensión de contrato, nunca en silencio.
+  Todo script nuevo se declara en la spec de la feature con su ruta completa.
 - **Una spec por feature** en `specs/<NN>_<name>/`: `requirements.md`
-  (SIEMPRE, EARS estricto: una línea = un requerimiento = exactamente un
-  `SHALL`, IDs `REQ-<NN>-<xx>`, sin verbos vagos) y `design.md` (solo si la
-  feature toca UI/presentación). `<NN>` = id con padding a 2 dígitos,
-  `<name>` = slug kebab-case del `name` de la feature. Las plantillas viven
-  en `specs/_template/`.
+  (SIEMPRE, EARS estricto) y `design.md` (solo si la feature toca UI).
+  `<NN>` = id con padding a 2 dígitos; plantillas en `specs/_template/`.
+
+## Orden dentro de un componente `.tsx`
+
+1. Imports (estilos, dominio, tipos).
+2. Props tipadas (`readonly`), sin lógica de negocio.
+3. Marcado JSX semántico; los datos llegan de casos de uso/puertos.
+4. Sin estilos inline ni CSS embebido: la hoja vive en `src/styles/`.
 
 ## Dependencias
 
 - **Ningún agente aprueba dependencias**: la aprobación es decisión exclusiva del humano,
-  tras discusión, y queda materializada en el registro. Si una feature necesita una
-  dependencia nueva, el agente marca la feature `blocked` y espera la decisión.
+  tras discusión, y queda materializada en el registro. Si una feature necesita
+  una dependencia nueva (paquete npm o crate), el agente marca la feature
+  `blocked` y espera la decisión.
 - La aprobación se materializa en `docs/dependencies.md` con formato de
   bloques: `### <package>` seguido de líneas `- clave: valor` con `version`,
   `scope`, `approved` y `motivo`.
 - El validador `scripts/validate-dependencies.mjs` (integrado en
-  `scripts/check-format.mjs`) falla si una dependencia de package.json no
-  tiene su entrada aprobada en el registro.
-
-## Orden dentro de un archivo `.astro`
-
-1. Frontmatter: imports de estilos, imports de dominio, `const` de datos.
-2. Marcado semántico (nav, section, article, footer).
-3. Sin `<style>`, sin lógica, sin scripts.
-
-## Estilos
-
-- Todo valor de color, espaciado, radio, sombra o fuente sale de
-  `src/styles/tokens.css`.
-- Media queries y estados (hover/active) al final del archivo CSS.
-- Responsive: breakpoint móvil en 768px, en orden móvil-primero.
+  `scripts/check-format.mjs`) falla si una dependencia no tiene su entrada
+  aprobada en el registro.
 
 ## Commits
 
-- Mensajes en inglés, verbos imperativos, concisos: `add cards section`,
-  `fix ultra wide screen`.
+- Mensajes en inglés, verbos imperativos, concisos: `add account list`,
+  `fix amount rounding`.
 - Un commit por feature o fix; sin cambios no relacionados mezclados.

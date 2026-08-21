@@ -46,6 +46,9 @@ function getKitFiles(dirUrl) {
   for (const entry of entries) {
     const entryUrl = new URL(`${entry.name}${entry.isDirectory() ? '/' : ''}`, dirUrl);
     if (entry.isDirectory()) {
+      // Los node_modules y los directorios target/dist son dependencias o
+      // artefactos de build generados, no archivos del kit (README §6).
+      if (entry.name === 'node_modules' || entry.name === 'target' || entry.name === 'dist') continue;
       files.push(...getKitFiles(entryUrl));
     } else {
       // Ignorar este archivo de test para evitar falsos positivos con los tokens definidos aquí

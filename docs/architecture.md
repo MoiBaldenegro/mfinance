@@ -3,79 +3,125 @@
 > Este documento define el estándar de calidad. Los agentes revisores
 > evalúan código contra este archivo. Si no está aquí, no es un requisito.
 
+mfinance es una **app de escritorio construida con Tauri 2**: frontend
+**React 19 + TypeScript + Vite** en `src/` (dev server en el puerto `1420`) y
+backend **Rust** en `src-tauri/`. Ambos lados siguen **arquitectura hexagonal**
+(puertos y adapters): el dominio en el centro y las dependencias apuntando
+siempre hacia él.
+
 ## Principios
 
-1. **Capas claras.** El proyecto tiene y debe tener siempre la siguiente estructura de carpetas:
+1. **Hexagonal en ambos lados.** Las dependencias apuntan siempre hacia el
+   dominio: nada del dominio importa del exterior; el exterior (UI, commands,
+   persistencia, IPC) depende del dominio, nunca al revés.
+2. **Dominio puro.** El dominio no conoce el framework: ni Tauri ni React ni
+   Vite. En Rust, `src-tauri/src/domain/` no declara dependencia de `tauri` y
+   se verifica aislado con `cargo test`; en TS, `src/domain/` no importa de
+   `@tauri-apps/api` ni de `react`.
+3. **Puertos y adapters.** Los puertos los define el núcleo (traits en Rust,
+   interfaces en TS) y los implementan los adapters. El núcleo nunca conoce
+   implementaciones concretas: recibe puertos inyectados.
+4. **Errores explícitos.** Las operaciones que pueden fallar devuelven errores
+   nombrados (`Result<T, E>` en Rust, clases `*Error` en TS), nunca valores
+   falsy silenciosos. Un fallo silencioso es un bug disfrazado.
+5. **Inmutabilidad por defecto.** `const`/`readonly` por defecto; entidades
+   inmutables: modificar = crear una nueva instancia.
+6. **Tokens, no valores sueltos.** Colores, espaciados, radios, sombras y
+   tipografías solo desde las custom properties de `src/styles/tokens.css`.
+   Prohibido hardcodear valores.
+7. **Estilos separados de la UI.** Un componente `.tsx` no contiene CSS: cada
+   uno importa su hoja desde `src/styles/`.
+8. **Lógica separada de la UI.** Los componentes `.tsx` renderizan y delegan:
+   la lógica vive en casos de uso (`src/domain/use-cases/`) y módulos TS.
+9. **Sin dependencias externas sin aprobar.** Paquetes npm y crates nuevos se
+   marcan `blocked` y esperan la aprobación del humano, materializada en
+   `docs/dependencies.md` (validada por `scripts/validate-dependencies.mjs`).
+10. **Modularización estricta.** Ningún archivo supera las 100 líneas; si es
+    imprescindible, se discute antes (estado `blocked`).
+11. **Scripts del arnés aislados.** Los scripts de `scripts/` se ejecutan con
+    Node y jamás se importan desde `src/`: no son build ni runtime.
+12. **Artefactos generados.** `dist/` (Vite) y `src-tauri/target/` (cargo) se
+    regeneran siempre completos: nunca se editan a mano.
 
-   | Carpeta | Rol |
-   |---------|-----|
-   | `public/` | Archivos que se sirven tal cual en la raíz (SVG, favicons, logos). Ej: `tomateLogo.svg`. Nunca procesados ni hasheados por el build. |
-   | `scripts/` | Scripts del arnés: validación, generación y orquestación (`check-format.mjs`). Se ejecutan con Node y nunca se importan desde `src/`. |
-   | `src/assets/` | Imágenes y recursos importados desde el código. Astro los optimiza y hashea en build (`astro:assets`). Lo que se sirve tal cual va en `public/`, no aquí. |
-   | `src/components/` | Componentes `.astro` de interfaz de usuario que no son layouts ni vistas de ruta (`LatestArticles`, `HtbStadistics`…). Cada uno importa su propia hoja de estilos de `src/styles/`. |
-   | `src/domain/entities/` | Entidades del dominio: modelos tipados que mapean el contenido estructurado (ej: `Card`, `Feature`, `Plan`). |
-   | `src/domain/repositories/` | Repositorios: única vía de acceso a los datos. Entregan entidades leyendo desde archivos JSON. |
-   | `src/data/` | Archivos JSON: única fuente de contenido estructurado (cards, features, etc.). Los componentes jamás leen JSON directamente. |
-   | `src/layouts/` | Componentes de página (`Layout.astro`). Todo el chrome compartido vive aquí. |
-   | `src/pages/` | Rutas. Un archivo por URL (`index.astro` → `/`). |
-   | `src/styles/` | CSS. `tokens.css` con el sistema de tokens del diseño + un archivo por componente (`layout.css`, `profile-card.css`, `latest-articles.css`…). |
+## Estructura de carpetas
 
-2. **Sin dependencias externas.** Si una feature requiere una dependencia, primero se discute (estado `blocked`): ningún agente aprueba dependencias; la aprobación es decisión exclusiva del humano tras discusión y se materializa en `docs/dependencies.md`, validado por `scripts/validate-dependencies.mjs` (integrado en `scripts/check-format.mjs`).
+| Carpeta | Rol |
+|---------|-----|
+| `src/` | Frontend React + TS (ver desglose hexagonal abajo). |
+| `src-tauri/` | Backend Rust: `src/` (código), `Cargo.toml`, `tauri.conf.json`. |
+| `public/` | Activos estáticos servidos tal cual (favicons, SVG). |
+| `scripts/` | Scripts del arnés (Node stdlib), nunca importados desde `src/`. |
+| `tests/` | Tests automáticos con `node:test` (sin dependencias). |
 
-3. **Errores explícitos.** Las funciones que pueden fallar (un JSON malformado, un id que no existe, un recurso ausente) lanzan errores nombrados, no devuelven valores falsy silenciosos. Un fallo silencioso es un bug disfrazado.
+### Backend hexagonal (`src-tauri/src/`)
 
-4. **Inmutabilidad por defecto.** `const` por defecto, tipos `readonly` para props y estructuras de datos. Las entidades son inmutables. Modificar = crear una nueva instancia. Nunca mutar props ni estado compartido.
-
-5. **Atomicidad en disco.** `dist/` es un artefacto generado por `astro build`: nunca se edita, ni se crea contenido en él a mano, ni se repara a medias. El build siempre regenera el directorio completo.
-
-6. **Tokens, no valores sueltos.** Colores, espaciados, radios, sombras y tipografías solo desde las custom properties de `global.css` (definidas en `DESIGN.md`). Queda prohibido hardcodear valores en componentes o estilos.
-
-7. **Estilos separados de la UI.** Nunca combinar estilos y HTML/UI en el mismo archivo. Un `.astro` solo contiene marcado; sus estilos viven en un archivo `.css` dentro de `src/styles/` que el componente importa. Tampoco CSS global para lo que pertenece a un componente.
-
-8. **Lógica separada de la UI.** JavaScript o lógica jamás en el mismo archivo que HTML/UI o estilos. El frontmatter de un `.astro` se limita a imports y paso de datos. Cualquier lógica (parseo, transformación, validación, acceso a datos) se extrae a módulos `.ts` en `src/domain/` o módulos utilitarios.
-
-9. **Estático por defecto.** Cero JavaScript de runtime salvo justificación. El sitio es HTML generado en build. No añadir frameworks ni scripts para interacción trivial.
-
-10. **Rutas explícitas.** Una página por archivo en `src/pages/`, una URL por página. Sin lógica de routing manual.
-
-11. **Un solo layout.** El chrome compartido (head, fuentes, estructura base) vive solo en `src/layouts/Layout.astro`. No crear layouts nuevos para variaciones menores; reutilizar el existente.
-
-12. **Modularización estricta.** Todo se modulariza muy bien. Ningún archivo supera las 100 líneas de código. Si es extremadamente necesario superarlas, se discute primero (estado `blocked`).
-
-13. **Scripts del arnés.** Los scripts de `scripts/` son herramientas de validación, generación y orquestación que se ejecutan con Node (`node scripts/<slug>.mjs`) y **nunca se importan desde `src/`**: no forman parte del build ni del runtime. Usan únicamente la librería estándar de Node (`node:*` o rutas relativas), sin dependencias externas. Objetivo ≤100 líneas, con excepciones documentadas como la de `validate-feature-list.mjs` (139 líneas, detector de ciclos de `depends_on` aprobado en la feature 19).
-
-## Flujo de datos
-
-```
-JSON (src/data/*.json)
-      │
-      ▼
-repositorio (src/domain/repositories)  →  entidades tipadas (src/domain/entities)
-      │
-      ▼
-componentes (LatestArticles, HtbStadistics)
-      │   └─ importan estilos de src/styles/*.css
-      ▼
-src/pages → Layout.astro → HTML estático
-```
+| Capa | Rol |
+|------|-----|
+| `src-tauri/src/domain/` | Entidades y traits-puerto en Rust puro, sin dependencia de `tauri`; testeable aislado con `cargo test`. |
+| `src-tauri/src/application/` | Casos de uso que orquestan el dominio a través de los puertos. |
+| `src-tauri/src/infrastructure/` | Adapters de salida que implementan los puertos (persistencia, fs, servicios externos). |
+| `src-tauri/src/commands/` | Capa de entrada: handlers `#[tauri::command]` finos, sin lógica de negocio, que delegan en `application/`. |
+| `src-tauri/src/lib.rs` | Composition root: construye los adapters e inyecta las dependencias; registra commands y plugins. |
 
 ```
-astro build
-   ├─ src/ → HTML estático + CSS + assets hasheados
-   └─ public/ → copiado tal cual
-      ↓
-   dist/
+#[tauri::command] (commands/)      ← capa de entrada, fina
+        │ delega
+        ▼
+caso de uso (application/)         ← orquesta vía puertos
+        │ usa                                ▲ implementa
+        ▼                                    │
+puerto (trait en domain/) ◄── adapter (infrastructure/)
+        │
+        ▼
+entidades (domain/)
 ```
+
+### Frontend hexagonal (`src/`)
+
+| Capa | Rol |
+|------|-----|
+| `src/domain/entities/` | Tipos TS puros del dominio (sin imports de framework). |
+| `src/domain/ports/` | Interfaces de repositorios/gateways que el núcleo necesita. |
+| `src/domain/use-cases/` | Casos de uso de aplicación: orquestan entidades vía puertos. |
+| `src/adapters/` | Implementaciones de puertos. El adapter Tauri IPC es el único sitio que usa `invoke()` de `@tauri-apps/api`. |
+| `src/components/` | UI React (`.tsx`): consume casos de uso/puertos; jamás invocan invoke directamente. |
+| `src/styles/` | `tokens.css` + una hoja por componente. |
+
+```
+componente .tsx (src/components/)
+        │ llama
+        ▼
+caso de uso (src/domain/use-cases/)
+        │ usa                        ▲ implementa
+        ▼                            │
+puerto (src/domain/ports/) ◄── adapter Tauri IPC (src/adapters/)
+                                     │ invoke()
+                                     ▼
+                          command de src-tauri (backend)
+```
+
+## Reglas hexagonales (resumen normativo)
+
+- Las dependencias apuntan siempre hacia el dominio, en ambos lados.
+- El dominio no conoce el framework: sin `tauri` en `domain/` de Rust, sin
+  `react` ni `@tauri-apps/api` en `src/domain/`.
+- Los puertos los define el núcleo y los implementan los adapters; el núcleo
+  los recibe inyectados (composition root en `lib.rs` en el backend).
+- La UI y los commands son detalles enchufables: se pueden reemplazar sin
+  tocar dominio ni casos de uso.
+- Los componentes de UI jamás invocan invoke directamente: pasan por puertos
+  y casos de uso. El adapter Tauri IPC es el único sitio que usa invoke.
 
 ## Qué NO hacer
 
 - No hardcodear colores, radios, espaciados ni fuentes — siempre tokens.
-- No poner `<style>` dentro de un `.astro` — los estilos van en `src/styles/`.
-- No meter lógica JS en un archivo de UI — va en módulos `.ts` separados.
+- No poner CSS dentro de un `.tsx` — los estilos van en `src/styles/`.
+- No meter lógica de negocio en un componente — va en use-cases/dominio.
+- No llamar a `invoke()` fuera de `src/adapters/`.
+- No importar `tauri` desde `src-tauri/src/domain/` ni `react` desde `src/domain/`.
 - No superar las 100 líneas por archivo sin discusión previa.
-- No hacer que los componentes lean JSON directamente — siempre vía repositorio.
-- No editar `dist/` a mano ni con scripts de terceros.
-- No añadir frameworks o JS de runtime para interacción trivial.
-- No CSS global para estilos que pertenecen a un componente.
-- No crear layouts nuevos para variaciones menores — reutilizar `Layout.astro`.
-- No devolver fallos silenciosos: si algo puede fallar, que falle con un error nombrado.
+- No leer/escribir persistencia directamente desde application o commands:
+  siempre vía puertos e infrastructure.
+- No añadir dependencias (npm o crates) sin aprobación humana registrada.
+- No editar `dist/` ni `src-tauri/target/` a mano.
+- No devolver fallos silenciosos: si algo puede fallar, error nombrado.

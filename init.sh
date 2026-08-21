@@ -33,6 +33,18 @@ echo ""
 echo "--- Herramientas y dependencias ---"
 run_check "node instalado" command -v node
 run_check "pnpm instalado" command -v pnpm
+if command -v rustc >/dev/null 2>&1; then
+  ok "rustc instalado"
+else
+  fail "rustc no instalado: instala la toolchain Rust vía https://rustup.rs"
+  FAILURES=$((FAILURES + 1))
+fi
+if command -v cargo >/dev/null 2>&1; then
+  ok "cargo instalado"
+else
+  fail "cargo no instalado: instala la toolchain Rust vía https://rustup.rs"
+  FAILURES=$((FAILURES + 1))
+fi
 run_check "dependencias instaladas (node_modules)" test -d node_modules
 
 echo ""

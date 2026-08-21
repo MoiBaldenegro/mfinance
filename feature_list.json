@@ -1,0 +1,42 @@
+{
+  "project": "mfinance — app de escritorio de finanzas personales (Tauri 2 + React 19 + TS, backend Rust)",
+  "description": "Backlog del ciclo actual tras la migración del arnés desde el proyecto Astro al proyecto Tauri. El historial de ciclos anteriores vive en progress/history.md y en los artefactos permanentes.",
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_tests_to_close": true,
+    "valid_status": ["pending", "in_progress", "done", "blocked"]
+  },
+  "features": [
+    {
+      "id": 1,
+      "name": "harness-tauri-hexagonal-docs",
+      "title": "Adaptar la documentación del arnés a Tauri y documentar arquitectura hexagonal back/front",
+      "description": "Reescritura de los documentos del arnés que aún describen el proyecto Astro, sustituyéndolos por el estándar del proyecto Tauri (frontend React+TS+Vite, backend Rust) y definiendo la arquitectura hexagonal de ambos lados.",
+      "acceptance": [
+        "grep -ri astro sobre AGENTS.md CLAUDE.md README.md CHECKPOINTS.md docs/ y los agentes spec_author devuelve 0 coincidencias",
+        "docs/architecture.md describe la arquitectura hexagonal del backend Rust (domain/application/infrastructure/commands + composition root en lib.rs) y del frontend TS (domain: entities/ports/use-cases; adapters: incl. adapter Tauri IPC vía invoke; components UI; styles tokens)",
+        "docs/architecture.md establece las reglas hexagonales: dependencias apuntan hacia el dominio, dominio sin dependencias de framework ni de tauri, puertos definidos por el núcleo e implementados por adapters, componentes/capacidad de entrada jamás invocan invoke() directamente",
+        "AGENTS.md y CLAUDE.md quedan sincronizados entre sí y describen comandos reales: pnpm dev (vite :1420), pnpm tauri dev/build, pnpm test (node:test), cargo check/test en src-tauri",
+        "docs/conventions.md define naming para .tsx/.ts/.rs/.css y estructura hexagonal de carpetas",
+        "docs/verification.md documenta verificación con ./init.sh + cargo check/test y ya no menciona astro dev logs ni localhost:4321",
+        "CHECKPOINTS.md refleja criterios Tauri/hexagonales"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 2,
+      "name": "harness-tooling-tauri",
+      "title": "Adaptar la herramienta del arnés (init.sh, validadores, registro de dependencias) al stack Tauri",
+      "description": "Ajuste de la herramienta ejecutable para que ./init.sh sea verde y significativo en un proyecto Tauri: script test en package.json, checks de toolchain Rust, validador de dependencias extendido a Cargo.toml y registro real de dependencias vigentes.",
+      "depends_on": [1],
+      "acceptance": [
+        "package.json declara \"test\": \"node --test\" (descubrimiento bare de la suite, verificado en Node v22.22.2 de este entorno) y pnpm test ejecuta la suite node:test en verde",
+        "./init.sh comprueba rustc y cargo instalados antes del build",
+        "scripts/validate-dependencies.mjs valida también los crates de src-tauri/Cargo.toml (dependencies + build-dependencies + dev-dependencies) contra docs/dependencies.md sin dependencias externas nuevas",
+        "docs/dependencies.md se reescribe con las dependencias REALES vigentes (react, react-dom, @tauri-apps/api, @tauri-apps/plugin-opener, @types/react, @types/react-dom, @vitejs/plugin-react, typescript, vite, @tauri-apps/cli + crates tauri, tauri-plugin-opener, tauri-build, serde, serde_json) y el validador pasa; nota explícita de que son las del scaffold oficial Tauri traídas por el humano, sujetas a su veto",
+        "./init.sh termina en verde completo (formato + tests + build)"
+      ],
+      "status": "done"
+    }
+  ]
+}

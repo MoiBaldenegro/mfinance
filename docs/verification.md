@@ -70,16 +70,21 @@ Cualquier vaciado del array que no responda a esos dos casos es un
 **vaciado automático no justificado** y el `./init.sh` (candado del kit:
 `tests/harness-kit-integrity.test.mjs`) lo rechaza.
 
-## 2. Regresión visual (si tocas UI)
+## 2. Verificación en la app Tauri (si tocas UI o backend)
 
-- `pnpm dev --background`, abre `localhost:4321` y revisa la página.
-- Responsive: prueba el ancho de 768px.
-- Verifica en `astro dev logs` que no hay errores.
+- Frontend solo: `pnpm dev` y abre `localhost:1420` (puerto fijo de Vite,
+  `strictPort`). Revisa la ventana/navegador y la consola sin errores.
+- App completa: `pnpm tauri dev` abre la ventana de escritorio con hot reload.
+- Backend Rust: `cargo check --manifest-path src-tauri/Cargo.toml` para
+  compilar, y `cargo test --manifest-path src-tauri/Cargo.toml` para los tests
+  del dominio (que se ejecutan aislados, sin depender de Tauri).
+- Responsive: prueba el ancho de 768px en la ventana.
 
 ## 3. Convenciones
 
-- `docs/architecture.md` §7 y `docs/conventions.md` (estilos fuera del `.astro`,
-  lógica en `.ts`, tokens, ≤100 líneas por archivo, datos vía repositorio).
+- `docs/architecture.md` y `docs/conventions.md` (hexagonal front/back, estilos
+  fuera del `.tsx`, lógica en use-cases/dominio, tokens, ≤100 líneas por
+  archivo, datos vía puertos y adapters).
 - La implementación es coherente con su spec `specs/<NN>_<name>/requirements.md`
   (y `design.md` si existe) y con la estructura `specs/` de
   `docs/conventions.md`.

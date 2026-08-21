@@ -108,7 +108,7 @@ Después de copiar, adapta obligatoriamente:
 - **Nombre de proyecto.** En `templates/feature_list.json`, sustituye `project:
   "<proyecto>"` y `description` por el nombre real del proyecto.
 - **Stack y gestor de paquetes en `package.json`.** Crea el `package.json` del
-  destino con el stack elegido (p. ej. Astro, Next, Vite…). El `init.sh` detecta
+  destino con el stack elegido (p. ej. Tauri + React, Next, Vite…). El `init.sh` detecta
   el gestor por lockfile (`pnpm-lock.yaml` → `pnpm`, `package-lock.json` → `npm`,
   `yarn.lock` → `yarn`); si usas otro, ajusta la línea de detección o fija `PM`
   directamente.
@@ -119,7 +119,7 @@ Después de copiar, adapta obligatoriamente:
   (integrado en `check-format.mjs`) falla si falta una entrada o no coincide.
   La aprobación de dependencias es decisión exclusiva del humano.
 - **Adaptar `docs/architecture.md` al stack.** La tabla de carpetas del kit es
-  una recomendación neutral para stack Astro/Node. Sustituye las carpetas de la
+  una recomendación neutral para stacks web/Node. Sustituye las carpetas de la
   app por las del stack real del destino (p. ej. componentes, estilos, dominio y
   repositorios de datos según corresponda), y documenta las excepciones reales.
 

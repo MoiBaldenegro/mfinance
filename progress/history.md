@@ -1,0 +1,10 @@
+# Bitácora de sesiones
+
+> Append-only. Al cerrar una sesión, mueve el resumen de `progress/current.md`
+> al final de este archivo y deja `current.md` solo con la plantilla.
+
+## Sesiones
+
+- <YYYY-MM-DD> — <feature <id> <name>: resumen del trabajo realizado>
+- 2026-08-21 — feature 1 harness-tauri-hexagonal-docs: documentación del arnés adaptada al stack Tauri 2 (React 19 + TS + Vite en src/, backend Rust en src-tauri/) con arquitectura hexagonal completa de ambos lados. Test-first: tests/harness-tauri-docs.test.mjs (9 tests, REQ-01-01..12) observado en rojo (9 fallos) y suite final en verde (node --test 12/12). Tocados: docs/architecture.md, docs/conventions.md, docs/verification.md, AGENTS.md == CLAUDE.md (byte a byte), CHECKPOINTS.md, README.md, spec_author ×2, templates/feature_list.json; corrección mínima del escáner de harness-kit-integrity (salta node_modules/target/dist, README §6). Grep del token legado en el alcance: 0 coincidencias. Reviewer: APPROVED (progress/review_1.md). Informe: progress/impl_1.md.
+- 2026-08-21 — feature 2 harness-tooling-tauri: tooling del arnés adaptado al stack Tauri y ./init.sh en verde total. package.json con script "test": "node --test" (AMEND documentado: el literal con directorio falla en Node v22.22.2). init.sh comprueba rustc/cargo antes del build (fallo nombrado con rustup.rs). scripts/validate-dependencies.mjs extendido: valida también crates de src-tauri/Cargo.toml (dependencies/build-dependencies/dev-dependencies, parser TOML por líneas, stdlib Node, 100 líneas exactas) y falla nombrando la dependencia ausente. docs/dependencies.md reescrito con registro real: 10 deps npm + 5 crates (cadenas literales de los manifiestos, tauri-build en build-dependencies) + nota de procedencia scaffold oficial Tauri sujeta a veto humano; cero residuos astro/wrangler/cloudflare. Test-first: 2 archivos de tests nuevos observados en rojo (# pass 14 # fail 7) y suite final verde (node --test y pnpm test 21/21; ./init.sh exit 0). Reviewer: APPROVED (progress/review_2.md). Informe: progress/impl_2.md.

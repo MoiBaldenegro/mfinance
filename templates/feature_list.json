@@ -1,5 +1,5 @@
 {
-  "project": "proyecto-ejemplo — sitio estático de muestra",
+  "project": "proyecto-ejemplo — app de escritorio de muestra",
   "description": "Plantilla de ejemplo del arnés: copia este archivo a feature_list.json y sustituye project, description, rules y features por los del proyecto real.",
   "rules": {
     "one_feature_at_a_time": true,

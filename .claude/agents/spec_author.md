@@ -75,7 +75,7 @@ spec ANTES de dar de alta la feature en `feature_list.json`:
    exactamente un `SHALL`; IDs `REQ-<NN>-<xx>`; en español; sin verbos vagos
    (`soportar`, `mejorar`, "debe ser"); mínimo 3-4 REQ.
 2. `specs/<NN>_<name>/design.md` — SOLO si la feature toca UI/presentación
-   (componentes `.astro`, estilos, layout, responsive, tipografía visible),
+   (componentes `.tsx`, estilos, layout/responsive, tipografía visible),
    con `specs/_template/design.md` como base. Si no toca UI, no se crea.
 3. Deriva los `acceptance` de la feature desde los REQ (trazabilidad
    REQ → acceptance → test): cada `acceptance` se asocia a al menos un REQ

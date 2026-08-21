@@ -3,37 +3,35 @@
 > Auto-evaluación antes de dar una tarea por terminada. Si algo de aquí no se
 > cumple, la tarea NO está `done`.
 
-## Arquitectura (docs/architecture.md)
+## Arquitectura hexagonal (docs/architecture.md)
 
-- [x] Los estilos están en `src/styles/*.css`; ningún `.astro` contiene `<style>`.
-- [x] No hay lógica JS en archivos de UI; el frontmatter solo importa y pasa datos.
-- [x] Ningún componente lee JSON directamente: todo pasa por
-      `src/domain/repositories`.
-- [x] Colores, espaciados, radios y sombras vienen de `src/styles/tokens.css`;
-      no hay valores hardcodeados.
-- [x] Ningún archivo del proyecto supera las 100 líneas (o hay discusión
-      registrada con estado `blocked`).
-- [x] No se añadieron dependencias externas sin discusión previa.
-
-## Datos
-
-- [x] `src/data/*.json` es válido y sus entidades lo tipan.
-- [x] Los repositorios validan y lanzan errores nombrados (`*Error`), sin
-      fallos silenciosos.
+- [x] Las dependencias apuntan hacia el dominio en ambos lados: `src/domain/`
+      no importa de React ni de `@tauri-apps/api`; `src-tauri/src/domain/` no
+      depende del crate `tauri`.
+- [x] Los puertos están definidos por el núcleo y los adapters los implementan;
+      el adapter Tauri IPC es el único sitio que usa `invoke()`.
+- [x] Ningún componente `.tsx` contiene CSS: los estilos viven en
+      `src/styles/*.css` y salen de `src/styles/tokens.css`.
+- [x] No hay lógica de negocio en la UI ni en los commands: vive en use-cases.
+- [x] Colores, espaciados, radios y sombras vienen de tokens; nada hardcodeado.
+- [x] Ningún archivo supera las 100 líneas (o hay discusión registrada con
+      estado `blocked`).
+- [x] No se añadieron dependencias externas (npm o crates) sin aprobación.
 
 ## Verificación
 
 - [x] `./init.sh` termina en verde (entorno, formato, tests al 100%, build).
-      ← verificado por el reviewer de la feature 25 (2026-08-13): suite
-      158/158, harness-kit 7/7, build OK con rutas /posts.
-- [ ] La página se ve correcta en desktop y móvil (≤768px) sin errores en consola.
-      ← pendiente inspección visual en navegador (no verificada por el reviewer).
+- [ ] `cargo check --manifest-path src-tauri/Cargo.toml` compila sin errores
+      cuando la feature toca backend Rust.
+- [ ] `cargo test --manifest-path src-tauri/Cargo.toml` pasa al 100% cuando la
+      feature toca dominio o casos de uso Rust.
+- [ ] La app arranca (`pnpm tauri dev`) y la ventana muestra la UI correcta,
+      sin errores en consola, cuando la feature toca UI.
 
 ## Harness
 
 - [ ] `feature_list.json` tiene la tarea en `done` (y ninguna otra a medias).
-      ← features 22-24 `done`; feature 25 `in_progress` a la espera de que el
-      líder la marque `done` tras la revisión APPROVED.
 - [x] `progress/current.md` documenta la sesión y `progress/history.md` está
       al día.
-- [x] No quedan archivos temporales, `print()` de debug ni TODOs sin contexto.
+- [x] No quedan archivos temporales, `print()`/`dbg!` de debug ni TODOs sin
+      contexto.

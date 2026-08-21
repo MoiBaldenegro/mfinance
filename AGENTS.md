@@ -47,7 +47,7 @@ Procedimiento completo en `docs/verification.md`.
 | `feature_list.json`          | Lista de tareas con estado (pending / in_progress / done / blocked) y criterios de aceptación | Siempre, al empezar |
 | `progress/current.md`        | Estado de la sesión actual                                | Siempre, al empezar |
 | `progress/history.md`        | Bitácora append-only de sesiones anteriores               | Si necesitas contexto histórico |
-| `docs/architecture.md`       | Qué significa "hacer un buen trabajo" en este proyecto    | Antes de implementar |
+| `docs/architecture.md`       | Qué significa "hacer un buen trabajo": arquitectura hexagonal front/back | Antes de implementar |
 | `docs/conventions.md`        | Reglas de estilo, nombres, estructura                     | Antes de escribir código |
 | `docs/verification.md`       | Cómo verificar que tu trabajo funciona                    | Antes de declarar una tarea como `done` |
 | `docs/dependencies.md`       | Registro de dependencias aprobadas por el humano (aprobación decisión exclusiva del humano) | Antes de necesitar una dependencia |
@@ -55,7 +55,8 @@ Procedimiento completo en `docs/verification.md`.
 | `.opencode/agents/` y `.claude/agents/` | Definiciones de subagentes (spec_author, leader, implementer, reviewer, explorer) en formato opencode y Claude Code | Si orquestas trabajo |
 | `scripts/check-format.mjs`   | Valida el formato de `feature_list.json` y `progress/`    | Invocado por `init.sh` |
 | `specs/`                     | Spec de requisitos por feature: `specs/<NN>_<name>/requirements.md` (EARS estricto) y `design.md` (solo si toca UI) | Antes de implementar y al revisar |
-| `src/`                       | Código de la aplicación (Astro)                           | Para implementar |
+| `src/`                       | Código frontend de la app (React 19 + TypeScript + Vite)  | Para implementar |
+| `src-tauri/`                 | Backend Rust de la app (Tauri 2): dominio, casos de uso, adapters y commands | Para implementar |
 | `tests/`                     | Tests automáticos (node:test, sin dependencias)           | Para verificar |
 
 ## 3. Reglas duras (no negociables)
@@ -113,53 +114,61 @@ agente la dispara por su cuenta.
 
 ## 7. Convenciones del proyecto (resumen de docs/architecture.md)
 
-- **Estilos separados de la UI.** Nunca `<style>` dentro de un `.astro`; el CSS
-  va en `src/styles/*.css` y el componente lo importa.
-- **Lógica separada de la UI.** El frontmatter de un `.astro` solo hace imports y
-  paso de datos. La lógica va en módulos `.ts` (`src/domain/`, utilidades).
-- **Tokens, no valores sueltos.** Colores, espaciados, radios y sombras solo desde
-  las custom properties de `src/styles/tokens.css`. Prohibido hardcodear.
-- **Datos vía repositorio.** Los componentes jamás leen JSON directamente: siempre
-  `src/domain/repositories` (que entregan entidades desde `src/data/*.json`).
-- **Máx. 100 líneas por archivo.** Si es extremadamente necesario superarlas, se
-  discute primero (estado `blocked`).
-- **Sin dependencias externas.** Si una feature requiere una dependencia, primero
-  se discute (estado `blocked`): ningún agente aprueba dependencias; la aprobación
-  es decisión exclusiva del humano tras discusión y se materializa en
-  `docs/dependencies.md` (validado por `scripts/validate-dependencies.mjs` vía
-  `scripts/check-format.mjs`).
-- **Estático por defecto.** Cero JavaScript de runtime salvo justificación.
-- **Un solo layout.** El chrome compartido vive solo en `src/layouts/Layout.astro`.
-- **Rutas explícitas.** Una página por archivo en `src/pages/`, una URL por página.
-- **Scripts del arnés en `scripts/`.** Se crean dentro de una feature con ruta `scripts/<slug>.mjs`, prefijo de verbo y Node stdlib; nunca se importan desde `src/`. Reglas en `docs/architecture.md` y `docs/conventions.md`.
+- **Arquitectura hexagonal en ambos lados.** Las dependencias apuntan siempre
+  hacia el dominio. Frontend: entidades/puertos/use-cases en `src/domain/`,
+  adapters en `src/adapters/`, UI en `src/components/`. Backend Rust:
+  `domain/`, `application/`, `infrastructure/`, `commands/` y composition root
+  en `lib.rs`.
+- **El dominio es puro.** Sin Tauri ni React dentro del dominio: los traits
+  Rust de `src-tauri/src/domain/` no dependen de `tauri` (testeables con
+  `cargo test` aislado) y `src/domain/` TS no importa de `@tauri-apps/api`.
+- **Puertos y adapters.** Los puertos los define el núcleo y los implementan
+  los adapters. El adapter Tauri IPC es el único sitio que usa `invoke()`;
+  los componentes jamás lo invocan directamente.
+- **Estilos separados de la UI.** Nunca CSS dentro de un `.tsx`; cada
+  componente importa su hoja desde `src/styles/`.
+- **Lógica separada de la UI.** Los `.tsx` renderizan y delegan; la lógica
+  vive en casos de uso (`src/domain/use-cases/`) y módulos TS.
+- **Tokens, no valores sueltos.** Colores, espaciados, radios y sombras solo
+  desde las custom properties de `src/styles/tokens.css`. Prohibido hardcodear.
+- **Datos vía puertos.** Los componentes jamás acceden a persistencia ni IPC
+  directamente: siempre puertos definidos por el núcleo e implementados por
+  adapters.
+- **Máx. 100 líneas por archivo.** Si es extremadamente necesario superarlas,
+  se discute primero (estado `blocked`).
+- **Sin dependencias externas sin aprobar.** Paquetes npm o crates nuevos se
+  discuten primero (estado `blocked`): ningún agente aprueba dependencias; la
+  aprobación es decisión exclusiva del humano tras discusión y se materializa
+  en `docs/dependencies.md` (validado por `scripts/validate-dependencies.mjs`
+  vía `scripts/check-format.mjs`).
+- **Scripts del arnés en `scripts/`.** Se crean dentro de una feature con ruta
+  `scripts/<slug>.mjs`, prefijo de verbo y Node stdlib; nunca se importan
+  desde `src/`. Reglas en `docs/architecture.md` y `docs/conventions.md`.
 
-## 8. Development (Astro)
-
-Cuando arranques el dev server, usa el modo background:
-
-```
-astro dev --background
-```
-
-Gestiona el servidor con `astro dev stop`, `astro dev status` y `astro dev logs`.
+## 8. Development (Tauri)
 
 Comandos del proyecto (`pnpm`):
 
 | Comando | Acción |
 |---------|--------|
 | `./init.sh` | Verifica entorno, formato y tests. Ejecutar SIEMPRE |
-| `pnpm dev` | Dev server en `localhost:4321` (usar `--background`) |
-| `pnpm build` | Build de producción en `./dist/` |
-| `pnpm preview` | Preview del build |
+| `pnpm dev` | Dev server de Vite en `localhost:1420` (puerto fijo) |
+| `pnpm tauri dev` | App de escritorio completa con hot reload |
+| `pnpm tauri build` | Build de producción de la app de escritorio |
 | `pnpm test` | Tests automáticos (node:test) |
+| `cargo check --manifest-path src-tauri/Cargo.toml` | Compila y valida el backend Rust |
+| `cargo test --manifest-path src-tauri/Cargo.toml` | Tests del backend (dominio aislado) |
 
-Documentación del framework: https://docs.astro.build
+Documentación del stack:
+
+- [Tauri — Develop](https://tauri.app/develop/)
+- [React](https://react.dev/learn)
+- [Vite](https://vite.dev/guide/)
+- [The Rust Book](https://doc.rust-lang.org/book/)
 
 Consulta estas guías antes de tareas relacionadas:
 
-- [Añadir páginas, rutas dinámicas o middleware](https://docs.astro.build/en/guides/routing/)
-- [Componentes Astro](https://docs.astro.build/en/basics/astro-components/)
-- [Componentes de frameworks (React, Vue, Svelte…)](https://docs.astro.build/en/guides/framework-components/)
-- [Añadir o gestionar contenido](https://docs.astro.build/en/guides/content-collections/)
-- [Añadir estilos o usar Tailwind](https://docs.astro.build/en/guides/styling/)
-- [Soporte multi-idioma](https://docs.astro.build/en/guides/internationalization/)
+- [Tauri: calling Rust from the frontend](https://tauri.app/develop/calling-rust/)
+- [Tauri: commands](https://tauri.app/develop/calling-rust/#commands)
+- [React: thinking in React](https://react.dev/learn/thinking-in-react)
+- [Vite: config del dev server](https://vite.dev/config/server-options.html)
