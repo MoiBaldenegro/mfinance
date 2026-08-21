@@ -1,0 +1,22 @@
+{
+  "project": "proyecto-ejemplo — sitio estático de muestra",
+  "description": "Plantilla de ejemplo del arnés: copia este archivo a feature_list.json y sustituye project, description, rules y features por los del proyecto real.",
+  "rules": {
+    "one_feature_at_a_time": true,
+    "require_tests_to_close": true,
+    "valid_status": ["pending", "in_progress", "done", "blocked"]
+  },
+  "features": [
+    {
+      "id": 1,
+      "name": "feature-ejemplo",
+      "title": "Feature de ejemplo para la plantilla",
+      "description": "Ejemplo de entrada del backlog: una feature describible en una frase, con criterios de aceptación verificables y un estado válido.",
+      "acceptance": [
+        "scripts/validate-feature-list.mjs valida esta plantilla sin errores",
+        "La plantilla contiene exactamente una feature de ejemplo"
+      ],
+      "status": "pending"
+    }
+  ]
+}
