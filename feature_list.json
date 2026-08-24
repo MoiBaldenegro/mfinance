@@ -628,6 +628,23 @@
         33
       ],
       "status": "done"
+    },
+    {
+      "id": 35,
+      "name": "fix-onboarding-status-wire-format",
+      "title": "Alinear el estado de onboarding que cruza IPC con el gate de arranque",
+      "description": "El backend serializa OnboardingStatus con la forma serde externa (\"Completed\" o {\"InProgress\":{\"current_step\":n}}), mientras el frontend y SnapshotProvider leen un objeto con discriminador nombre. Tras finalizar o saltar, el estado Completed se interpreta como no completado, el wizard se vuelve a montar en el paso 1 y AppShell nunca aparece. Alinear la forma JSON canónica, conservar lectura de perfiles con la forma anterior y cubrir el contrato real de carga/recarga. No requiere dependencias nuevas ni cambios visuales. Análisis completo en progress/research/fix-onboarding-status-wire-format.md.",
+      "acceptance": [
+        "Test cargo TDD verifica que NotStarted, InProgress con current_step y Completed se serializan como objetos con discriminador nombre y que el frontend puede leerlos con la forma de su entidad (REQ-35-01)",
+        "Test cargo TDD deserializa perfiles que conservan la representación serde externa anterior de los tres estados y mantiene sus valores sin pérdida (REQ-35-02)",
+        "Test de contrato del gate verifica que una respuesta de carga con onboarding_status { nombre: 'Completed' } clasifica SnapshotProvider como listo y permite renderizar AppShell, mientras NotStarted e InProgress conservan la rama onboarding (REQ-35-03)",
+        "Test de integración de finalización y salto verifica que, tras una respuesta correcta, se ejecuta una recarga del snapshot persistido y AppShell queda visible sin una nueva instancia del wizard en el paso 1 (REQ-35-04)",
+        "La suite TDD deja cubiertos los tres estados, compatibilidad legacy, finalización y salto; cargo test, pnpm test y ./init.sh terminan en verde sin dependencias nuevas (REQ-35-05)"
+      ],
+      "depends_on": [
+        29
+      ],
+      "status": "done"
     }
   ]
 }

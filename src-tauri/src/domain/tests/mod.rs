@@ -11,6 +11,7 @@ mod liability_tests;
 mod monthly_record_tests;
 mod monthly_assessment_tests;
 mod onboarding_goal_entry_tests;
+mod onboarding_status_wire_tests;
 mod perfil_tests;
 mod repository_tests;
 mod snapshot_tests;
