@@ -1,0 +1,38 @@
+/* REQ-13-01..07: estilos del estado de la cuenta (extraídos de cuenta-conciliada-card.css). */
+
+.cuenta-conciliada-card.conciliada {
+  border-color: var(--color-positive);
+}
+
+.cuenta-conciliada-card.descuadrada {
+  border-color: var(--color-negative);
+}
+
+.cuenta-conciliada-card__estado {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--espacio-1) var(--espacio-2);
+  border-radius: var(--radio-full);
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cuenta-conciliada-card__estado--conciliada {
+  background: var(--color-positive-bg);
+  color: var(--color-positive);
+}
+
+.cuenta-conciliada-card__estado--descuadrada {
+  background: var(--color-negative-bg);
+  color: var(--color-negative);
+}
+
+.cuenta-conciliada-card__campo--diferencia.negativa dd {
+  color: var(--color-negative);
+}
+
+.cuenta-conciliada-card__campo--diferencia.positiva dd {
+  color: var(--color-positive);
+}

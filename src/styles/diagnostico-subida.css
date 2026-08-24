@@ -1,0 +1,72 @@
+/* Hoja del panel de subida de la sección Diagnóstico (REQ-12-04).
+   Solo tokens dual de src/styles/tokens.css. */
+.diagnostico-subida {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.diagnostico-subida__campo {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.diagnostico-subida__etiqueta {
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.diagnostico-subida__input {
+  color: var(--color-text);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.diagnostico-subida__vacio {
+  margin: 0;
+}
+
+.diagnostico-subida__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.diagnostico-subida__item {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radio-md);
+  background: var(--color-primary-bg);
+  color: var(--color-text);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.diagnostico-subida__analizar {
+  justify-self: start;
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: var(--fuente-peso-semibold);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.diagnostico-subida__analizar:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.diagnostico-subida__analizar:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.diagnostico-subida__analizar:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

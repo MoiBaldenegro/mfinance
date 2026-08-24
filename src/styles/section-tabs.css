@@ -1,0 +1,53 @@
+/* Hoja de las pestañas horizontales scrollables (SectionTabs).
+   Refino F18 (REQ-18-02/03): estados hover/focus-visible/activo uniformes
+   con tokens, transición con token y jerarquía tipográfica del sistema. */
+.section-tabs__lista {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-6);
+  list-style: none;
+  overflow-x: auto;
+  background: var(--color-surface);
+  border-bottom: var(--space-1) solid var(--color-bg);
+}
+
+.section-tabs__item {
+  flex-shrink: 0;
+}
+
+.section-tabs__pestaña {
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-medium);
+  border: none;
+  border-radius: var(--radio-full);
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition:
+    background var(--transicion-rapida),
+    color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.section-tabs__pestaña:hover:not(.section-tabs__pestaña--activa) {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.section-tabs__pestaña:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.section-tabs__pestaña--activa,
+.section-tabs__pestaña--activa:hover {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.section-tabs__pestaña:active:not(.section-tabs__pestaña--activa) {
+  color: var(--color-primary);
+}

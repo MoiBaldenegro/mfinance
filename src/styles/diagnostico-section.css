@@ -1,0 +1,39 @@
+/* Hoja de la sección Diagnóstico (REQ-12-04, feature 12): layout general
+   del flujo subir → analizar → revisar → actualizar. Solo tokens dual. */
+.diagnostico-section {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.diagnostico-section__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-xl);
+}
+
+.diagnostico-section__ayuda {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-base);
+}
+
+.diagnostico-section__mes {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.diagnostico-section__mes-etiqueta {
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-medium);
+}
+
+.diagnostico-section__error {
+  width: 100%;
+  color: var(--color-negative);
+}

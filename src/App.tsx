@@ -1,51 +1,45 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { ErrorScreen } from "./components/error-screen/ErrorScreen";
+import { AppShell } from "./components/shell/AppShell";
+import { OnboardingWizard } from "./components/onboarding/OnboardingWizard";
+import {
+  SnapshotProvider,
+  useSnapshot,
+} from "./components/shell/SnapshotProvider";
+import "./styles/app.css";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
-
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
+/** Pantalla transitoria mientras llega el snapshot por IPC. */
+function PantallaCargando() {
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <div className="app__cargando">
+      <p>Cargando tus finanzas…</p>
+    </div>
   );
 }
 
-export default App;
+/** Conmuta entre cargando, error, onboarding y shell según el estado compartido. */
+function Contenido() {
+  const { estado, recargar, completarOnboarding } = useSnapshot();
+  if (estado.nombre === "cargando") return <PantallaCargando />;
+  if (estado.nombre === "error") {
+    return <ErrorScreen error={estado.error} reintentar={recargar} />;
+  }
+  if (estado.nombre === "onboarding") {
+    return (
+      <div className="app__pagina">
+        <OnboardingWizard
+          alCompletar={() => void completarOnboarding()}
+          alSaltar={() => void completarOnboarding()}
+        />
+      </div>
+    );
+  }
+  return <AppShell snapshot={estado.snapshot} />;
+}
+
+export default function App() {
+  return (
+    <SnapshotProvider>
+      <Contenido />
+    </SnapshotProvider>
+  );
+}

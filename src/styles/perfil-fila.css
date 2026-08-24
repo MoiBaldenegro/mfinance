@@ -1,0 +1,11 @@
+/* REQ-27-09: badge de onboarding en progreso de la lista de perfiles.
+   Complementa gestion-perfiles.css sin modificarla (regla dura
+   de ≤100 líneas en archivos creados o modificados). */
+.gestion-perfiles__badge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-medium);
+}

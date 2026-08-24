@@ -1,0 +1,5 @@
+/* Wrapper de tablas Balance (REQ-08-01/02): solo tokens. */
+.balance-table-section {
+  display: grid;
+  gap: var(--space-5);
+}

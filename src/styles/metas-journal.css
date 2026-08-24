@@ -1,0 +1,72 @@
+/* REQ-27-03: journal de metas — sección y lista de entradas.
+   Importada por MetasJournalSection.tsx; solo tokens de tokens.css. */
+.metas-journal {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--espacio-4);
+  background: var(--color-surface);
+}
+
+.metas-journal__titulo { font-weight: var(--fuente-peso-semibold); color: var(--color-text); }
+
+.metas-journal__ayuda,
+.metas-journal__descripcion {
+  margin: var(--espacio-2) 0;
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.metas-journal__accion {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--espacio-1) var(--espacio-3);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-xs);
+  cursor: pointer;
+  transition: color var(--transicion-rapida), border-color var(--transicion-rapida);
+}
+
+.metas-journal__accion:hover {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.metas-journal__accion--peligro:hover {
+  color: var(--color-negative);
+  border-color: var(--color-negative);
+}
+
+.metas-journal__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espacio-3);
+}
+
+.metas-journal__entrada {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--espacio-3);
+  background: var(--color-surface);
+}
+
+.metas-journal__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.metas-journal__titulo-meta {
+  margin-right: auto;
+  color: var(--color-text-primary);
+  font-weight: var(--fuente-peso-medium);
+}
+
+.metas-journal__tags {
+  margin: var(--espacio-2) 0 0;
+  color: var(--color-primary);
+  font-size: var(--fuente-tamano-xs);
+}

@@ -1,0 +1,91 @@
+/* Sección Indicadores: 4 tarjetas con semáforo (REQ-10-06). Refino F18:
+   escala tipográfica y forma exclusivamente con tokens del sistema. */
+.indicadores-section {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.indicadores-section__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-text);
+}
+
+.indicadores-section__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+@media (max-width: 480px) {
+  .indicadores-section__grid { grid-template-columns: 1fr; }
+}
+
+.indicador-tarjeta {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radio-lg);
+  border: 1px solid var(--color-border);
+}
+
+.indicador-tarjeta__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.indicador-tarjeta__nombre {
+  margin: 0;
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-medium);
+  color: var(--color-text);
+}
+
+/* Punto de semáforo: círculo perfecto con el radio pleno del sistema. */
+.indicador-tarjeta__punto {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radio-full);
+  flex-shrink: 0;
+}
+
+.indicador-tarjeta__punto--verde { background: var(--color-positive); }
+.indicador-tarjeta__punto--amarillo { background: var(--color-warn); }
+.indicador-tarjeta__punto--rojo { background: var(--color-negative); }
+.indicador-tarjeta__punto--gris { background: var(--color-muted); }
+
+.indicador-tarjeta__valor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.indicador-tarjeta__numero {
+  font-size: var(--fuente-tamano-xl);
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-text);
+}
+
+.indicador-tarjeta__clasificacion {
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-semibold);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.indicador-tarjeta--sin-datos { opacity: 0.7; }
+.indicador-tarjeta--sin-datos .indicador-tarjeta__nombre { color: var(--color-muted); }
+
+.indicador-tarjeta__sin-datos {
+  margin: 0;
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-muted);
+}

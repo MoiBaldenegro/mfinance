@@ -1,0 +1,37 @@
+/* Elemento de consejo (REQ-16-04/06): compartido por el paso Assessment
+   del wizard y el panel independiente de Consejos. Variantes semáforo. */
+.consejo {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  border-left: var(--space-2) solid var(--color-positive);
+}
+
+.consejo__titulo {
+  font-size: var(--fuente-tamano-base);
+}
+
+.consejo__texto {
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.consejo--positivo {
+  border-left-color: var(--color-positive);
+}
+
+.consejo--aviso {
+  border-left-color: var(--color-warn);
+  background: var(--color-warning-bg);
+}
+
+.consejo--negativo {
+  border-left-color: var(--color-negative);
+  background: var(--color-negative-bg);
+}
+
+.consejo--negativo .consejo__titulo {
+  color: var(--color-negative);
+}

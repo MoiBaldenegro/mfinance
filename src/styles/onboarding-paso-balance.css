@@ -1,0 +1,31 @@
+/* REQ-25-10: Estilos padre OnboardingPasoBalance - solo tokens.css (≤100 líneas) */
+.onboarding-paso-balance {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.onboarding-paso-balance__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  color: var(--color-text);
+}
+
+.onboarding-paso-balance__ayuda {
+  margin: 0;
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-muted);
+}
+
+.onboarding-paso-balance__vacio-global {
+  padding: var(--space-4);
+  text-align: center;
+  background: var(--color-primary-bg);
+  border: var(--space-1) dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-muted);
+}
+
+.onboarding-paso-balance__vacio-global p {
+  margin: 0;
+  font-size: var(--fuente-tamano-sm);
+}

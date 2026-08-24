@@ -1,0 +1,79 @@
+/*
+ * Formulario del simulador: rejilla compacta de campos, botón primario
+ * y mensajes de error de validación (REQ-15-05). Solo tokens.
+ */
+
+.simulador-formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+  margin-top: var(--space-4);
+}
+
+.simulador-campo label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text-secondary);
+}
+
+.simulador-campo input {
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  background: var(--color-surface);
+  color: var(--color-text);
+  transition:
+    border-color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.simulador-campo input:focus-visible,
+.simulador-campo input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--anillo-foco);
+}
+
+.simulador-boton {
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-family: var(--font-sans);
+  font-weight: var(--fuente-peso-semibold);
+  cursor: pointer;
+  transition:
+    background var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.simulador-boton:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.simulador-boton:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.simulador-boton:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.simulador-boton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.simulador-error {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-negative-bg);
+  color: var(--color-negative);
+}

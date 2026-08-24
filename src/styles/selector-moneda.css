@@ -1,0 +1,41 @@
+/* Hoja del selector de moneda de Ajustes (REQ-20-01): grupo segmentado
+   con las tres divisas del catálogo, solo tokens del sistema dual. */
+.selector-moneda {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radio-md);
+}
+
+.selector-moneda__opcion {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-semibold);
+  border: none;
+  border-radius: var(--radio-md);
+  cursor: pointer;
+  transition:
+    background var(--transicion-rapida),
+    color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.selector-moneda__opcion:hover:not(.selector-moneda__opcion--activa) {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.selector-moneda__opcion:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.selector-moneda__opcion--activa {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}

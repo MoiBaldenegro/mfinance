@@ -1,0 +1,23 @@
+/* Hoja de App: pantallas transitorias (carga inicial) y contenedor. */
+.app__cargando {
+  display: grid;
+  place-content: center;
+  gap: var(--space-4);
+  min-height: 100vh;
+  padding: var(--space-6);
+}
+
+.app__cargando p {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* Feature 34 (REQ-34-03): contenedor de página para pantallas montadas
+   standalone (p. ej. el wizard) con padding y scroll propios. */
+.app__pagina {
+  box-sizing: border-box;
+  min-height: 100vh;
+  min-width: 0;
+  padding: var(--space-6) var(--space-4);
+  overflow-y: auto;
+}

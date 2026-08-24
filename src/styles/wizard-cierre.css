@@ -1,0 +1,90 @@
+/* Hoja del wizard de cierre (REQ-16): barra de progreso, tarjetas por
+   paso y navegación atrás/continuar. Refino F18: receta interactiva
+   común en los botones y referencia a la hoja compartida de estados
+   vacíos/carga (REQ-18-04). */
+@import './estados-comunes.css';
+
+.cierre-wizard {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.cierre-wizard__progreso {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.cierre-wizard__barra {
+  width: 100%;
+  height: var(--space-3);
+  accent-color: var(--color-primary);
+}
+
+.cierre-wizard__pasos {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-muted);
+}
+
+.cierre-wizard__paso--activo {
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-text);
+}
+
+/* Navegación y acciones con la receta interactiva común (REQ-18-02). */
+.cierre-wizard__navegacion button,
+.paso-confirmacion__boton,
+.mes-cerrado__boton {
+  padding: var(--space-3) var(--space-6);
+  font: inherit;
+  font-weight: var(--fuente-peso-semibold);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    background var(--transicion-rapida),
+    box-shadow var(--transicion-rapida),
+    opacity var(--transicion-rapida);
+}
+
+.cierre-wizard__navegacion button:hover:not(:disabled),
+.paso-confirmacion__boton:hover:not(:disabled),
+.mes-cerrado__boton:hover:not(:disabled) {
+  background: var(--color-border);
+}
+
+.cierre-wizard__navegacion button:focus-visible,
+.paso-confirmacion__boton:focus-visible,
+.mes-cerrado__boton:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.cierre-wizard__navegacion button:active:not(:disabled),
+.paso-confirmacion__boton:active:not(:disabled),
+.mes-cerrado__boton:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.cierre-wizard__navegacion button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Doble clase para ganar especificidad al botón genérico de navegación. */
+.cierre-wizard__navegacion .cierre-wizard__continuar {
+  margin-left: auto;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.cierre-wizard__navegacion .cierre-wizard__continuar:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}

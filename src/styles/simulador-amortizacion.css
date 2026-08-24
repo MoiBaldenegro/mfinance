@@ -1,0 +1,40 @@
+/*
+ * Acordeón de la tabla de amortización (REQ-15-06): colapsado por
+ * defecto con scroll horizontal para meses largos.
+ */
+
+.simulador-amortizacion {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.simulador-amortizacion summary {
+  padding: var(--space-3);
+  cursor: pointer;
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-primary);
+}
+
+.simulador-amortizacion__scroll {
+  overflow-x: auto;
+  padding: var(--space-3);
+}
+
+.simulador-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fuente-tamano-sm);
+}
+
+.simulador-tabla th,
+.simulador-tabla td {
+  padding: var(--space-2);
+  text-align: right;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.simulador-tabla th {
+  color: var(--color-text-secondary);
+  font-weight: var(--fuente-peso-semibold);
+}

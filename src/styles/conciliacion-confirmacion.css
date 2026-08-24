@@ -1,0 +1,17 @@
+/* REQ-13-01..07: estilos de confirmación de conciliación completa (extraídos de conciliacion-section.css). */
+
+.conciliacion-section__confirmacion {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-4);
+  background: var(--color-positive-bg);
+  border: 1px solid var(--color-positive);
+  border-radius: var(--radio-lg);
+  color: var(--color-positive);
+  font-weight: var(--fuente-peso-medium);
+}
+
+.conciliacion-section__icono {
+  font-size: var(--fuente-tamano-xl);
+}

@@ -1,0 +1,53 @@
+/* REQ-13-01..07: estilos de la lista de movimientos (extraídos de conciliacion-section.css). */
+
+.conciliacion-section__lista-movimientos {
+  list-style: none;
+  padding: 0;
+  margin: var(--espacio-2) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.conciliacion-section__sin-movimientos {
+  color: var(--color-text-secondary);
+  font-style: italic;
+  text-align: center;
+  padding: var(--espacio-3);
+}
+
+.conciliacion-section__movimiento {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: var(--espacio-3);
+  padding: var(--espacio-2);
+  background: var(--color-bg);
+  border-radius: var(--radio-md);
+  font-size: var(--fuente-tamano-sm);
+  align-items: center;
+}
+
+.conciliacion-section__mov-fecha {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.conciliacion-section__mov-concepto {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conciliacion-section__mov-importe {
+  font-weight: var(--fuente-peso-semibold);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.conciliacion-section__mov-importe.positivo {
+  color: var(--color-positive);
+}
+
+.conciliacion-section__mov-importe.negativo {
+  color: var(--color-negative);
+}

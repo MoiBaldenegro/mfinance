@@ -1,0 +1,15 @@
+/* Hoja del contenedor de la gráfica de proyección PyG (REQ-14-03/07):
+   solo tokens de tokens.css; mismo patrón que grafica-pyg.css. */
+.grafica-proyeccion {
+  position: relative;
+  height: calc(var(--space-8) * 4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+}
+
+.grafica-proyeccion canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

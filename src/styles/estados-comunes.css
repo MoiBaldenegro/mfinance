@@ -1,0 +1,26 @@
+/*
+ * Patrón común de estados vacíos y de carga (REQ-18-04, design.md F18):
+ * panel centrado con superficie hundida, borde suave y texto secundario.
+ * La hoja la referencian registro-section.css, pyg-section.css,
+ * balance-section.css e inversiones-section.css (@import) y las vistas
+ * componen estado-vacio o estado-carga junto a su clase propia.
+ */
+.estado-vacio,
+.estado-carga {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  padding: var(--space-6);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-base);
+  text-align: center;
+}
+
+/* La carga se distingue con borde discontinuo; nada más cambia. */
+.estado-carga {
+  border-style: dashed;
+}

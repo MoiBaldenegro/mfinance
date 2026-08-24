@@ -1,0 +1,95 @@
+/* Hoja de la tabla revisable del diagnóstico (REQ-12-10/11).
+   Solo tokens dual de src/styles/tokens.css. */
+.diagnostico-tabla { display: grid; gap: var(--space-3); }
+
+.diagnostico-tabla__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.diagnostico-tabla__tabla th {
+  text-align: left;
+  padding: var(--space-3);
+  background: var(--color-surface-hover);
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-xs);
+}
+
+.diagnostico-tabla__tabla td {
+  padding: var(--space-2) var(--space-3);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.diagnostico-tabla__fila--confirmada td { background: var(--color-positive-bg); }
+.diagnostico-tabla__fila--descartada td {
+  color: var(--color-muted);
+  text-decoration: line-through;
+}
+
+.diagnostico-tabla__campo {
+  width: 100%;
+  padding: var(--space-2);
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.diagnostico-tabla__campo--ancho { min-width: var(--space-8); }
+.diagnostico-tabla__campo--importe { max-width: var(--space-7); }
+
+.diagnostico-tabla__acciones { white-space: nowrap; }
+
+.diagnostico-tabla__boton {
+  padding: var(--space-1) var(--space-3);
+  margin-right: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-full);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.diagnostico-tabla__boton:hover:not(:disabled) { background: var(--color-surface-hover); }
+.diagnostico-tabla__boton:focus-visible { outline: none; box-shadow: var(--anillo-foco); }
+.diagnostico-tabla__boton:disabled { opacity: 0.55; cursor: not-allowed; }
+.diagnostico-tabla__boton--ok:not(:disabled) {
+  background: var(--color-primary-bg);
+  color: var(--color-primary-hover);
+}
+.diagnostico-tabla__boton--mal { color: var(--color-negative); }
+
+.diagnostico-tabla__pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.diagnostico-tabla__conteo {
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.diagnostico-tabla__confirmar-todo {
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: var(--fuente-peso-semibold);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.diagnostico-tabla__confirmar-todo:hover:not(:disabled) { background: var(--color-primary-hover); }
+.diagnostico-tabla__confirmar-todo:focus-visible { outline: none; box-shadow: var(--anillo-foco); }
+.diagnostico-tabla__confirmar-todo:disabled { opacity: 0.55; cursor: not-allowed; }

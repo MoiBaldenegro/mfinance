@@ -1,0 +1,70 @@
+/* REQ-27-04: formulario del journal — campos, contadores y botones.
+   Importada por FormularioMeta.tsx; solo tokens de tokens.css. */
+.metas-journal__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  margin-bottom: var(--espacio-4);
+}
+
+.metas-journal__etiqueta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.metas-journal__requerido { color: var(--color-negative); }
+
+.metas-journal__input,
+.metas-journal__textarea {
+  padding: var(--espacio-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: var(--fuente-tamano-base);
+  transition: border-color var(--transicion-rapida);
+}
+
+.metas-journal__input:focus-visible,
+.metas-journal__textarea:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+  border-color: var(--color-primary);
+}
+
+.metas-journal__contador {
+  align-self: flex-end;
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-xs);
+}
+
+.metas-journal__error { margin: 0; color: var(--color-negative); font-size: var(--fuente-tamano-xs); }
+
+.metas-journal__acciones {
+  display: flex;
+  gap: var(--espacio-3);
+  margin-top: var(--espacio-2);
+}
+
+.metas-journal__anadir {
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--espacio-2) var(--espacio-4);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-weight: var(--fuente-peso-semibold);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.metas-journal__anadir:hover:not(:disabled) { background: var(--color-primary-hover); }
+.metas-journal__anadir:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.metas-journal__anadir:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}

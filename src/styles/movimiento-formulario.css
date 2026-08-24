@@ -1,0 +1,89 @@
+/* REQ-13-01..07: estilos del formulario de movimiento. */
+
+.movimiento-formulario {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-3);
+  padding: var(--espacio-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+}
+
+.movimiento-formulario__input {
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.movimiento-formulario__input:focus-visible,
+.movimiento-formulario__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--anillo-foco);
+}
+
+.movimiento-formulario__acciones {
+  display: flex;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-1);
+}
+
+.movimiento-formulario__btn-guardar,
+.movimiento-formulario__btn-cancelar {
+  padding: var(--espacio-1) var(--espacio-3);
+  border-radius: var(--radio-md);
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-medium);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.movimiento-formulario__btn-guardar {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border: none;
+}
+
+.movimiento-formulario__btn-guardar:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.movimiento-formulario__btn-guardar:focus-visible,
+.movimiento-formulario__btn-cancelar:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.movimiento-formulario__btn-guardar:active:not(:disabled),
+.movimiento-formulario__btn-cancelar:active:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.movimiento-formulario__btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.movimiento-formulario__btn-cancelar {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.movimiento-formulario__btn-cancelar:hover {
+  background: var(--color-surface-hover);
+}
+
+.movimiento-formulario__error {
+  margin: 0;
+  padding: var(--espacio-1) var(--espacio-2);
+  color: var(--color-negative);
+  background: var(--color-negative-bg);
+  border-radius: var(--radio-md);
+  font-size: var(--fuente-tamano-sm);
+}

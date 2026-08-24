@@ -1,0 +1,75 @@
+/* REQ-26-11: Estilos DeudaSection - solo tokens.css (≤100 líneas) */
+.deuda-section {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.deuda-section__subtitulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-md);
+  color: var(--color-text);
+}
+
+.deuda-section__radios {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.deuda-section__radio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  padding: var(--space-2);
+  background: var(--color-primary-bg);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transicion-rapida);
+}
+
+.deuda-section__radio:hover {
+  border-color: var(--color-primary);
+}
+
+.deuda-section__radio input[type="radio"] {
+  accent-color: var(--color-primary);
+}
+
+.deuda-section__grupo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.deuda-section__label {
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.deuda-section__input {
+  flex: 1;
+  max-width: 200px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.deuda-section__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--anillo-foco);
+}
+
+.deuda-section__sufijo {
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}

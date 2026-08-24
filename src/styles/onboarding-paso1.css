@@ -1,0 +1,146 @@
+/* REQ-24-12: estilos solo con tokens.css */
+.onboarding-paso1 {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.onboarding-paso1__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  color: var(--color-text);
+}
+
+.onboarding-paso1__campo {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.onboarding-paso1__etiqueta {
+  font-size: var(--fuente-tamano-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.onboarding-paso1__requerido {
+  color: var(--color-negative);
+}
+
+.onboarding-paso1__input,
+.onboarding-paso1__select {
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.onboarding-paso1__input:disabled,
+.onboarding-paso1__select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.onboarding-paso1__grupo {
+  display: grid;
+  gap: var(--space-2);
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.onboarding-paso1__legend {
+  font-size: var(--fuente-tamano-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.onboarding-paso1__ayuda {
+  margin: 0;
+  font-size: var(--fuente-tamano-xs);
+  color: var(--color-muted);
+}
+
+.onboarding-paso1__checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-2);
+}
+
+.onboarding-paso1__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.onboarding-paso1__checkbox-label input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
+.onboarding-paso1__error {
+  margin: 0;
+  font-size: var(--fuente-tamano-xs);
+  color: var(--color-negative);
+}
+
+.onboarding-paso1__saltar {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-primary-bg);
+  border-radius: var(--radius-md);
+  border: var(--space-1) solid var(--color-border);
+}
+
+.onboarding-paso1__btn-saltar {
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  color: var(--color-primary);
+  background: transparent;
+  border: var(--space-1) solid var(--color-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transicion-rapida), color var(--transicion-rapida);
+}
+
+.onboarding-paso1__btn-saltar:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.onboarding-paso1__btn-saltar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.onboarding-paso1__saltar-ayuda {
+  margin: 0;
+  font-size: var(--fuente-tamano-xs);
+  color: var(--color-muted);
+}
+
+.onboarding-paso1__validez {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.onboarding-paso1__validez--ok {
+  background: var(--color-positive-bg);
+  color: var(--color-positive);
+  border: var(--space-1) solid var(--color-positive);
+}
+
+.onboarding-paso1__validez-falta {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: var(--space-1) solid var(--color-warning);
+}

@@ -1,0 +1,89 @@
+/* REQ-26-11: Estilos ProyeccionSection - solo tokens.css (≤100 líneas) */
+.proyeccion-section {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.proyeccion-section__subtitulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-md);
+  color: var(--color-text);
+}
+
+.proyeccion-section__ayuda {
+  margin: 0;
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-muted);
+}
+
+.proyeccion-section__tabla-wrap {
+  overflow-x: auto;
+}
+
+.proyeccion-section__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fuente-tamano-sm);
+}
+
+.proyeccion-section__tabla th,
+.proyeccion-section__tabla td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: var(--space-1) solid var(--color-border);
+}
+
+.proyeccion-section__tabla th {
+  background: var(--color-surface);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.proyeccion-section__input {
+  width: 100%;
+  max-width: 120px;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.proyeccion-section__input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--anillo-foco);
+}
+
+.proyeccion-section__btn-restablecer {
+  justify-self: start;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--fuente-tamano-sm);
+  font-weight: 500;
+  color: var(--color-primary);
+  background: transparent;
+  border: var(--space-1) solid var(--color-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transicion-rapida), color var(--transicion-rapida);
+}
+
+.proyeccion-section__btn-restablecer:hover {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.proyeccion-section__btn-restablecer:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.proyeccion-section__btn-restablecer:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

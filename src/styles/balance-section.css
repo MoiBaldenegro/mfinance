@@ -1,0 +1,36 @@
+/* Sección Balance (REQ-08): solo tokens. Refino F18: jerarquía
+   tipográfica, panel de error con semáforo y referencia a la hoja
+   compartida de estados vacíos/carga (REQ-18-04); sus clases se
+   componen con __cargando y --vacia desde el componente. */
+@import './estados-comunes.css';
+
+.balance-section {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.balance-section__titulo {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fuente-tamano-xl);
+}
+
+.balance-section__cargando,
+.balance-section__resumen {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* Error operativo con la receta de aviso del sistema (semáforo rojo). */
+.balance-section__error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-error-bg);
+  color: var(--color-negative);
+  border-radius: var(--radio-lg);
+}

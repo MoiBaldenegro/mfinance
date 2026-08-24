@@ -1,0 +1,56 @@
+/* Lista de deudas con objetivo destacado. Refino F18: transición y
+   espaciados con tokens; badge y textos en la escala tipográfica. */
+.deuda-section__lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.deuda-section__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: var(--space-1) solid transparent;
+  transition: border-color var(--transicion-normal), background var(--transicion-normal);
+}
+
+.deuda-section__item--objetivo {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg));
+}
+
+.deuda-section__item-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.deuda-section__item-nombre {
+  font-weight: var(--fuente-peso-semibold);
+  font-size: var(--fuente-tamano-base);
+  color: var(--color-text);
+}
+
+.deuda-section__badge {
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-semibold);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-radius: var(--radio-full);
+  text-transform: uppercase;
+}
+
+.deuda-section__item-detalles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-muted);
+}

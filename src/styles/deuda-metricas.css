@@ -1,0 +1,28 @@
+/* Métricas resumen del plan. */
+.deuda-section__metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.deuda-section__metrica {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.deuda-section__metrica-label {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.deuda-section__metrica-valor {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}

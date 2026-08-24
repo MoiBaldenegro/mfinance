@@ -1,0 +1,73 @@
+/* REQ-13-07: estilos del histórico mensual (extraídos de conciliacion-section.css). */
+
+.conciliacion-section__historico {
+  margin-top: var(--espacio-4);
+  padding: var(--espacio-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-lg);
+}
+
+.conciliacion-section__historico-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--espacio-3);
+}
+
+.conciliacion-section__historico-header h3 {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+}
+
+.conciliacion-section__btn-cerrar {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-xl);
+  cursor: pointer;
+  border-radius: var(--radio-full);
+  transition: background var(--transicion-rapida);
+}
+
+.conciliacion-section__btn-cerrar:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+.conciliacion-section__historico-meses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2);
+}
+
+.conciliacion-section__historico-mes {
+  padding: var(--espacio-1) var(--espacio-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-full);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+  cursor: pointer;
+  transition: all var(--transicion-rapida);
+}
+
+.conciliacion-section__historico-mes:hover {
+  border-color: var(--color-primary);
+}
+
+.conciliacion-section__historico-mes.actual {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  border-color: var(--color-primary);
+}
+
+.conciliacion-section__historico-ok {
+  margin-left: var(--espacio-1);
+  color: var(--color-positive);
+}

@@ -1,0 +1,35 @@
+/* Hoja de estilos del resumen de proyección. */
+
+.inversiones-resumen {
+  margin-top: var(--space-4);
+}
+
+.inversiones-resumen h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.inversiones-resumen__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.inversiones-resumen__tabla th,
+.inversiones-resumen__tabla td {
+  padding: var(--space-2) var(--space-3);
+  text-align: right;
+  border-bottom: var(--space-1) solid var(--color-bg);
+}
+
+.inversiones-resumen__tabla th:first-child,
+.inversiones-resumen__tabla td:first-child {
+  text-align: left;
+}
+
+.inversiones-resumen__tabla th {
+  font-weight: 600;
+  color: var(--color-muted);
+  background: var(--color-surface);
+}

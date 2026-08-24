@@ -1,0 +1,35 @@
+/* Hoja de las tarjetas Ingresos|Gastos (REQ-06-05): solo tokens.
+   Superficie sin borde: la delimita shadow-card (convención F5);
+   el divisor usa banda --space-1/--color-bg (técnica section-tabs). */
+.tarjeta-montos {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.tarjeta-montos__titulo {
+  padding: 0 var(--space-2);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.tarjeta-montos__subtotal {
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: var(--space-1) solid var(--color-bg); /* técnica section-tabs */
+  text-align: right;
+  color: var(--color-text);
+}
+
+.tarjeta-montos__subtotal--ingreso strong {
+  color: var(--color-positive);
+}
+
+.tarjeta-montos__subtotal--gasto strong {
+  color: var(--color-negative);
+}

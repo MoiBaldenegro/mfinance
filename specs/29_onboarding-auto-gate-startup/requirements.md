@@ -1,0 +1,8 @@
+REQ-29-01 El sistema SHALL exponer el onboarding_status del perfil activo al cargar el snapshot inicial extendiendo la respuesta de load_state o mediante command dedicado obtener_perfil_activo_con_onboarding
+REQ-29-02 CUANDO la carga del snapshot es exitosa ENTONCES el SnapshotProvider SHALL leer el onboarding_status del perfil activo y decidir renderizar OnboardingWizard si NotStarted o InProgress o AppShell si Completed
+REQ-29-03 CUANDO el onboarding_status del perfil activo es NotStarted o InProgress AL arrancar ENTONCES el OnboardingWizard SHALL renderizarse a pantalla completa reemplazando AppShell con los datos iniciales del perfil
+REQ-29-04 CUANDO el usuario completa el onboarding Y el comando completar_onboarding o saltar_onboarding responde OK ENTONCES el SnapshotProvider SHALL recargar el snapshot y transicionar a AppShell
+REQ-29-05 CUANDO el perfil activo tiene onboarding_status Completed AL arrancar ENTONCES la app SHALL mostrar AppShell directamente sin pasar por el wizard
+REQ-29-06 El OnboardingWizard renderizado por el gate de arranque SHALL usar los mismos puertos casos de uso y props que el wizard de Ajustes reutilizando useOnboarding y OnboardingWizard component
+REQ-29-07 SI el comando load_state falla ENTONCES el SnapshotProvider SHALL mostrar ErrorScreen como hoy el gate de onboarding solo aplica tras carga exitosa
+REQ-29-08 Los tests node:test TDD SHALL cubrir arranque con perfil NotStarted wizard renderizado arranque con perfil Completed AppShell renderizado completar wizard transicion a AppShell con snapshot recargado

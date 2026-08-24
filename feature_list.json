@@ -4,7 +4,12 @@
   "rules": {
     "one_feature_at_a_time": true,
     "require_tests_to_close": true,
-    "valid_status": ["pending", "in_progress", "done", "blocked"]
+    "valid_status": [
+      "pending",
+      "in_progress",
+      "done",
+      "blocked"
+    ]
   },
   "features": [
     {
@@ -28,13 +33,599 @@
       "name": "harness-tooling-tauri",
       "title": "Adaptar la herramienta del arnés (init.sh, validadores, registro de dependencias) al stack Tauri",
       "description": "Ajuste de la herramienta ejecutable para que ./init.sh sea verde y significativo en un proyecto Tauri: script test en package.json, checks de toolchain Rust, validador de dependencias extendido a Cargo.toml y registro real de dependencias vigentes.",
-      "depends_on": [1],
+      "depends_on": [
+        1
+      ],
       "acceptance": [
         "package.json declara \"test\": \"node --test\" (descubrimiento bare de la suite, verificado en Node v22.22.2 de este entorno) y pnpm test ejecuta la suite node:test en verde",
         "./init.sh comprueba rustc y cargo instalados antes del build",
         "scripts/validate-dependencies.mjs valida también los crates de src-tauri/Cargo.toml (dependencies + build-dependencies + dev-dependencies) contra docs/dependencies.md sin dependencias externas nuevas",
         "docs/dependencies.md se reescribe con las dependencias REALES vigentes (react, react-dom, @tauri-apps/api, @tauri-apps/plugin-opener, @types/react, @types/react-dom, @vitejs/plugin-react, typescript, vite, @tauri-apps/cli + crates tauri, tauri-plugin-opener, tauri-build, serde, serde_json) y el validador pasa; nota explícita de que son las del scaffold oficial Tauri traídas por el humano, sujetas a su veto",
         "./init.sh termina en verde completo (formato + tests + build)"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 3,
+      "name": "domain-core-backend",
+      "title": "Dominio Rust puro con entidades puertos y errores del modelo financiero",
+      "description": "Base de todo el producto: entidades del dominio financiero, trait-puerto de repositorio y errores nombrados en src-tauri/src/domain y application sin dependencia de tauri, testeables con cargo test.",
+      "depends_on": [],
+      "acceptance": [
+        "cargo test --manifest-path src-tauri/Cargo.toml pasa en verde con tests de dominio para MonthlyRecord Asset Liability Investment AccountStatement FinanceSnapshot y errores nombrados",
+        "grep -ri tauri sobre src-tauri/src/domain/ y src-tauri/src/application/ devuelve 0 coincidencias",
+        "El catálogo de fuentes de ingreso (salario freelance arriendos otros) y categorías de gasto (vivienda alimentacion transporte cuotas_deuda ocio otros) coincide con el requerimiento y un valor fuera de catálogo produce error nombrado verificado por test",
+        "Un Asset un Liability o un Investment con valor negativo produce error nombrado verificado por test",
+        "El trait SnapshotRepository declara load save export e import sobre FinanceSnapshot",
+        "Ningún archivo bajo src-tauri/src/domain/ supera las 100 líneas (wc -l)"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 4,
+      "name": "persistencia-json",
+      "title": "Persistencia JSON en Documents/mfinance con export/import y seed realista",
+      "description": "Adapter infrastructure JSON que materializa el puerto SnapshotRepository en Documents/mfinance/, commands finos load/save/export/import, composition root en lib.rs y seed de datos de ejemplo realistas cuando no hay datos guardados.",
+      "depends_on": [
+        3
+      ],
+      "acceptance": [
+        "Al primer arranque sin datos guardados se genera y persiste el seed de 12 meses coherente en Documents/mfinance/ resuelto con el directorio Document del sistema operativo sin ruta hardcodeada",
+        "save_state persiste los cambios y load_state los recupera idénticos tras reiniciar la app",
+        "export_json escribe una copia válida del JSON vigente en la ruta elegida e import_json de ese archivo restaura el mismo snapshot",
+        "IF el archivo importado es corrupto o no cumple el esquema THEN import_json devuelve error nombrado sin alterar los datos vigentes",
+        "lib.rs construye adapter inyecta dependencias y registra load_state save_state export_json e import_json con handlers que delegan en application/ sin lógica ni acceso directo al filesystem",
+        "Tests de round-trip serde con directorio temporal en verde sin tocar Documents real; ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 5,
+      "name": "shell-frontend",
+      "title": "Shell frontend hexagonal con navegación tokens y carga IPC al arrancar",
+      "description": "Esqueleto navegable de la app: tipos/puertos TS espejo en src/domain/, único adapter Tauri IPC con invoke(), casos de uso front, App con secciones placeholder en español, tokens.css base y carga del snapshot al arrancar.",
+      "depends_on": [
+        3,
+        4
+      ],
+      "acceptance": [
+        "src/domain contiene tipos TS espejo de las entidades backend y puertos propios sin importar react ni @tauri-apps/api (grep 0 coincidencias)",
+        "invoke() aparece únicamente bajo src/adapters/",
+        "Al arrancar la app carga el snapshot vía IPC y muestra datos; la navegación entre Registro PyG Balance Deuda Inversiones Indicadores Conciliación Cierre Diagnóstico y Ajustes funciona mostrando placeholders con rótulos en español",
+        "src/styles/tokens.css define custom properties de color espaciado radio sombra tipografía y ningún componente hardcodea valores (scripts/audit-design-tokens.mjs verde)",
+        "./init.sh termina verde completo incluyendo pnpm build y cargo check/test"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 6,
+      "name": "registro-mensual",
+      "title": "Registro mensual de ingresos por fuente y gastos por categoría",
+      "description": "Módulo 1 del requerimiento: formulario por mes YYYY-MM para capturar ingresos netos por fuente y gastos por categoría con validación totales y persistencia vía puertos.",
+      "depends_on": [
+        5
+      ],
+      "acceptance": [
+        "El selector de mes navega anterior/siguiente y abre a ceros los meses sin registro previo",
+        "El formulario edita ingresos por fuente (salario freelance arriendos otros) y gastos por categoría (vivienda alimentacion transporte cuotas_deuda ocio otros) en euros",
+        "Guardar persiste el MonthlyRecord vía IPC y tras recargar o reiniciar los valores persisten exactos",
+        "IF el usuario introduce importe negativo o no numérico THEN el guardado se bloquea con mensaje en español junto al campo afectado",
+        "Los totales de ingresos y gastos recalculan en vivo al editar cualquier importe",
+        "WHILE hay guardado en curso el botón confirmar permanece deshabilitado; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 7,
+      "name": "pyg-automatico",
+      "title": "P&G automático con tabla gráfica mensual y línea de ahorro acumulado",
+      "description": "Módulo 2: serie mensual ingresos/gastos/utilidad calculada en backend y renderizada como tabla más gráfica Chart.js con línea de ahorro acumulado; incluye alta aprobada de chart.js en docs/dependencies.md.",
+      "depends_on": [
+        5,
+        6
+      ],
+      "acceptance": [
+        "docs/dependencies.md registra chart.js con versión exacta scope dependencies fecha aprobada y motivo pedido explícito del humano y scripts/validate-dependencies.mjs pasa con el paquete instalado",
+        "La tabla muestra la serie mensual ordenada con columnas mes ingresos gastos utilidad ahorro acumulado en formato es-ES euros",
+        "La gráfica Chart.js dibuja barras de ingresos contra gastos por mes con línea superpuesta de ahorro acumulado",
+        "cargo test verifica utilidad = ingresos - gastos por mes y acumulado = suma corrida desde el primer mes",
+        "Editar un mes en Registro y volver a P&G refresca tabla y gráfica con la nueva serie",
+        "IF no hay registros THEN la sección muestra mensaje en español invitando al primer registro en lugar de gráfica vacía; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 8,
+      "name": "balance-general",
+      "title": "Balance general con activos pasivos patrimonio y evolución graficada",
+      "description": "Módulo 3: CRUD de activos (valor actual) y pasivos (saldo y tasa), patrimonio automático calculado en backend y evolución mensual graficada con Chart.js.",
+      "depends_on": [
+        5,
+        7
+      ],
+      "acceptance": [
+        "La UI permite crear editar y eliminar activos con nombre categoría liquido/inversion/propiedad y valor actual",
+        "La UI permite crear editar y eliminar pasivos con nombre saldo pendiente y tasa de interés anual",
+        "cargo test verifica patrimonio = suma activos - suma pasivos devolviendo ambos totales",
+        "La gráfica Chart.js muestra la evolución mensual del patrimonio a partir del histórico guardado",
+        "IF se guarda valor o saldo negativo THEN la app lo rechaza con mensaje en español sin persistir",
+        "Confirmar cambios refresca tarjetas y gráfica; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 9,
+      "name": "plan-deuda",
+      "title": "Plan de deuda avalancha/bola de nieve con proyección e intereses ahorrados",
+      "description": "Módulo 4: ordenar deudas por tasa (avalancha) o saldo (bola de nieve) en backend, indicar la primera a atacar según estrategia elegida y proyectar meses hasta liquidar con pago extra mostrando intereses ahorrados.",
+      "depends_on": [
+        5,
+        7
+      ],
+      "acceptance": [
+        "cargo test verifica que avalancha ordena por tasa descendente y bola de nieve por saldo ascendente sobre fixture de tres o más deudas",
+        "La proyección simula pagos mínimos más extra mensual hasta liquidar todas las deudas devolviendo meses hasta libertad total pagado e intereses verificados contra caso conocido",
+        "Intereses ahorrados = intereses del plan sin extra menos intereses del plan con extra verificado por test",
+        "La UI destaca la deuda objetivo según la estrategia elegida y la preferencia persiste en Settings del snapshot",
+        "El pago extra mensual es editable y cambiarlo recalcula proyección métricas y mini-gráfica de saldo restante",
+        "Métricas en formato es-ES euros; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 10,
+      "name": "indicadores-semaforo",
+      "title": "Indicadores clave con semáforo verde amarillo rojo y umbrales exactos",
+      "description": "Módulo 5: cálculo en backend de endeudamiento tasa de ahorro fondo de emergencia e ingreso pasivo con umbrales exactos del requerimiento y tarjetas de semáforo en frontend.",
+      "depends_on": [
+        5,
+        8
+      ],
+      "acceptance": [
+        "cargo test cubre los cuatro indicadores con casos verde amarillo rojo y fronteras exactas: endeudamiento <15% verde >30% rojo; ahorro >15% verde <5% rojo; fondo >=3m verde <1 rojo; ingreso pasivo >=100% verde >=25% amarillo",
+        "La sección muestra cuatro tarjetas con nombre valor calculado y punto de color según clasificación del backend",
+        "IF falta dato necesario para un indicador como ingresos cero THEN la tarjeta correspondiente SHALL mostrar estado sin datos en gris con explicación breve en español",
+        "Los umbrales viven como constantes de dominio testeables y no hardcodeadas en componentes",
+        "Cambiar registros balances o inversiones recalcula indicadores al recargar manteniendo consistencia con lo persistido; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 11,
+      "name": "inversiones-proyeccion",
+      "title": "Inversiones por familia con proyección compuesta a 5 10 y 20 años",
+      "description": "Fusiona módulos 6 y 11: aportes mensuales y valor actual por familia (renta fija renta variable finca raíz) con tasa esperada editable y valor futuro compuesto calculado en backend.",
+      "depends_on": [
+        5,
+        7
+      ],
+      "acceptance": [
+        "La tabla lista renta_fija renta_variable y finca_raiz con aporte mensual valor actual y tasa esperada editables y persiste los cambios",
+        "cargo test verifica interés compuesto a 5 10 y 20 años sobre valor actual más aportes mensuales capitalizados contra casos conocidos",
+        "Editar la tasa esperada recalcula las cifras al confirmar y la gráfica Chart.js compara valor futuro total por familia",
+        "IF la tasa es negativa o mayor al 30% anual THEN se rechaza con mensaje en español",
+        "Los valores proyectados se muestran en euros sin decimales y la suma de aportes coincide con el total invertido del mes; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 12,
+      "name": "diagnostico-pdf",
+      "title": "Diagnóstico por PDFs con análisis revisable e incorporación de movimientos",
+      "description": "Extra 7 BLOQUEADA: la librería de parseo PDF no está aprobada (candidatos a evaluar: crates pdf-extract o lopdf en Rust vs pdfjs-dist en npm); incluye subir PDFs por mes botón analizar tabla revisable journey end-to-end probado y gate de aprobación humana de la dependencia concreta.",
+      "depends_on": [
+        4,
+        5
+      ],
+      "acceptance": [
+        "docs/dependencies.md registra la librería PDF aprobada por el humano tras evaluar pdf-extract lopdf y pdfjs-dist documentando costo licencia y cobertura; mientras no exista esa entrada la feature permanece blocked",
+        "Subir uno o varios PDFs los almacena en Documents/mfinance/comprobantes/<YYYY-MM>/ conservando el nombre original asociados al mes seleccionado",
+        "Pulsar analizar procesa los PDFs del mes extrayendo fecha comercio e importe presentándolos en tabla revisable donde se confirma edita o descarta cada movimiento",
+        "Confirmar incorpora los movimientos aceptados al MonthlyRecord del mes correspondiente persistiendo el snapshot actualizado",
+        "IF un PDF está corrupto o ilegible THEN el análisis informa el archivo concreto sin abortar el resto del lote",
+        "El journey subir→analizar→verificar datos→actualizar herramienta queda cubierto por prueba automatizada end-to-end antes de cerrar"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 13,
+      "name": "conciliacion-cuentas",
+      "title": "Conciliación de cuentas hasta cuadrar el saldo final",
+      "description": "Extra 8: estados de cuenta con saldo inicial movimientos y saldo teórico calculado en backend marcando conciliada o descuadrada con diferencia exacta y ajuste de cuadre.",
+      "depends_on": [
+        5
+      ],
+      "acceptance": [
+        "cargo test verifica saldo teórico = saldo inicial + suma algebraica de movimientos por cuenta",
+        "La sección marca cada cuenta conciliada cuando el saldo real coincide con el teórico y descuadrada mostrando la diferencia exacta en euros con campo de ajuste",
+        "Registrar movimiento con fecha importe y concepto recalcula el teórico al confirmar y persiste el snapshot",
+        "WHEN todas las cuentas quedan conciliadas THEN se muestra confirmación en español y el estado queda persistido",
+        "El histórico mensual de estados es consultable sin mezclar saldos entre meses; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 14,
+      "name": "pyg-proyeccion-supuestos",
+      "title": "Proyección PyG 12 meses y balance futuro según supuestos editables",
+      "description": "Extra 9: proyección a 12 meses de PyG y balance modificable mediante supuestos porcentuales por variable reutilizando el motor de P&G y distinguiendo histórico real de proyectado.",
+      "depends_on": [
+        7,
+        8
+      ],
+      "acceptance": [
+        "cargo test verifica la proyección de 12 meses aplicando variaciones porcentuales mensuales editables sobre ingresos y cada categoría de gasto partiendo del histórico real",
+        "El balance futuro proyecta patrimonio mes a mes con amortización de pasivos según pagos actuales verificado por test",
+        "Editar un supuesto y confirmar refresca tablas y gráficas con la serie recalculada",
+        "Los meses históricos y proyectados son distinguibles visualmente en tabla y gráfica",
+        "IF no hay al menos un mes histórico THEN la vista muestra mensaje en español pidiendo registrar el primer mes",
+        "Restablecer supuestos vuelve todo a cero variación mostrando continuación plana; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 15,
+      "name": "simulador-creditos",
+      "title": "Simulador de créditos con escenarios optimizables por estrategia",
+      "description": "Extra 10: laboratorio sandbox que calcula cuota intereses y amortización de créditos hipotéticos comparando escenario base contra optimizado con extras y estrategia reutilizando el motor del plan de deuda.",
+      "depends_on": [
+        9
+      ],
+      "acceptance": [
+        "cargo test verifica cuota mensual total de intereses y tabla de amortización contra caso conocido a partir de importe plazo y tasa",
+        "Pagos extra mensuales o extraordinarios reducen plazo e intereses verificado por test",
+        "Aplicar avalancha o bola de nieve sobre varios créditos simulados reutiliza el motor de plan-deuda devolviendo orden de ataque e intereses por escenario",
+        "La UI compara base vs optimizado mostrando meses ahorrados e intereses ahorrados en euros con badge sandbox visible",
+        "IF plazo cero o tasa negativa THEN el formulario rechaza el cálculo con mensaje en español",
+        "Ninguna simulación altera pasivos reales del balance salvo decisión explícita de guardar; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 16,
+      "name": "cierre-mensual-assessment",
+      "title": "Cierre mensual guiado con assessment de reglas y consejos continuos",
+      "description": "Fusiona extras 12 y 13: wizard de ~10 min con evolución de flujo patrimonio y presupuesto del mes siguiente más assessment basado en reglas del semáforo y consejos continuos en español.",
+      "depends_on": [
+        6,
+        10
+      ],
+      "acceptance": [
+        "El wizard guía pasos repaso flujo/patrimonio presupuesto siguiente assessment y confirmación con barra de progreso y navegación atrás/continuar",
+        "El presupuesto del mes siguiente se pre-rellena con el promedio móvil de los últimos tres meses registrados editable por categoría",
+        "Completar el wizard marca el mes cerrado y persiste el assessment con fecha indicadores y decisiones consultable de meses anteriores",
+        "Las reglas del assessment evaluadas en backend generan recomendaciones accionables en español encabezadas por riesgos rojos prioritarios",
+        "La sección Consejos muestra recomendaciones vigentes recalculadas cuando cambian los datos cargados",
+        "WHILE un mes está cerrado su MonthlyRecord es solo lectura hasta reabrirlo explícitamente; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 17,
+      "name": "tema-oscuro-tokens",
+      "title": "Sistema de tokens dual con modo oscuro por defecto conmutación y persistencia",
+      "description": "Primera fase de la sesión de estilos pedida por el humano mientras la 12 permanece blocked: tokens.css pasa a definir dos paletas con los MISMOS nombres de token (oscura como valores por defecto en :root y clara bajo [data-theme='claro']), data-theme se fija en <html> antes del primer render, el conmutador vive en la sección Ajustes y la preferencia persiste vía puerto propio e adapter localStorage (sin tocar StrategySettings ni el snapshot ni commands). Incluye corregir GraficaProyeccion.tsx que hoy pasa literales var(--chart-*) que el canvas de Chart.js no resuelve, y redibujar gráficas al cambiar de tema. Sin dependencias nuevas.",
+      "acceptance": [
+        "wc -l sobre src/styles/tokens.css no supera 100 líneas y el archivo define la paleta oscura como valores por defecto en :root más la clara bajo [data-theme='claro'] con el mismo conjunto de nombres de token verificado por test de estructura",
+        "Al arrancar sin preferencia la app abre en modo oscuro con data-theme='oscuro' fijado en <html> antes del primer render sin destello de tema claro",
+        "Test node:test escrito antes del código verifica resolver-tema: sin preferencia o valor corrupto devuelve oscuro; con 'claro' u 'oscuro' almacenados respeta la elección",
+        "El conmutador en Ajustes alterna oscuro↔claro al instante en toda la interfaz y la elección persiste tras cerrar y reabrir la app vía puerto TemaPort en src/domain/ports e adapter bajo src/adapters; grep confirma 0 usos de window.localStorage bajo src/components",
+        "WHEN cambia el tema THEN las gráficas visibles se redibujan con la paleta activa sin recargar; grep confirma que GraficaProyeccion.tsx ya no contiene literales 'var(--chart' y consume colores resueltos de src/lib/chart-colores.ts",
+        "node scripts/audit-design-tokens.mjs termina en OK y grep -riE de hex rgb y rgba sobre src/components devuelve 0 coincidencias (ningún color hardcodeado)",
+        "La suite pnpm test pasa completa incluidos los tests frontend-hexagono con nombres de token intactos y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 18,
+      "name": "refino-visual-secciones",
+      "title": "Pasada de refinamiento visual de las secciones sobre el sistema de tema",
+      "description": "Segunda fase de la sesión de estilos: elevar el atractivo visual de Registro PyG Balance Deuda Inversiones Indicadores Conciliación Cierre Diagnóstico Ajustes y la shell usando exclusivamente el sistema de tokens dual de la feature 17: jerarquía tipográfica ritmo de espaciado elevación por tema estados hover/focus-visible/activo uniformes patrón común de estados vacíos y transiciones con tokens. Solo cosmética: ninguna lógica de use-cases puertos adapters ni backend cambia. Sin dependencias nuevas.",
+      "depends_on": [
+        17
+      ],
+      "acceptance": [
+        "pnpm test pasa íntegra sin modificar tests funcionales y las diez secciones conservan navegación datos y persistencia idénticos (los .tsx solo ajustan clases o estilos importados)",
+        "Toda hoja creada o editada usa solo custom properties de tokens.css: node scripts/audit-design-tokens.mjs termina en OK y grep dirigido no encuentra colores radios sombras espaciados ni tamaños tipográficos sueltos en las hojas tocadas",
+        "Los controles interactivos definen :hover :focus-visible y estado activo con tokens; grep confirma :focus-visible presente en section-tabs.css header-bar.css y las hojas de formulario principales",
+        "Los estados vacíos y de carga comparten patrón visual común con tokens referenciado al menos por Registro PyG Balance e Inversiones (clase u hoja compartida verificable por grep)",
+        "Ningún archivo creado o modificado supera las 100 líneas según wc -l y ningún .tsx incorpora CSS embebido (tests frontend-hexagono en verde)",
+        "El test de estructura comprueba que ambos temas definen el mismo conjunto de nombres de token y ./init.sh termina verde completo"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 19,
+      "name": "modelo-moneda-nucleo",
+      "title": "Modelo de moneda MXN/USD/EUR en snapshot con MXN por defecto y núcleo de formateo determinista",
+      "description": "Base del ciclo de configuración de entrada (análisis en progress/research/config-monedas-perfiles.md): hoy TODO el formato está hardcodeado a euros es-ES. Esta feature crea el MODELO sin tocar UI: campo currency en StrategySettings dentro de FinanceSnapshot (serde default MXN, así el mfinance.json existente migra solo y cada futuro perfil heredará su moneda sin repintar), enum espejo en el frontend y un núcleo puro determinista de formateo multi-moneda (sin Intl ni ICU ni dependencias nuevas) con tests TDD. Cambiar de moneda re-etiqueta la visualización; no convierte importes (sin tasas externas). La UI sigue mostrando euros hasta la feature 20.",
+      "depends_on": [],
+      "acceptance": [
+        "TDD rojo→verde: test cargo escrito antes del código verifica que StrategySettings::default() lleva currency MXN y que deserializar un snapshot antiguo sin campo currency lo completa a MXN sin alterar el resto (REQ-19-01 y REQ-19-02)",
+        "cargo test verifica round-trip serde de currency MXN USD y EUR sobre FinanceSnapshot y grep -ri tauri sobre src-tauri/src/domain devuelve 0 coincidencias (REQ-19-01 y REQ-19-03)",
+        "Test node:test escrito antes del código verifica formatoMoneda determinista: 1576000.5 produce $1,576,000.50 en MXN y USD y 1.576.000,50 € en EUR; negativos con signo inicial -$… y -1…€; variante sin decimales para inversiones (REQ-19-04)",
+        "IF-test: una moneda fuera del catálogo lanza el error nombrado definido bajo src/domain/errors verificado por test sin devolver cadena (REQ-19-05)",
+        "src/domain/entities/moneda.ts define el tipo Moneda y su catálogo espejo del enum Rust (símbolo separadores posición) y strategy-settings.ts añade currency con AJUSTES_POR_DEFECTO en MXN; grep confirma 0 imports de react o @tauri-apps/api bajo src/domain (REQ-19-03)",
+        "Ningún archivo creado o modificado supera las 100 líneas según wc -l y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 20,
+      "name": "moneda-ui-ajustes",
+      "title": "Selector de moneda en Ajustes y migración de todo el formateo es-ES € al núcleo multi-moneda",
+      "description": "Hace usable la moneda de la feature 19: selector Pesos mexicanos/Dólares/Euros en la sección Ajustes que persiste en strategy.currency vía save_state, propagación única de la moneda activa desde el snapshot (patrón estado-tema/use-tema) y migración de TODOS los puntos hardcodeados al núcleo: formatoEuros de resumenes-flujo.ts (convergencia de media UI), formatearEuros de conciliacion-logic.ts e inversiones-proyeccion.ts, literal de GraficaProyeccion.tsx, sufijo € de CampoImporte y cabeceras (€) de tablas y formularios. Re-etiquetado de visualización sin conversión de importes. Análisis y tabla exacta de puntos en progress/research/config-monedas-perfiles.md §2.",
+      "depends_on": [
+        19
+      ],
+      "acceptance": [
+        "TDD rojo→verde: tests node escritos antes verifican que los formateadores migrados (resúmenes PyG Balance Deuda Conciliación Inversiones Simulador Cierre Registro) producen cadenas según la moneda recibida en casos MXN y EUR (REQ-20-03)",
+        "grep -rn es-ES sobre src/domain/use-cases devuelve 0 coincidencias y grep -rn € sobre src/components devuelve 0 coincidencias: símbolo y separadores provienen solo del catálogo de monedas (REQ-20-04)",
+        "El selector de Ajustes lista las tres monedas etiquetadas en español marca la activa y al cambiar reformatea al instante todas las secciones visibles; la elección persiste tras cerrar y reabrir la app quedando en strategy.currency vía save_state (REQ-20-01 y REQ-20-02)",
+        "Al abrir un snapshot antiguo sin campo currency la app muestra pesos mexicanos por defecto sin errores (REQ-20-06)",
+        "CampoImporte muestra como sufijo el símbolo de la moneda activa y las cabeceras con euro fijo pasan al símbolo activo (REQ-20-05)",
+        "Los estilos nuevos usan solo tokens de tokens.css (audit-design-tokens OK) ningún archivo supera 100 líneas y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 21,
+      "name": "perfiles-modelo-almacenamiento",
+      "title": "Modelo de perfiles con aislamiento de datos por perfil en Documents/mfinance",
+      "description": "Responde a necesitar saber de quién es la información (capa backend, sin UI): entidad Perfil (id nombre creado_en), registro profiles.json con indicador de perfil activo, un snapshot completo por perfil en perfiles/<id>/mfinance.json y comprobantes bajo comprobantes/<id>/; commands listar_perfiles crear_perfil seleccionar_perfil; load_state save_state export_json import_json operan sobre el PERFIL ACTIVO sin cambiar firma; migración automática ÚNICA del mfinance.json legado al primer perfil con backup renombrado y seed inicial cuando no existen perfiles. Ids generados con Rust stdlib (sin crate uuid). Layout y decisiones en progress/research/config-monedas-perfiles.md §5.",
+      "depends_on": [
+        19
+      ],
+      "acceptance": [
+        "TDD rojo→verde: tests cargo escritos antes verifican crear dos perfiles alternar el activo y que cada uno carga y guarda SU snapshot aislado en directorio temporal sin cruzar datos (REQ-21-02 y REQ-21-03)",
+        "Test de migración única con directorios temporales: el legado mfinance.json queda en perfiles/<id>/mfinance.json del primer perfil con copia de seguridad renombrada y un segundo arranque no repite la operación (REQ-21-04)",
+        "Test: sin ningún perfil el arranque crea el inicial sembrado con el seed vigente igual que el guard actual de ensure_seed (REQ-21-05)",
+        "Tests: nombre vacío o duplicado y profiles.json corrupto producen errores nombrados sin alterar datos e ids únicos verificados (REQ-21-06)",
+        "Test: la ruta de comprobantes incluye el id del perfil activo verificada con directorio temporal (REQ-21-07)",
+        "cargo test verde aislado grep -ri tauri sobre src-tauri/src/domain devuelve 0 lib.rs registra listar_perfiles crear_perfil seleccionar_perfil con handlers finos sin filesystem directo y ./init.sh termina verde (REQ-21-08)"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 22,
+      "name": "perfiles-ui-selector",
+      "title": "Selector y gestión de perfiles en la interfaz con indicador permanente del titular",
+      "description": "Hace visibles los perfiles para saber siempre de quién son los datos: puerto PerfilPort en src/domain/ports + adapter IPC bajo src/adapters (único sitio con invoke), gestión en Ajustes (lista marcando el activo crear con nombre activar) e indicador permanente Perfil: <nombre> en la cabecera. Al activar otro perfil se recarga el snapshot vía el flujo existente y toda la app refresca con sus datos; la moneda mostrada es la del perfil activo heredando f19/f20 sin lógica extra. Sin borrado de perfiles en este ciclo (catálogo futuro en progress/research/config-monedas-perfiles.md §6.3).",
+      "depends_on": [
+        21
+      ],
+      "acceptance": [
+        "TDD rojo→verde: test node del caso de uso de cambio de perfil verifica que activar otro perfil dispara la recarga del snapshot y actualiza el titular visible en la cabecera (REQ-22-02 y REQ-22-03)",
+        "Puerto perfil-port.ts en src/domain/ports y adapter en src/adapters con invoke(); grep confirma que invoke aparece únicamente bajo src/adapters y 0 imports de react o @tauri-apps/api bajo src/domain (REQ-22-01)",
+        "En Ajustes se listan los perfiles marcando el activo y se crea uno nuevo por nombre; nombre vacío o ya existente muestra mensaje en español junto al campo sin crear nada verificado por test con puerto falso (REQ-22-04 y REQ-22-05)",
+        "La cabecera muestra el nombre del titular activo de forma permanente y cambia al seleccionar otro perfil (REQ-22-02)",
+        "Simular fallo de carga del snapshot produce error nombrado en español sin mezclar datos de otros perfiles (REQ-22-06)",
+        "La moneda mostrada tras cambiar de perfil es la del snapshot del perfil activo sin lógica adicional (REQ-22-07); los estilos usan solo tokens ningún archivo supera 100 líneas y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 23,
+      "name": "perfiles-onboarding-modelo",
+      "title": "Modelo backend extendido para onboarding: estado, datos parciales, journal de metas, perfil financiero",
+      "description": "Extiende la entidad Perfil (feature 21) con onboarding_status (NotStarted/InProgress/Completed), onboarding_data (datos parciales del wizard), goals_journal (entradas libres de metas: título, descripción, tags, fecha) y financial_profile (preferencias estructuradas: fuentes ingreso, categorías gasto, estrategia deuda, pago extra, familias inversión, tasas, umbrales indicadores). Incluye commands actualizar_perfil_onboarding, completar_onboarding, obtener_onboarding_status y migración de perfiles existentes (onboarding_status=Completed por defecto). Dominio puro sin tauri, testeable con cargo test.",
+      "acceptance": [
+        "cargo test verde: Perfil extendido con nuevos campos, serialización round-trip JSON, migración legacy → onboarding_status=Completed/goals_journal=[]/financial_profile=default",
+        "Tests TDD rojo→verde verifican: validación GoalEntry (título no vacío ≤100, descripción ≤5000, tags ≤5×20), error nombrado GoalEntryError si falla",
+        "Commands: actualizar_perfil_onboarding (datos parciales), completar_onboarding (consolida en StrategySettings/Investment/financial_profile + status=Completed), obtener_onboarding_status (devuelve paso actual)",
+        "grep -ri tauri sobre src-tauri/src/domain/ devuelve 0; ningun archivo domain supera 100 líneas (wc -l)",
+        "PerfilRepository actualizado persiste nuevos campos en profiles.json y snapshot por perfil; compatibilidad hacia atrás con defaults"
+      ],
+      "depends_on": [
+        21
+      ],
+      "status": "done"
+    },
+    {
+      "id": 24,
+      "name": "onboarding-wizard-shell-basicos",
+      "title": "Shell del wizard de onboarding + Paso 1: datos personales, moneda, fuentes ingreso, categorías gasto",
+      "description": "Frontend: puerto OnboardingPort + adapter IPC (único invoke), caso de uso gestionarOnboarding, componente OnboardingWizard (barra progreso 5 pasos, navegación atrás/siguiente, persistencia parcial automática debounce 500ms). Paso 1: nombre completo, selector moneda MXN/USD/EUR (reusa catálogo feature 19/20), fuentes de ingreso (checkboxes, mín 1 activa), categorías gasto (checkboxes, mín 1 activa), botón 'Saltar onboarding' crea perfil mínimo. Integración con Ajustes (feature 22): 'Crear perfil' lanza wizard; 'Reanudar' si status=InProgress. Tests TDD node:test para caso de uso y componente.",
+      "acceptance": [
+        "OnboardingPort en src/domain/ports/ y OnboardingAdapter en src/adapters/ con invoke(); grep invoke 0 en components/domain",
+        "OnboardingWizard renderiza 5 pasos, navegación controlada, barra progreso, botones Atrás/Siguiente/Finalizar/Saltar",
+        "Persistencia parcial: actualizarDatos llamado con debounce 500ms al modificar campo o cambiar paso permitiendo reanudar onboarding tras cerrar app",
+        "Paso 1 valida: nombre requerido, ≥1 fuente ingreso activa, ≥1 categoría gasto activa; bloquea Siguiente con mensaje en español",
+        "Botón 'Saltar' crea perfil (nombre + moneda MXN + onboarding=Completed) y navega a Registro",
+        "Ajustes: 'Crear perfil' abre wizard; perfil con InProgress muestra 'Reanudar onboarding' en step guardado",
+        "Tests node:test TDD: caso de uso con puerto falso, wizard render/validación/navegación, persistencia parcial",
+        "Estilos solo tokens.css (audit-design-tokens OK); ≤100 líneas/archivo; domain sin react/@tauri-apps/api"
+      ],
+      "depends_on": [
+        23,
+        20,
+        22
+      ],
+      "status": "done"
+    },
+    {
+      "id": 25,
+      "name": "onboarding-paso-balance",
+      "title": "Paso 2 del onboarding: Activos, Pasivos, Inversiones iniciales",
+      "description": "Componente OnboardingPasoBalance con tres secciones colapsables. Activos: CRUD (nombre, categoría líquido/inversión/propiedad, valor>0). Pasivos: CRUD (nombre, saldo>0, tasa 0-30%). Inversiones: 3 familias (renta_fija, renta_variable, finca_raiz) con aporte mensual, valor actual, tasa esperada 0-30%. Reusa lógica features 8 y 11 (patrimonio, validación tasas). Persistencia parcial en onboarding_data.balance. Formateo con núcleo multi-moneda. Sin datos obligatorios para avanzar. Tests TDD node:test.",
+      "acceptance": [
+        "Tres secciones renderizadas: Activos, Pasivos, Inversiones con CRUD inline/modal",
+        "Validación: valor>0 (activos/pasivos), tasa 0-30% (pasivos/inversiones); mensajes en español",
+        "Reutiliza casos de uso features 8/11 vía puertos (NO duplica lógica de patrimonio/tasas)",
+        "onboarding_data.balance actualizado con debounce 500ms; flush al cambiar paso",
+        "Formateo monetario usa formatoMoneda (moneda del perfil activo MXN/USD/EUR)",
+        "Botón Siguiente siempre habilitado (paso opcional); resumen vacío si sin datos",
+        "Tests node:test TDD: CRUD actualiza onboarding_data, validaciones, formateo, reutilización motores",
+        "Estilos tokens.css; ≤100 líneas; arquitectura hexagonal"
+      ],
+      "depends_on": [
+        24,
+        8,
+        11
+      ],
+      "status": "done"
+    },
+    {
+      "id": 26,
+      "name": "onboarding-paso-deuda-proyeccion",
+      "title": "Paso 3 del onboarding: Estrategia deuda, pago extra, supuestos proyección",
+      "description": "Componente OnboardingPasoDeudaProyeccion con dos secciones. Deuda: radio buttons Avalancha/Bola de nieve (default Avalancha), campo pago extra mensual ≥0. Proyección: tabla supuestos % por variable (fuentes ingreso paso 1, categorías gasto paso 1, revalorización activos, interés pasivos) rango -50% a +100%, default 0%; vista previa solo lectura PyG 12 meses + patrimonio 12 meses recalculada en vivo. Reusa motores features 9 (plan-deuda) y 14 (pyg-proyeccion-supuestos) vía puertos. Persistencia en onboarding_data.deuda y onboarding_data.proyeccion. Paso opcional. Tests TDD.",
+      "acceptance": [
+        "Sección Deuda: selector estrategia (radio), pago extra numérico ≥0 formateado moneda; persiste en onboarding_data.deuda",
+        "Sección Proyección: tabla editable supuestos % por variable (fuentes/categorías del paso 1 + balance), validación rango -50..+100%",
+        "Vista previa solo lectura: PyG 12 meses (ingresos/gastos/utilidad/ahorro acumulado) + patrimonio 12 meses; recalculo en vivo",
+        "Reutiliza motor plan-deuda (feature 9) para ordenar deudas y proyectar con pago extra; reutiliza motor proyección (feature 14) para PyG/balance 12 meses",
+        "Botón 'Restablecer a 0%' pone supuestos a 0 y refresca vista previa",
+        "Persistencia debounce 500ms en onboarding_data.deuda y onboarding_data.proyeccion",
+        "Tests node:test TDD: selector/campo actualizan onboarding_data, tabla supuestos recalcula vista previa, mocks verifican delegación a puertos deuda/proyección",
+        "Estilos tokens.css; ≤100 líneas; arquitectura hexagonal"
+      ],
+      "depends_on": [
+        25,
+        9,
+        14
+      ],
+      "status": "done"
+    },
+    {
+      "id": 27,
+      "name": "onboarding-paso-metas-completar",
+      "title": "Paso 4: Umbrales indicadores + Metas/Journal; Paso 5: Resumen, Finalizar, Integración completa",
+      "description": "Paso 4: IndicadoresUmbralesSection (4 indicadores, campos verde/rojo con validación cruzada) + MetasJournalSection (CRUD entradas: título req ≤100, descripción ≤5000, tags ≤5×20, persiste en goals_journal del perfil). Paso 5: OnboardingPasoResumen muestra todo capturado, botón 'Finalizar onboarding' llama completarOnboarding (consolida en StrategySettings, Investment.tasa_esperada, financial_profile, status=Completed). Integración Ajustes: 'Saltar' en paso 1, 'Reanudar' si InProgress, sub-sección 'Mis metas' post-onboarding para editar journal. Toast bienvenida. Tests TDD node:test.",
+      "acceptance": [
+        "Paso 4: 4 indicadores con umbrales verde/rojo editables; validación cruzada (verde>rojo endeudamiento/fondo, verde<rojo ahorro/ingreso_pasivo); botón 'Restaurar defectos'",
+        "Paso 4: MetasJournal CRUD completo; validación cliente coincidente con backend (REQ-23-11); persiste en goals_journal del perfil",
+        "Paso 5: Resumen renderiza todos los pasos con totales/checks; botón Finalizar llama completarOnboarding",
+        "completarOnboarding consolida: StrategySettings(currency, debt_strategy, extra_monthly_payment), Investment.tasa_esperada por familia, financial_profile, status=Completed",
+        "Post-onboarding: navega a Registro + toast '¡Bienvenido, <nombre>!'",
+        "Ajustes: 'Saltar' en paso 1 crea perfil mínimo; 'Reanudar' carga step+datos; sub-sección 'Mis metas' edita journal",
+        "Tests node:test TDD: completarOnboarding consolida correctamente, paso 4 validaciones/CRUD, paso 5 resumen, saltar/reanudar/metas post-onboarding",
+        "Estilos tokens.css; ≤100 líneas; arquitectura hexagonal; ./init.sh verde"
+      ],
+      "depends_on": [
+        26,
+        10,
+        22
+      ],
+      "status": "done"
+    },
+    {
+      "id": 28,
+      "name": "fix-arranque-perfil-activo",
+      "title": "Restaurar el perfil activo en cada arranque y autorecuperar registros inviables sin pérdida de datos",
+      "description": "Causa raíz verificada del ErrorScreen fatal en cada reinicio: cargar_registro (infrastructure/perfil_registry.rs) devuelve Some(registro) pero nunca restaura self.activo —solo guardar_registro lo fija— y preparar_arranque (application/arranque_perfiles.rs) hace early-return Ok(false) cuando profiles.json ya existe; tras cualquier reinicio el JsonSnapshotRepository recién construido en estado_inicial queda con activo None y todo load_state falla con «sin perfil activo: no hay snapshot que operar». La corrección restaura el activo al leer el registro (firma del puerto &self→&mut self o interior mutabilidad, decisión del implementador) y añade autorecuperación determinista en preparar_arranque para registros inviables: activa null, activo huérfano fuera del registro o sin snapshot en disco (elige el primer perfil con snapshot y persiste), cero perfiles (flujo frío vigente) y ningún snapshot legible (siembra solo el primero vía guard ensure_seed), sin borrar ni reescribir jamás los datos de otros perfiles. Incluye el test de reinicio contra el adapter real sobre directorio temporal que faltaba en REQ-21 (los dobles en memoria no modelan el campo activo). Queda FUERA el cosmético del mensaje triple-prefijado «no se pudo cargar el snapshot: ×3» (doble re-envoltura en el frontend: snapshot-errors.ts + load-snapshot.ts sobre el Display Rust): problema distinto, candidato a feature propia. Análisis completo en progress/research/fix-arranque-perfil-activo.md.",
+      "depends_on": [
+        21
+      ],
+      "acceptance": [
+        "TDD rojo→verde: test cargo escrito primero contra JsonSnapshotRepository real sobre directorio temporal CON profiles.json preexistente (activa apuntando al perfil con su snapshot en perfiles/<id>/mfinance.json simulando un reinicio) falla hoy con «sin perfil activo» y tras el arreglo preparar_arranque deja repo.activo() = Some(id) y load() devuelve exactamente ese snapshot (REQ-28-01/02/03)",
+        "Test cargo: cargar_registro restaura el activo en memoria del adapter y save/load resuelven perfiles/<id>/mfinance.json sin necesidad de guardar nada previamente (REQ-28-01)",
+        "Test cargo sobre directorio temporal: estado_inicial deja ComprobantesFsRepository operando bajo el id del activo restaurado en el repositorio (REQ-28-04)",
+        "Tests cargo con directorios temporales para los tres dead-ends: profiles.json con activa null; activo huérfano ausente del registro; activo cuyo snapshot falta en disco — cada caso autorecupera eligiendo el primer perfil registrado con snapshot existente y la elección queda persistida en profiles.json (REQ-28-05/06)",
+        "Tests cargo: registro sin ningún perfil reproduce el flujo frío (perfil inicial con adopción del legado pendiente o seed) y registro donde ningún perfil tiene snapshot siembra únicamente el primero aplicando el guard ensure_seed (REQ-28-07/08)",
+        "Test cargo: la autorecuperación conserva íntegros los snapshots y registros de los demás perfiles verificado comparando contenido en directorio temporal sin borrados ni reescrituras (REQ-28-09)",
+        "cargo test --manifest-path src-tauri/Cargo.toml verde completo, grep -ri tauri sobre src-tauri/src/domain devuelve 0 y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 29,
+      "name": "onboarding-auto-gate-startup",
+      "title": "Gate automático de onboarding al arrancar: mostrar wizard si perfil activo no completó onboarding",
+      "description": "El onboarding completo existe (features 23-27) pero no se dispara automáticamente en primera instalación. El usuario ve la app principal con datos de ejemplo (seed) en lugar de ser guiado por el wizard. Esta feature añade el gate de arranque: tras cargar el snapshot, leer onboarding_status del perfil activo y renderizar OnboardingWizard (pantalla completa) si NotStarted/InProgress, o AppShell si Completed. Incluye backend: exponer onboarding_status en carga inicial (nuevo command o extender load_state), y frontend: SnapshotProvider coordina con usarPerfiles para decisión condicional. Al completar wizard → recargar snapshot → transición a AppShell. Análisis en progress/research/onboarding-first-install.md (Gap 1 y 3).",
+      "depends_on": [
+        27,
+        28
+      ],
+      "acceptance": [
+        "Backend: nuevo command obtener_perfil_activo_con_onboarding (o extender load_state) devuelve { snapshot, onboarding_status } del perfil activo; cargo test verde con casos NotStarted/InProgress/Completed",
+        "Frontend: SnapshotProvider tras carga exitosa lee onboarding_status y decide render: OnboardingWizard full-screen si NotStarted/InProgress, AppShell si Completed",
+        "Test node:test TDD: arranque en directorio temporal SIN profiles.json → backend crea perfil Personal NotStarted → frontend muestra OnboardingWizard (no AppShell)",
+        "Test node:test TDD: arranque con perfil Completed → frontend muestra AppShell directamente",
+        "Test node:test TDD: completar wizard (Finalizar/Saltar) → recargar snapshot → AppShell visible con datos actualizados",
+        "Perfiles legacy (onboarding_status=Completed por migración feature 23) NO muestran wizard nunca",
+        "Botón 'Saltar' en paso 1 del gate de arranque funciona igual que en Ajustes (crea perfil mínimo + Completed)",
+        "Estilos solo tokens.css; ≤100 líneas/archivo; arquitectura hexagonal; ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 30,
+      "name": "onboarding-defer-seed-until-complete",
+      "title": "Diferir siembra de datos de ejemplo hasta completar onboarding",
+      "description": "Hoy arranque_frio y recuperar (R3) llaman a ensure_seed ANTES de que el usuario complete onboarding, sembrando 12 meses de datos de ejemplo que el usuario ve en primera instalación. Esta feature mueve la siembra al momento de completar_onboarding: arranque_frio crea perfil Personal NotStarted SIN snapshot en disco; completar_onboarding siembra example_snapshot() (o snapshot vacío mínimo, decisión REQ-30-05) una sola vez si no existe. Así el usuario post-onboarding ve sus datos reales (o vacío limpio), nunca datos ajenos. Análisis en progress/research/onboarding-first-install.md (Gap 2).",
+      "depends_on": [
+        23,
+        28
+      ],
+      "acceptance": [
+        "Test cargo TDD: arranke_frio en directorio temporal → perfil Personal creado, NO existe perfiles/<id>/mfinance.json (ni seed)",
+        "Test cargo TDD: completar_onboarding siembra snapshot si no existe (llama ensure_seed o lógica equivalente)",
+        "Test cargo TDD: completar_onboarding NO resiembra si snapshot ya existe (perfil migrado, o usuario hizo Saltar)",
+        "Test cargo TDD: reinicio posterior a completar onboarding → preparar_arranque → recuperar R1 → load_state carga snapshot sembrado correctamente",
+        "Migración legacy (perfiles pre-onboarding) mantiene onboarding_status=Completed y su snapshot intacto; recuperar R1 no toca seed",
+        "Decisión REQ-30-05 documentada en specs/30_onboarding-defer-seed-until-complete/design.md (seed real vs vacío mínimo)",
+        "cargo test --manifest-path src-tauri/Cargo.toml verde completo, grep -ri tauri sobre src-tauri/src/domain devuelve 0, ./init.sh verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 31,
+      "name": "fix-onboarding-status-perfilid",
+      "title": "Corregir las claves camelCase del adapter de onboarding que Tauri rechaza al arrancar",
+      "description": "Causa raíz verificada del error fatal reportado por el humano al arrancar («no se pudo cargar el estado del onboarding: ... missing required key perfilId», la app queda bloqueada en WizardErrorCarga): src/adapters/onboarding-adapter.ts envía claves snake_case (perfil_id en la línea 44 y también en 49 54 60 74 81; meta_id en 74 y 81) pero el macro #[tauri::command] de Tauri 2 aplica rename_all camelCase por defecto, de modo que obtener_onboarding_status actualizar_perfil_onboarding completar_onboarding agregar_meta actualizar_meta y eliminar_meta exigen perfilId/metaId y rechazan la llamada antes de entrar al handler. El bug existe desde las features 23/24 pero el gate de arranque de la feature 29 lo hizo visible al montar OnboardingWizard en la primera instalación (useOnboarding → cargarEstadoOnboarding → OnboardingAdapter.obtenerEstado). No se detectó porque los cargo tests nunca pasan por la deserialización de argumentos IPC y los node:test usan puertos falsos; además tests/onboarding-wizard/estructura-integracion-27.test.mjs fijaba la clave equivocada como correcta. Corrección elegida (opción A del informe; descartadas rename_all snake_case en backend y command sin argumento): cambiar a camelCase las claves del payload en el adapter (único archivo de producción), actualizar PRIMERO el test de estructura (TDD rojo) y añadir un test de contrato src/adapters↔commands para evitar regresiones de esta clase. El cosmético del doble prefijo del mensaje queda documentado y fuera de alcance (precedente feature 28). Análisis completo en progress/research/fix-onboarding-status-perfilid.md.",
+      "acceptance": [
+        "TDD rojo→verde: el test tests/onboarding-wizard/estructura-integracion-27.test.mjs (que hoy fija la clave snake_case perfil_id como correcta) se actualiza primero —o se añade un test node:test nuevo— para exigir que onboarding-adapter.ts envía las claves perfilId y metaId; el test falla en rojo contra el adapter vigente y pasa a verde tras el arreglo (REQ-31-01 y REQ-31-02)",
+        "Test de contrato nuevo (node:test, escrito antes del arreglo): verifica que las claves de cada invoke de src/adapters coinciden con los parámetros de los #[tauri::command] de src-tauri según la convención camelCase por defecto de Tauri; falla en rojo antes del fix y cubre los seis commands de onboarding y metas (REQ-31-05 y REQ-31-06)",
+        "grep de perfil_id y meta_id como claves de payload de invoke en src/adapters devuelve 0 coincidencias; los payloads de structs serde (p. ej. datos de OnboardingData con campos snake_case) permanecen intactos (REQ-31-01 y REQ-31-02)",
+        "Verificación del arranque: con perfil activo NotStarted o InProgress el wizard carga su estado sin error «missing required key perfilId» y el guardado parcial completar saltar y CRUD de metas pasan por el adapter con las claves corregidas (REQ-31-03 y REQ-31-04)",
+        "pnpm test verde completo sin tests funcionales rotos, cargo test verde sin cambios en backend y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 32,
+      "name": "fix-balance-crud-commands",
+      "title": "Restaurar los commands de CRUD de activos y pasivos perdidos en la migración a Tauri",
+      "description": "Hallazgo durante la investigación de la feature 31 (progress/research/fix-onboarding-status-perfilid.md §7): el CRUD de la sección Balance falla en runtime porque src/adapters/snapshot-ipc-adapter.ts invoca los commands asset_upsert asset_eliminar liability_upsert y liability_eliminar (REQ-08-01/02, consumidos por src/components/balance-section/use-balance.ts) que NO existen en el backend Tauri: snapshot_commands.rs solo registra load save export import y generate_handler de lib.rs no los lista. Los artefactos progress/impl_8.md y review_8.md confirman que estos commands existían en el proyecto Astro y se perdieron en la migración a Tauri. Consecuencia: cualquier alta edición o borrado de activo o pasivo en Balance falla con «command not found»; hoy queda enmascarado porque la app se bloquea antes en el gate de onboarding (feature 31). Corrección: reimplementar los cuatro commands finos delegando en application/ con las validaciones de dominio (valor/saldo negativos o tasa fuera de rango → error nombrado en español sin persistir) sobre el snapshot del perfil activo, registrarlos en lib.rs y verificar el cableado con el test de contrato de la feature 31.",
+      "acceptance": [
+        "TDD rojo→verde: tests cargo escritos primero ejercitan sobre directorio temporal los cuatro commands (upsert y borrado de activo y de pasivo) sobre el snapshot del perfil activo: persistencia round-trip, devolución del snapshot actualizado y borrado efectivo; fallan en rojo antes de implementar los commands (REQ-32-01 REQ-32-02 y REQ-32-03)",
+        "Tests cargo: valor de activo negativo o saldo/tasa de pasivo fuera de rango producen error nombrado en español sin persistir cambios (REQ-32-04)",
+        "Los commands quedan registrados en generate_handler de lib.rs y snapshot-ipc-adapter.ts los invoca con claves de cable según la convención camelCase por defecto de Tauri; el test de contrato de la feature 31 los cubre (REQ-32-05)",
+        "La sección Balance crea edita y elimina activos y pasivos con los cambios persistidos en el snapshot del perfil activo y visibles tras recarga (REQ-32-06)",
+        "cargo test y pnpm test verdes, grep -ri tauri sobre src-tauri/src/domain devuelve 0, ningún archivo nuevo supera las 100 líneas y ./init.sh termina verde"
+      ],
+      "status": "done"
+    },
+    {
+      "id": 33,
+      "name": "fix-onboarding-guardado-ocupacion",
+      "title": "Corregir la semántica de guardado del wizard que congela inputs y bloquea la navegación",
+      "description": "Causas raíz verificadas (progress/research/fix-wizard-onboarding-inputs.md): (1) use-onboarding.ts aplicar() activa setGuardando(true) de forma síncrona en CADA edición aunque el IPC real solo ocurre 500 ms tras la última tecla (el debounce de REQ-25-06 funciona bien); guardando se propaga como prop deshabilitado a TODOS los inputs del wizard (OnboardingWizard.tsx línea 86 → WizardContenido → OnboardingPaso1 línea 65), así que la primera pulsación deshabilita el campo nombre, le quita el foco y muestra el toast Guardando cambios hasta que expira el debounce más la latencia IPC: el lag por tecla reportado. (2) sig() hace setGuardando(true) y await flushGuardado(), pero flushGuardado es un no-op cuando no hay guardado pendiente (timeoutId null y flushPromise null, caso normal si el usuario esperó más de 500 ms antes de navegar); en ese caso nadie ejecuta guardarRef (único sitio con setGuardando(false)) y guardando queda true PARA SIEMPRE: todos los inputs del Paso 2 quedan disabled y los botones Atrás/Siguiente/Finalizar/Saltar también (disabled incluye guardando): el Paso 2 bloqueado sin poder avanzar. comp() y salt() tienen el mismo defecto latente. Corrección: extraer la semántica de ocupación a módulo puro nuevo src/domain/use-cases/onboarding/onboarding-ocupacion.ts (use-onboarding.ts ya tiene 100 líneas), editar no activa ocupación, ocupación true solo mientras el IPC de persistencia parcial está en vuelo, flush restablece ocupación siempre en finally incluso sin pendiente o con error, inputs del paso activo jamás deshabilitados por persistencia parcial (solo operaciones bloqueantes de navegación/completar/saltar durante su propio vuelo). Conservar crearLogicaGuardado y DEBOUNCE_MS=500. Análisis completo en progress/research/fix-wizard-onboarding-inputs.md.",
+      "acceptance": [
+        "TDD rojo→verde node:test sobre el módulo puro nuevo onboarding-ocupacion.ts: editar marca ocupación false, expirar el debounce activa exactamente un guardado con ocupación true solo en vuelo, y terminar el guardado restablece ocupación false (REQ-33-01 y REQ-33-02)",
+        "TDD rojo→verde node:test: flush sin guardado pendiente y flush con error restablecen ocupación false; con error se conservan los datos locales editados y el fallo queda registrado (REQ-33-04 y REQ-33-05)",
+        "Test estructural (node:test estilo estructura-integracion-27): aplicar/act1-act4 en use-onboarding.ts no invocan setGuardando(true); sig/comp/salt restablecen la ocupación en finally; la prop que llega a OnboardingPaso1 y OnboardingPasoBalance como deshabilitado NO deriva del estado de persistencia parcial (REQ-33-03 y REQ-33-04)",
+        "Test node:test de ráfaga: N ejecuciones del guardado con debounce dentro de la ventana producen exactamente una llamada a guardarFn y DEBOUNCE_MS permanece en 500 (REQ-33-06)",
+        "pnpm test verde completo, ningún archivo nuevo o modificado supera las 100 líneas y ./init.sh termina verde"
+      ],
+      "depends_on": [],
+      "status": "done"
+    },
+    {
+      "id": 34,
+      "name": "fix-paso2-details-glitch-layout",
+      "title": "Corregir el bucle de toggle de las secciones del Paso 2 y el desborde del wizard",
+      "description": "Causa raíz verificada (progress/research/fix-wizard-onboarding-inputs.md §CR-3, síntoma «la UI se desborda y glitchea con saltos infinitos»): las tres secciones del Paso 2 usan details controlado con open={abierto} más onToggle={() => setAbierto(!abierto)} (ActivosSection.tsx línea 36, PasivosSection.tsx línea 36, InversionesSection.tsx línea 40). React re-aplica open={estado} en cada render y con re-renders frecuentes el estado pelea con el toggle nativo del navegador produciendo bucles onToggle y secciones que saltan abierto/cerrado solas. Contribuyen: el toast Guardando cambios position fixed con animación slide-in aparece y desaparece en cada tecla (se estabiliza al corregir la feature 33), y .onboarding-wizard__pasos usa grid repeat(5, 1fr) con títulos white-space nowrap sin contención (min-width 0 ni wrap) lo que desborda horizontalmente en ventanas estrechas; además el wizard se monta standalone desde App.tsx sin contenedor de página con padding o scroll propio. Corrección: acordeones details no controlados (o sincronización vía ref) en las tres secciones, contención del progreso y del área central del wizard, todo con tokens.css y estilos fuera de los tsx. Análisis completo en progress/research/fix-wizard-onboarding-inputs.md.",
+      "acceptance": [
+        "TDD rojo→verde test estructural node:test: ActivosSection PasivosSection e InversionesSection dejan de usar simultáneamente open={estado} y onToggle={() => setAbierto(!abierto)} sobre el mismo <details>; falla en rojo contra el código vigente (REQ-34-01)",
+        "Test estructural node:test: el patrón resultante permite alternar cada sección sin que un re-render del padre revierta el estado abierto o cerrado elegido (verificado sobre el helper o patrón extraído, REQ-34-02)",
+        "Test estructural de estilos: la hoja onboarding-wizard.css define contención para .onboarding-wizard__pasos y el contenedor central del wizard (min-width 0 wrap o equivalente) sin introducir valores crudos fuera de var(--*) según el test onboarding-integracion-estilos-hexagonal actualizado (REQ-34-03 y REQ-34-04)",
+        "Verificación en pnpm tauri dev o pnpm dev a 720 px de ancho: la barra de progreso y el contenido del wizard no generan scroll horizontal y las secciones del Paso 2 alternan sin saltos (REQ-34-03)",
+        "pnpm test verde completo, ningún archivo nuevo o modificado supera las 100 líneas y ./init.sh termina verde"
+      ],
+      "depends_on": [
+        33
       ],
       "status": "done"
     }

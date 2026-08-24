@@ -1,0 +1,21 @@
+/* Estilos base de tablas Balance (REQ-08-01/02): solo tokens. */
+.balance-tabla-wrapper{background:var(--color-surface);border-radius:var(--radius-md);box-shadow:var(--shadow-card);padding:var(--space-4)}
+.balance-tabla-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-3)}
+.balance-tabla-titulo{margin:0;font-size:1.125rem}
+.btn--pequeno{padding:var(--space-1) var(--space-3);font-size:0.875rem}
+.balance-tabla{width:100%;border-collapse:collapse;font-size:0.9375rem}
+.balance-tabla th,.balance-tabla td{padding:var(--space-2) var(--space-3);text-align:left;border-bottom:var(--space-1) solid var(--color-bg)}
+.balance-tabla th{font-weight:600;color:var(--color-muted);font-size:0.8125rem;text-transform:uppercase;letter-spacing:0.05em}
+.balance-tabla--numero{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--font-sans)}
+.balance-tabla--positivo{color:var(--color-positive)}
+.balance-tabla--negativo{color:var(--color-negative)}
+.balance-tabla--vacio{text-align:center;color:var(--color-muted);padding:var(--space-5)!important;font-style:italic}
+.balance-categoria{display:inline-block;padding:var(--space-1) var(--space-2);border-radius:var(--radius-md);font-size:0.75rem;font-weight:500;text-transform:capitalize}
+.balance-categoria--liquido{background:var(--color-primary);color:var(--color-primary-contrast)}
+.balance-categoria--inversion{background:var(--color-warn);color:var(--color-text)}
+.balance-categoria--propiedad{background:var(--color-primary);color:var(--color-primary-contrast);opacity:.8}
+.balance-tabla__acciones{display:flex;gap:var(--space-2)}
+.btn--icono{background:none;border:none;cursor:pointer;padding:var(--space-1);border-radius:var(--radius-md);font-size:1rem;line-height:1;transition:background var(--space-1) ease}
+.btn--icono:hover:not(:disabled){background:var(--color-bg)}
+.btn--icono:disabled{opacity:.4;cursor:not-allowed}
+.btn--peligro:hover:not(:disabled){background:var(--color-negative);color:var(--color-primary-contrast)}

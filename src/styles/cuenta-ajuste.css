@@ -1,0 +1,31 @@
+/* REQ-13-01..07: estilos del ajuste de cuadre (extraídos de cuenta-conciliada-card.css). */
+
+.cuenta-conciliada-card__ajuste {
+  padding: var(--espacio-3);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radio-md);
+  margin-bottom: var(--espacio-3);
+}
+
+.cuenta-conciliada-card__ajuste label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text-primary);
+}
+
+.cuenta-conciliada-card__input-ajuste {
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.cuenta-conciliada-card__ajuste-nota {
+  font-size: var(--fuente-tamano-xs);
+  color: var(--color-text-secondary);
+}

@@ -1,0 +1,38 @@
+/* Tabla de proyección mes a mes. */
+.deuda-section__tabla-wrap {
+  overflow-x: auto;
+}
+
+.deuda-section__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.deuda-section__tabla th,
+.deuda-section__tabla td {
+  padding: var(--space-2) var(--space-3);
+  text-align: right;
+  border-bottom: 1px solid var(--color-bg);
+}
+
+.deuda-section__tabla th:first-child,
+.deuda-section__tabla td:first-child {
+  text-align: left;
+}
+
+.deuda-section__tabla th {
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+.deuda-section__tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.deuda-section__tabla tbody tr:hover {
+  background: var(--color-bg);
+}

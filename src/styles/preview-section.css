@@ -1,0 +1,54 @@
+/* REQ-26-11: Estilos PreviewSection - solo tokens.css (≤100 líneas) */
+.preview-section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.preview-section__subtitulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-md);
+  color: var(--color-text);
+}
+
+.preview-section__cargando {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.preview-section__vacio {
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--color-muted);
+}
+
+.preview-section__tabla-wrap {
+  overflow-x: auto;
+}
+
+.preview-section__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fuente-tamano-sm);
+}
+
+.preview-section__tabla th,
+.preview-section__tabla td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: var(--space-1) solid var(--color-border);
+}
+
+.preview-section__tabla th {
+  background: var(--color-surface);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.preview-section__fila-proyectado {
+  background: var(--color-primary-bg);
+}
+
+.preview-section__fila-proyectado td {
+  color: var(--color-muted);
+}

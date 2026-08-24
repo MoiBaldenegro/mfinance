@@ -1,0 +1,100 @@
+/*
+ * Tokens DUALES de diseño (features 17-18): este archivo define la PALETA
+ * OSCURA como valores por defecto en el selector raíz y la CLARA bajo el
+ * atributo data-theme=claro. Ambos bloques declaran EXACTAMENTE el mismo
+ * conjunto de nombres (REQ-18-06): solo cambian los valores de paleta y
+ * elevación; la escala común se replica tal cual. Toda la UI consume
+ * var(): prohibido hardcodear valores fuera de este archivo.
+ */
+:root {
+  /* Paleta oscura (default): superficies texto bordes acción semáforo */
+  --color-bg: #15181c; --color-surface: #1e2227;
+  --color-surface-hover: #262b31; --color-border: #343b42;
+  --color-text: #e8eaed; --color-muted: #9aa4ad;
+  --color-primary: #1f7f5f; --color-primary-hover: #269973;
+  --color-primary-bg: rgba(38, 153, 115, 0.16);
+  --color-primary-contrast: #ffffff;
+  --color-positive: #58b368; --color-positive-hover: #6fc47d;
+  --color-positive-bg: rgba(88, 179, 104, 0.14);
+  --color-positive-contrast: #0c2413;
+  --color-warn: #d9a514; --color-warning-bg: rgba(217, 165, 20, 0.14);
+  --color-negative: #e06c5b; --color-negative-hover: #ea8676;
+  --color-negative-bg: rgba(224, 108, 91, 0.14);
+  --color-negative-contrast: #2b0b06;
+  --color-error-bg: rgba(224, 108, 91, 0.14);
+  /* Gráficas Chart.js sobre fondo oscuro */
+  --chart-color-1: rgba(38, 153, 115, 0.75); --chart-border: rgb(56, 178, 138);
+  --chart-color-2: rgba(38, 153, 115, 0.5);
+  --chart-color-3: rgba(38, 153, 115, 0.3);
+  --chart-grid: rgba(232, 234, 237, 0.12); --chart-ticks: #aab4bd;
+  /* Elevación reforzada en oscuro + anillo de foco accesible */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.55);
+  --sombra-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --anillo-foco: 0 0 0 3px var(--color-primary-bg);
+  /* Alias semánticos (heredan del tema activo vía var()) */
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-muted);
+  --color-warning: var(--color-warn);
+  /* Espaciado — escala base 4px (común a ambos temas) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+  --espacio-1: var(--space-1); --espacio-2: var(--space-2);
+  --espacio-3: var(--space-3); --espacio-4: var(--space-4);
+  --espacio-5: var(--space-5); --espacio-6: var(--space-6);
+  --espacio-7: var(--space-7); --espacio-8: var(--space-8);
+  /* Forma transiciones y tipografía (comunes a ambos temas) */
+  --radius-md: 10px; --radio-md: var(--radius-md);
+  --radio-lg: 14px; --radio-full: 9999px;
+  --transicion-rapida: 120ms ease; --transicion-normal: 200ms ease;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fuente-sans: var(--font-sans);
+  --fuente-tamano-xs: 0.7rem; --fuente-tamano-sm: 0.8125rem;
+  --fuente-tamano-base: 0.9375rem; --fuente-tamano-lg: 1.125rem;
+  --fuente-tamano-xl: 1.5rem; --fuente-peso-medium: 500;
+  --fuente-peso-semibold: 600;
+}
+
+/* Paleta clara con los mismos nombres: se activa con data-theme=claro. */
+[data-theme='claro'] {
+  /* Mismos nombres, valores propios de la paleta clara */
+  --color-bg: #f4f5f2; --color-surface: #ffffff;
+  --color-surface-hover: #f0f1ee; --color-border: #d8dcd6;
+  --color-text: #23272b; --color-muted: #6b7280;
+  --color-primary: #1f5c45; --color-primary-hover: #1a4d38;
+  --color-primary-bg: rgba(31, 92, 69, 0.12);
+  --color-primary-contrast: #ffffff;
+  --color-positive: #2e7d32; --color-positive-hover: #256b28;
+  --color-positive-bg: rgba(46, 125, 50, 0.1);
+  --color-positive-contrast: #ffffff;
+  --color-warn: #b58a00; --color-warning-bg: rgba(181, 138, 0, 0.1);
+  --color-negative: #c0392b; --color-negative-hover: #a33024;
+  --color-negative-bg: rgba(192, 57, 43, 0.1);
+  --color-negative-contrast: #ffffff;
+  --color-error-bg: rgba(192, 57, 43, 0.1);
+  --chart-color-1: rgba(31, 92, 69, 0.7); --chart-border: rgb(31, 92, 69);
+  --chart-color-2: rgba(31, 92, 69, 0.5);
+  --chart-color-3: rgba(31, 92, 69, 0.3);
+  --chart-grid: rgba(35, 39, 43, 0.08); --chart-ticks: #4b5563;
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.12);
+  --sombra-md: 0 4px 12px rgba(15, 23, 42, 0.12);
+  --anillo-foco: 0 0 0 3px var(--color-primary-bg);
+  /* Escala común replicada: paridad exacta de nombres entre temas */
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-muted);
+  --color-warning: var(--color-warn);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+  --espacio-1: var(--space-1); --espacio-2: var(--space-2);
+  --espacio-3: var(--space-3); --espacio-4: var(--space-4);
+  --espacio-5: var(--space-5); --espacio-6: var(--space-6);
+  --espacio-7: var(--space-7); --espacio-8: var(--space-8);
+  --radius-md: 10px; --radio-md: var(--radius-md);
+  --radio-lg: 14px; --radio-full: 9999px;
+  --transicion-rapida: 120ms ease; --transicion-normal: 200ms ease;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fuente-sans: var(--font-sans);
+  --fuente-tamano-xs: 0.7rem; --fuente-tamano-sm: 0.8125rem;
+  --fuente-tamano-base: 0.9375rem; --fuente-tamano-lg: 1.125rem;
+  --fuente-tamano-xl: 1.5rem; --fuente-peso-medium: 500;
+  --fuente-peso-semibold: 600;
+}

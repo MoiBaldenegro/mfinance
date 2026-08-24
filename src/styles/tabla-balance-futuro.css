@@ -1,0 +1,67 @@
+/* Tokens exclusivos, ≤100 líneas */
+.tabla-balance-futuro__wrap {
+  overflow-x: auto;
+  margin-top: var(--espacio-3);
+}
+
+.tabla-balance-futuro {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fuente-tamano-sm);
+}
+
+.tabla-balance-futuro th,
+.tabla-balance-futuro td {
+  padding: var(--espacio-2) var(--espacio-3);
+  text-align: right;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabla-balance-futuro th {
+  text-align: left;
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-muted);
+  background: var(--color-surface-hover);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tabla-balance-futuro__celda--mes {
+  text-align: left;
+  font-weight: var(--fuente-peso-medium);
+}
+
+.tabla-balance-futuro__fila--historico {
+  background: var(--color-surface);
+}
+
+.tabla-balance-futuro__fila--proyectado {
+  background: var(--color-primary-bg);
+}
+
+.tabla-balance-futuro__fila--proyectado .tabla-balance-futuro__celda--importe {
+  color: var(--color-primary);
+  opacity: 0.8;
+}
+
+.tabla-balance-futuro__badge {
+  display: inline-block;
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-semibold);
+  padding: 2px var(--espacio-2);
+  border-radius: var(--radio-full);
+  margin-right: var(--espacio-2);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tabla-balance-futuro__badge--historico {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+}
+
+.tabla-balance-futuro__badge--proyectado {
+  background: var(--color-warn);
+  color: var(--color-text);
+}

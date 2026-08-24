@@ -1,0 +1,98 @@
+/* REQ-13-01..07: estilos base y layout de la sección Conciliación.
+   Refino F18: estados focus-visible/activo uniformes con tokens. */
+
+@import './conciliacion-lista.css';
+@import './conciliacion-historico.css';
+@import './conciliacion-ajuste.css';
+@import './conciliacion-formulario.css';
+@import './conciliacion-cuenta.css';
+@import './conciliacion-confirmacion.css';
+
+.conciliacion-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+  padding: var(--espacio-4);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.conciliacion-section__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-3);
+  padding-bottom: var(--espacio-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.conciliacion-section__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-xl);
+  color: var(--color-text-primary);
+}
+
+.conciliacion-section__controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-3);
+  align-items: center;
+}
+
+/* Controles de mes e histórico: misma receta interactiva (REQ-18-02). */
+.conciliacion-section__selector-mes {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text-secondary);
+}
+
+.conciliacion-section__input-mes,
+.conciliacion-section__btn-historico {
+  padding: var(--espacio-1) var(--espacio-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+  transition:
+    background var(--transicion-rapida),
+    border-color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.conciliacion-section__btn-historico { cursor: pointer; }
+
+.conciliacion-section__btn-historico:hover { background: var(--color-surface-hover); }
+
+.conciliacion-section__input-mes:focus-visible,
+.conciliacion-section__btn-historico:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--anillo-foco);
+}
+
+.conciliacion-section__btn-historico:active { filter: brightness(0.92); }
+
+.conciliacion-section__cargando,
+.conciliacion-section__historico-cargando,
+.conciliacion-section__vacio {
+  text-align: center;
+  padding: var(--espacio-8);
+  color: var(--color-text-secondary);
+}
+
+.conciliacion-section__error,
+.conciliacion-section__historico-error {
+  text-align: center;
+  padding: var(--espacio-4);
+  color: var(--color-negative);
+  background: var(--color-negative-bg);
+  border-radius: var(--radio-md);
+}
+
+.conciliacion-section__cuentas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-4);
+}

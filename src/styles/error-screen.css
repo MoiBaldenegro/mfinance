@@ -1,0 +1,28 @@
+/* Hoja de la pantalla de error de carga (ErrorScreen, REQ-05-07). */
+.error-screen {
+  display: grid;
+  place-content: center;
+  gap: var(--space-4);
+  min-height: 100vh;
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.error-screen__titulo {
+  margin: 0;
+}
+
+.error-screen__mensaje {
+  margin: 0;
+  color: var(--color-negative);
+}
+
+.error-screen__boton {
+  justify-self: center;
+  padding: var(--space-3) var(--space-6);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  cursor: pointer;
+}

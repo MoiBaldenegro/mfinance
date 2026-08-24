@@ -1,0 +1,76 @@
+/* Hoja de la sección Ajustes (REQ-05-05/06). Refino F18: receta
+   interactiva común en el conmutador de tema (hover/focus/activo) y
+   jerarquía tipográfica del sistema. */
+.ajustes-section {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.ajustes-section__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-xl);
+}
+
+.ajustes-section__resumen {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* Conmutador de tema (REQ-17-02): control accesible solo con tokens. */
+.ajustes-section__tema {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--space-1) solid var(--color-bg);
+}
+
+/* Bloque Moneda de Ajustes (REQ-20-01); el grupo segmentado vive en
+   su hoja propia selector-moneda.css (un componente, una hoja). */
+.ajustes-section__moneda {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ajustes-section__aviso {
+  margin: 0;
+  color: var(--color-negative);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.ajustes-section__tema-etiqueta {
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.ajustes-section__conmutar {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-semibold);
+  border: none;
+  border-radius: var(--radio-full);
+  cursor: pointer;
+  transition:
+    background var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.ajustes-section__conmutar:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.ajustes-section__conmutar:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
+
+.ajustes-section__conmutar:active:not(:disabled) {
+  filter: brightness(0.92);
+}

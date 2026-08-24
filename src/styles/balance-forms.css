@@ -1,0 +1,94 @@
+/* Formularios inline Balance (REQ-08): solo tokens. Refino F18: foco
+   visible con el anillo del sistema (corrige la sombra inválida
+   «var(--color-primary)44» que no renderizaba), tipografía en escala y
+   transiciones con tokens de tiempo (antes usaban --space-1). */
+.balance-form {
+  padding: var(--space-3); background: var(--color-bg);
+  border-radius: var(--radius-md); margin-top: var(--space-3);
+}
+
+.balance-form__fila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3); margin-bottom: var(--space-3);
+}
+
+.balance-form__label {
+  display: flex; flex-direction: column; gap: var(--space-1);
+  font-size: var(--fuente-tamano-sm);
+  font-weight: var(--fuente-peso-medium); color: var(--color-text);
+}
+
+.balance-form__input,
+.balance-form__select {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--fuente-tamano-base);
+  background: var(--color-surface); color: var(--color-text);
+  transition:
+    border-color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida),
+    opacity var(--transicion-rapida);
+}
+
+.balance-form__input:focus-visible,
+.balance-form__select:focus-visible,
+.balance-form__input:focus,
+.balance-form__select:focus {
+  outline: none;
+  border-color: var(--color-primary); box-shadow: var(--anillo-foco);
+}
+
+.balance-form__input:disabled,
+.balance-form__select:disabled {
+  opacity: 0.6; cursor: not-allowed;
+}
+
+.balance-form__error {
+  margin: 0 0 var(--space-3); padding: var(--space-2) var(--space-3);
+  background: var(--color-error-bg); color: var(--color-negative);
+  border-radius: var(--radius-md);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.balance-form__acciones {
+  display: flex; gap: var(--space-2); justify-content: flex-end;
+}
+
+/* Botones base con la receta interactiva común del refino F18. */
+.btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--fuente-tamano-base);
+  font-weight: var(--fuente-peso-medium);
+  border: none; cursor: pointer;
+  transition:
+    background var(--transicion-rapida),
+    color var(--transicion-rapida),
+    border-color var(--transicion-rapida),
+    box-shadow var(--transicion-rapida);
+}
+
+.btn:focus-visible { outline: none; box-shadow: var(--anillo-foco); }
+
+.btn:active:not(:disabled) { filter: brightness(0.92); }
+
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn--primario {
+  background: var(--color-primary); color: var(--color-primary-contrast);
+}
+
+.btn--primario:hover:not(:disabled) { background: var(--color-primary-hover); }
+
+.btn--secundario {
+  background: var(--color-bg); color: var(--color-text);
+  border: 1px solid var(--color-muted);
+}
+
+.btn--secundario:hover:not(:disabled) {
+  background: var(--color-surface-hover); color: var(--color-text);
+}

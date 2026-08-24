@@ -1,0 +1,12 @@
+/* Hoja de estilos de la gráfica de proyección. */
+
+.inversiones-grafica-wrap {
+  height: 300px;
+  margin-top: var(--space-4);
+}
+
+.inversiones-grafica__vacia {
+  text-align: center;
+  color: var(--color-muted);
+  padding: var(--space-6);
+}

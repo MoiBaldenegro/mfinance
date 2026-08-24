@@ -1,0 +1,32 @@
+/* REQ-27-07/08: toast global de la shell (bienvenida, confirmaciones). */
+.toast-aviso {
+  position: fixed;
+  right: var(--espacio-5);
+  bottom: var(--espacio-5);
+  z-index: 60;
+  max-width: min(24rem, calc(100vw - var(--espacio-6)));
+  padding: var(--espacio-3) var(--espacio-5);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  box-shadow: var(--sombra-md);
+  animation: toast-aviso__entrada var(--transicion-normal);
+}
+
+.toast-aviso__texto {
+  margin: 0;
+  color: var(--color-primary-contrast);
+  font-size: var(--fuente-tamano-base);
+  font-weight: var(--fuente-peso-medium);
+}
+
+@keyframes toast-aviso__entrada {
+  from {
+    opacity: 0;
+    transform: translateY(var(--espacio-2));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

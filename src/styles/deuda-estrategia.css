@@ -1,0 +1,61 @@
+/* Panel de estrategia y pago extra. */
+.deuda-section__estrategia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2);
+  border: none;
+}
+
+.deuda-section__estrategia legend {
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.deuda-section__radio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  cursor: pointer;
+}
+
+.deuda-section__radio input[type="radio"] {
+  accent-color: var(--color-primary);
+  width: 18px;
+  height: 18px;
+}
+
+.deuda-section__radio-label {
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+/* Pago extra */
+.deuda-section__extra {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.deuda-section__extra-label {
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.deuda-section__extra-input {
+  width: 120px;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-bg);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.deuda-section__extra-input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}

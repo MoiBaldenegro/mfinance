@@ -1,0 +1,21 @@
+/* Placeholder para pasos 2-5 del wizard. Solo tokens.css. */
+.onboarding-paso-placeholder {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  text-align: center;
+  background: var(--color-primary-bg);
+  border: var(--space-1) dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.onboarding-paso-placeholder__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  color: var(--color-text);
+}
+
+.onboarding-paso-placeholder__texto {
+  margin: 0;
+  color: var(--color-muted);
+}

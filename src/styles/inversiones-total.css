@@ -1,0 +1,10 @@
+/* Hoja de estilos del total invertido. */
+
+.inversiones-total {
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}

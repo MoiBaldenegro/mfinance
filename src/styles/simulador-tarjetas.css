@@ -1,0 +1,40 @@
+/*
+ * Tarjetas comparadas Base | Optimizado del simulador (design.md):
+ * rejilla dos columnas que colapsa; el optimizado destaca con
+ * --color-primary.
+ */
+
+.simulador-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.simulador-tarjeta {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.simulador-tarjeta--optimizada {
+  border-color: var(--color-primary);
+  box-shadow: var(--sombra-md);
+}
+
+.simulador-tarjeta__titulo {
+  margin-bottom: var(--space-3);
+  color: var(--color-primary);
+}
+
+.simulador-tarjeta__metrica {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.simulador-tarjeta__etiqueta {
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+}

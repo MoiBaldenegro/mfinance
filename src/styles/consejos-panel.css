@@ -1,0 +1,58 @@
+/* Panel independiente de Consejos e histórico de cierres (REQ-16-05/08). */
+.consejos-panel,
+.historico-cierres {
+  display: grid;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--space-1) solid var(--color-border);
+}
+
+.consejos-panel__titulo,
+.historico-cierres__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+}
+
+.consejos-panel__ayuda,
+.historico-cierres__vacio,
+.consejos-panel__vacio {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.consejos-panel__error {
+  margin: 0;
+  color: var(--color-negative);
+}
+
+.consejos-panel__lista {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mes-cerrado {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-negative-bg);
+  border-radius: var(--radius-md);
+}
+
+.mes-cerrado__aviso {
+  margin: 0;
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-negative);
+}
+
+.mes-cerrado__detalle {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.mes-cerrado__error {
+  margin: 0;
+  color: var(--color-negative);
+}

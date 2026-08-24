@@ -1,0 +1,15 @@
+/* Hoja del contenedor de la gráfica P&G (REQ-07-03): solo tokens.
+   design.md: contenedor con --color-surface y --radius-md. */
+.grafica-pyg {
+  position: relative;
+  height: calc(var(--space-8) * 4);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+}
+
+.grafica-pyg canvas {
+  width: 100% !important;
+  height: 100% !important;
+}

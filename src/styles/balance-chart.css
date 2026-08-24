@@ -1,0 +1,21 @@
+/* Gráfica Balance (REQ-08-05): solo tokens. */
+.balance-grafica-wrapper {
+  margin: var(--space-5) 0;
+}
+
+.balance-chart {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  min-height: 300px;
+}
+
+.balance-grafica--vacia {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-muted);
+}

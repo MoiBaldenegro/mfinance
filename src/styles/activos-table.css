@@ -1,0 +1,3 @@
+/* Tabla Activos (REQ-08-01): importa estilos base y formularios. */
+@import './balance-tables-base.css';
+@import './balance-forms.css';

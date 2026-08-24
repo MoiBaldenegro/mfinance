@@ -21,11 +21,11 @@
 ## Verificación
 
 - [x] `./init.sh` termina en verde (entorno, formato, tests al 100%, build).
-- [ ] `cargo check --manifest-path src-tauri/Cargo.toml` compila sin errores
+- [x] `cargo check --manifest-path src-tauri/Cargo.toml` compila sin errores
       cuando la feature toca backend Rust.
-- [ ] `cargo test --manifest-path src-tauri/Cargo.toml` pasa al 100% cuando la
+- [x] `cargo test --manifest-path src-tauri/Cargo.toml` pasa al 100% cuando la
       feature toca dominio o casos de uso Rust.
-- [ ] La app arranca (`pnpm tauri dev`) y la ventana muestra la UI correcta,
+- [x] La app arranca (`pnpm tauri dev`) y la ventana muestra la UI correcta,
       sin errores en consola, cuando la feature toca UI.
 
 ## Harness

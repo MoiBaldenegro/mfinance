@@ -1,0 +1,3 @@
+/* Tabla Pasivos (REQ-08-02): importa estilos base y formularios. */
+@import './balance-tables-base.css';
+@import './balance-forms.css';

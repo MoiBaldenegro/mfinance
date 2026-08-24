@@ -1,0 +1,101 @@
+/* REQ-13-01..07: estilos de la tarjeta de cuenta dentro de la sección (extraídos de conciliacion-section.css). */
+
+.conciliacion-section__cuenta {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-lg);
+  padding: var(--espacio-4);
+  transition: box-shadow var(--transicion-normal);
+}
+
+.conciliacion-section__cuenta:hover {
+  box-shadow: var(--sombra-md);
+}
+
+.conciliacion-section__cuenta.conciliada {
+  border-color: var(--color-positive);
+}
+
+.conciliacion-section__cuenta.descuadrada {
+  border-color: var(--color-negative);
+}
+
+.conciliacion-section__cuenta-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--espacio-3);
+  padding-bottom: var(--espacio-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.conciliacion-section__cuenta-nombre {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  color: var(--color-text-primary);
+}
+
+.conciliacion-section__resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+}
+
+.conciliacion-section__campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.conciliacion-section__campo dt {
+  margin: 0;
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-medium);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.conciliacion-section__campo dd {
+  margin: 0;
+  font-size: var(--fuente-tamano-base);
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-text-primary);
+}
+
+.conciliacion-section__campo--diferencia.negativa dd {
+  color: var(--color-negative);
+}
+
+.conciliacion-section__campo--diferencia.positiva dd {
+  color: var(--color-positive);
+}
+
+.conciliacion-section__movimientos {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--espacio-3);
+}
+
+.conciliacion-section__movimientos summary {
+  cursor: pointer;
+  font-weight: var(--fuente-peso-medium);
+  color: var(--color-text-primary);
+  padding: var(--espacio-1) 0;
+}
+
+.conciliacion-section__btn-nuevo-movimiento {
+  margin-top: var(--espacio-2);
+  padding: var(--espacio-1) var(--espacio-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.conciliacion-section__btn-nuevo-movimiento:hover {
+  background: var(--color-surface-hover);
+}

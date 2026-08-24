@@ -1,0 +1,43 @@
+/* Hoja de la tabla P&G (REQ-07-02): solo tokens. */
+.tabla-pyg__scroll {
+  overflow: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-1);
+}
+
+.tabla-pyg {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-pyg th,
+.tabla-pyg td {
+  padding: var(--space-2) var(--space-3);
+  text-align: right;
+}
+
+.tabla-pyg thead th {
+  color: var(--color-muted);
+  font-weight: normal;
+  border-bottom: var(--space-1) solid var(--color-bg);
+}
+
+.tabla-pyg tbody tr:nth-child(even) {
+  background: var(--color-bg);
+}
+
+.tabla-pyg tbody th {
+  text-align: left;
+  font-weight: normal;
+  color: var(--color-muted);
+}
+
+.tabla-pyg__positivo {
+  color: var(--color-positive);
+}
+
+.tabla-pyg__negativo {
+  color: var(--color-negative);
+}

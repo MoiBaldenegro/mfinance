@@ -49,6 +49,9 @@ function getKitFiles(dirUrl) {
       // Los node_modules y los directorios target/dist son dependencias o
       // artefactos de build generados, no archivos del kit (README §6).
       if (entry.name === 'node_modules' || entry.name === 'target' || entry.name === 'dist') continue;
+      // Los informes de progress/ citan tokens como EVIDENCIA de incidencias
+      // (impl_*/review_*): misma razón de la autoexclusión de este test.
+      if (entry.name === 'progress') continue;
       files.push(...getKitFiles(entryUrl));
     } else {
       // Ignorar este archivo de test para evitar falsos positivos con los tokens definidos aquí
@@ -63,23 +66,19 @@ function getKitFiles(dirUrl) {
 test('REQ-17-01/02: los archivos obligatorios del kit existen en disco', () => {
   for (const fileRel of OBLIGATORY_FILES) {
     const fileUrl = new URL(fileRel, KIT_ROOT);
-    assert.ok(
-      existsSync(fileUrl),
-      `harness-kit/${fileRel}: archivo obligatorio del kit no existe`
-    );
+    assert.ok(existsSync(fileUrl), `harness-kit/${fileRel}: archivo obligatorio del kit no existe`);
   }
 });
 
 test('REQ-17-03/05: los tokens de la app no aparecen en los archivos del kit', () => {
+  // Matching por límites de palabra: un token cuenta como fuga solo como término completo (evita el falso positivo histórico con «ficheros»).
+  const patrones = FORBIDDEN_TOKENS.map((token) => ({ token, regex: new RegExp(`\\b${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i') }));
   const files = getKitFiles(KIT_ROOT);
   for (const fileUrl of files) {
-    const content = readFileSync(fileUrl, 'utf8').toLowerCase();
+    const content = readFileSync(fileUrl, 'utf8');
     const relativePath = fileUrl.pathname.slice(KIT_ROOT.pathname.length);
-    for (const token of FORBIDDEN_TOKENS) {
-      assert.ok(
-        !content.includes(token),
-        `harness-kit/${relativePath}: fuga de token de app detectada "${token}"`
-      );
+    for (const { token, regex } of patrones) {
+      assert.ok(!regex.test(content), `harness-kit/${relativePath}: fuga de token de app detectada "${token}"`);
     }
   }
 });

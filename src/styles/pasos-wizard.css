@@ -1,0 +1,89 @@
+/* Hojas de los pasos del wizard de cierre (REQ-16): repaso tabla y
+   patrimonio, presupuesto por categoría, confirmación y mes cerrado. */
+.paso-repaso,
+.paso-presupuesto,
+.paso-assessment,
+.paso-confirmacion {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.paso-repaso__titulo,
+.paso-presupuesto__titulo,
+.paso-assessment__titulo,
+.paso-confirmacion__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+}
+
+.paso-repaso__tabla,
+.historico-cierres__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fuente-tamano-base);
+}
+
+.paso-repaso__tabla th,
+.paso-repaso__tabla td,
+.historico-cierres__tabla th,
+.historico-cierres__tabla td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: var(--space-1) solid var(--color-border);
+}
+
+.paso-repaso__patrimonio {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: var(--space-1) var(--space-5);
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-primary-bg);
+  border-radius: var(--radius-md);
+}
+
+.paso-presupuesto {
+  padding: 0;
+  border: none;
+}
+
+.paso-presupuesto__ayuda {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.paso-presupuesto__campo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.paso-presupuesto__campo input {
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: var(--space-1) solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.paso-presupuesto__error {
+  grid-column: 2;
+  color: var(--color-negative);
+}
+
+.paso-assessment__lista,
+.paso-confirmacion__resumen {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.paso-confirmacion__aviso {
+  margin: 0;
+  color: var(--color-negative);
+}

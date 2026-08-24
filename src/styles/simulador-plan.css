@@ -1,0 +1,60 @@
+/*
+ * Plan sandbox multi-crédito: selector de estrategia con los mismos
+ * tokens que F9 y tarjetas por escenario con el ahorro destacado.
+ */
+
+.simulador-plan {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.simulador-plan__titulo {
+  color: var(--color-primary);
+}
+
+.simulador-plan__estrategias {
+  display: flex;
+  gap: var(--space-4);
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) 0;
+  border: none;
+}
+
+.simulador-plan__estrategias label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.simulador-plan__lista {
+  margin: var(--space-3) 0;
+  padding-left: var(--space-5);
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.simulador-plan__rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.simulador-plan__escenario {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.simulador-plan__escenario--activa {
+  border-color: var(--color-primary);
+  box-shadow: var(--sombra-md);
+}
+
+.simulador-plan__ahorro strong {
+  color: var(--color-positive);
+}

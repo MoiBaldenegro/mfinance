@@ -1,0 +1,88 @@
+/* REQ-13-01..07: estilos base de la tarjeta de cuenta en conciliación. */
+
+@import './cuenta-estado.css';
+@import './cuenta-ajuste.css';
+
+.cuenta-conciliada-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-lg);
+  padding: var(--espacio-4);
+  transition: box-shadow var(--transicion-normal);
+}
+
+.cuenta-conciliada-card:hover {
+  box-shadow: var(--sombra-md);
+}
+
+.cuenta-conciliada-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--espacio-3);
+  padding-bottom: var(--espacio-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cuenta-conciliada-card__nombre {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  color: var(--color-text-primary);
+}
+
+.cuenta-conciliada-card__resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--espacio-3);
+  margin-bottom: var(--espacio-3);
+}
+
+.cuenta-conciliada-card__campo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+}
+
+.cuenta-conciliada-card__campo dt {
+  margin: 0;
+  font-size: var(--fuente-tamano-xs);
+  font-weight: var(--fuente-peso-medium);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cuenta-conciliada-card__campo dd {
+  margin: 0;
+  font-size: var(--fuente-tamano-base);
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-text-primary);
+}
+
+.cuenta-conciliada-card__movimientos {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--espacio-3);
+}
+
+.cuenta-conciliada-card__movimientos summary {
+  cursor: pointer;
+  font-weight: var(--fuente-peso-medium);
+  color: var(--color-text-primary);
+  padding: var(--espacio-1) 0;
+}
+
+.cuenta-conciliada-card__btn-nuevo-movimiento {
+  margin-top: var(--espacio-2);
+  padding: var(--espacio-1) var(--espacio-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.cuenta-conciliada-card__btn-nuevo-movimiento:hover {
+  background: var(--color-surface-hover);
+}

@@ -1,0 +1,252 @@
+/* REQ-24-12: estilos solo con tokens.css */
+.onboarding-wizard {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 640px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.onboarding-wizard--error {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  text-align: center;
+  background: var(--color-negative-bg);
+  border: var(--space-1) solid var(--color-negative);
+  border-radius: var(--radius-lg);
+}
+
+.onboarding-wizard__error {
+  margin: 0;
+  color: var(--color-negative);
+}
+
+.onboarding-wizard__reintentar {
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  color: var(--color-on-negative);
+  background: var(--color-negative);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  justify-self: center;
+}
+
+/* Barra de progreso */
+.onboarding-wizard__progreso {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Feature 34 (REQ-34-03): columnas con minmax(0, 1fr) y min-width: 0 para
+   contener el progreso sin desborde horizontal en ventanas estrechas. */
+.onboarding-wizard__pasos {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-width: 0;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboarding-wizard__paso {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  text-align: center;
+  padding: var(--space-2) 0;
+  position: relative;
+}
+
+.onboarding-wizard__paso:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--space-2) + 10px);
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: var(--color-border);
+  z-index: 0;
+}
+
+.onboarding-wizard__paso-numero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  border-radius: 50%;
+  font-size: var(--fuente-tamano-sm);
+  font-weight: 600;
+  color: var(--color-muted);
+  background: var(--color-bg);
+  border: var(--space-1) solid var(--color-border);
+  position: relative;
+  z-index: 1;
+}
+
+.onboarding-wizard__paso--completado .onboarding-wizard__paso-numero {
+  color: var(--color-on-positive);
+  background: var(--color-positive);
+  border-color: var(--color-positive);
+}
+
+.onboarding-wizard__paso--actual .onboarding-wizard__paso-numero {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.onboarding-wizard__paso-titulo {
+  font-size: var(--fuente-tamano-xs);
+  color: var(--color-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.onboarding-wizard__paso--actual .onboarding-wizard__paso-titulo {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.onboarding-wizard__barra {
+  height: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: var(--space-1);
+}
+
+.onboarding-wizard__barra-progreso {
+  height: 100%;
+  width: var(--progreso, 0%);
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transicion-normal);
+}
+
+/* Contenido (feature 34: min-width: 0 evita desbordes horizontales) */
+.onboarding-wizard__contenido {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 300px;
+}
+
+/* Placeholder para pasos no implementados */
+.onboarding-paso-placeholder {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  text-align: center;
+  background: var(--color-primary-bg);
+  border: var(--space-1) dashed var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.onboarding-paso-placeholder__titulo {
+  margin: 0;
+  font-size: var(--fuente-tamano-lg);
+  color: var(--color-text);
+}
+
+.onboarding-paso-placeholder__texto {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+/* Navegación */
+.onboarding-wizard__navegacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--space-1) solid var(--color-border);
+}
+
+.onboarding-wizard__btn {
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transicion-rapida), color var(--transicion-rapida), opacity var(--transicion-rapida);
+}
+
+.onboarding-wizard__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.onboarding-wizard__btn--atras {
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: var(--space-1) solid var(--color-border);
+}
+
+.onboarding-wizard__btn--atras:hover:not(:disabled) {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+}
+
+.onboarding-wizard__acciones-principales {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.onboarding-wizard__btn--saltar {
+  color: var(--color-primary);
+  background: transparent;
+  border: var(--space-1) solid var(--color-primary);
+}
+
+.onboarding-wizard__btn--saltar:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.onboarding-wizard__btn--principal {
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border: none;
+}
+
+.onboarding-wizard__btn--principal:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.onboarding-wizard__btn--principal:disabled,
+.onboarding-wizard__btn--deshabilitado {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Indicador de guardado */
+.onboarding-wizard__guardando {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--sombra-lg);
+  animation: slide-in var(--transicion-normal);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

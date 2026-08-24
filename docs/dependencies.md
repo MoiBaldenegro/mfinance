@@ -44,6 +44,13 @@ devDependencies para npm; nombre literal de la sección TOML para crates),
 - approved: 2026-08-21
 - motivo: API oficial de Tauri 2; provee invoke() para el adapter IPC del frontend
 
+### chart.js
+
+- version: ^4.5.1
+- scope: dependencies
+- approved: 2026-08-21
+- motivo: pedido explícito del humano en el requerimiento del producto («Usa gráficas claras con Chart.js»): gráfica de barras ingresos/gastos con línea superpuesta de ahorro acumulado en la sección P&G (REQ-07-03)
+
 ### @tauri-apps/plugin-opener
 
 - version: ^2
@@ -129,3 +136,10 @@ devDependencies para npm; nombre literal de la sección TOML para crates),
 - scope: dependencies
 - approved: 2026-08-21
 - motivo: formato JSON de la serialización en el puente IPC de Tauri
+
+### pdf-extract
+
+- version: =0.12
+- scope: dependencies
+- approved: 2026-08-22
+- motivo: librería de parseo PDF para la feature 12 diagnostico-pdf, elegida tras evaluar los tres candidatos (pdf-extract vs lopdf en Rust y pdfjs-dist en npm; informes en progress/research/pdf-evaluacion-crates-rust.md, pdf-evaluacion-pdfjs-dist.md y pdf-parsing-extractos-bancarios.md). Costo: 0 (crate gratuito); licencia MIT única. Cobertura: extracción de texto de PDFs digitales con capa de texto vía extract_text_from_mem_by_pages (caso objetivo: extractos bancarios descargados del portal del banco); NO hace OCR sobre escaneos (se detectan con el umbral de ilegibilidad de 60 caracteres/página y se informan como archivo ilegible sin abortar el lote), y los pánicos documentados ante PDFs malformados (issue #141) se contienen con catch_unwind por archivo. Veredicto literal del humano como aprobación explícita: «Usa el crate pdf-extract en Rust invocado mediante un comando Tauri (#[tauri::command]). Mantendrás el frontend en React limpio, ligero y con un rendimiento nativo.» El crate vive SOLO bajo src-tauri/src/infrastructure/ detrás del puerto PdfMovimientosExtractor; versión clavada (=0.12) por semver 0.x.

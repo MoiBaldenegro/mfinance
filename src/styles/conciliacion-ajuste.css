@@ -1,0 +1,31 @@
+/* REQ-13-01..07: estilos de ajuste de cuadre (extraídos de conciliacion-section.css). */
+
+.conciliacion-section__ajuste {
+  padding: var(--espacio-3);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radio-md);
+  margin-bottom: var(--espacio-3);
+}
+
+.conciliacion-section__ajuste label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espacio-1);
+  font-size: var(--fuente-tamano-sm);
+  color: var(--color-text-primary);
+}
+
+.conciliacion-section__input-ajuste {
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radio-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.conciliacion-section__ajuste-nota {
+  font-size: var(--fuente-tamano-xs);
+  color: var(--color-text-secondary);
+}

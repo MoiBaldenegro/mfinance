@@ -1,0 +1,89 @@
+/* REQ-27-02: tarjetas de umbrales de indicadores del paso 4. */
+.indicadores-umbrales {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--espacio-4);
+  background: var(--color-surface);
+}
+
+.indicadores-umbrales__titulo {
+  font-weight: var(--fuente-peso-semibold);
+  color: var(--color-text);
+}
+
+.indicadores-umbrales__ayuda,
+.indicadores-umbrales__descripcion {
+  margin: var(--espacio-2) 0;
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-xs);
+}
+
+.indicadores-umbrales__tarjetas {
+  display: grid;
+  gap: var(--espacio-3);
+  margin-bottom: var(--espacio-4);
+}
+
+.indicadores-umbrales__tarjeta {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--espacio-3);
+  background: var(--color-surface);
+}
+
+.indicadores-umbrales__nombre {
+  margin: 0 0 var(--espacio-1);
+  color: var(--color-text-primary);
+  font-size: var(--fuente-tamano-base);
+}
+
+.indicadores-umbrales__campo {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  margin-top: var(--espacio-2);
+  color: var(--color-text-secondary);
+  font-size: var(--fuente-tamano-sm);
+}
+
+.indicadores-umbrales__input {
+  width: 5rem;
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: border-color var(--transicion-rapida);
+}
+
+.indicadores-umbrales__input:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+  border-color: var(--color-primary);
+}
+
+.indicadores-umbrales__error {
+  margin: var(--espacio-2) 0 0;
+  color: var(--color-negative);
+  font-size: var(--fuente-tamano-xs);
+}
+
+.indicadores-umbrales__restaurar {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--espacio-2) var(--espacio-4);
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background var(--transicion-rapida);
+}
+
+.indicadores-umbrales__restaurar:hover {
+  background: var(--color-primary-bg);
+}
+
+.indicadores-umbrales__restaurar:focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+}
