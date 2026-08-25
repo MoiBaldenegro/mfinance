@@ -9,6 +9,7 @@ interface Props {
   readonly esActivo: boolean;
   readonly onActivar: (id: string) => void;
   readonly onReanudar: (id: string) => void;
+  readonly deshabilitada?: boolean;
 }
 
 /** Extrae el paso guardado cuando el onboarding está InProgress. */
@@ -19,7 +20,7 @@ export function pasoGuardado(perfil: Perfil): number {
 }
 
 /** Una fila del registro de perfiles con su estado de onboarding. */
-export function PerfilFila({ perfil, esActivo, onActivar, onReanudar }: Props) {
+export function PerfilFila({ perfil, esActivo, onActivar, onReanudar, deshabilitada }: Props) {
   const enProgreso = perfil.onboarding_status?.nombre === 'InProgress';
   return (
     <li className={esActivo ? 'gestion-perfiles__fila gestion-perfiles__fila--activa' : 'gestion-perfiles__fila'}>
@@ -35,8 +36,8 @@ export function PerfilFila({ perfil, esActivo, onActivar, onReanudar }: Props) {
       <span className="gestion-perfiles__meta">creado el {perfil.creado_en.slice(0, 10)}</span>
       {!esActivo && (
         enProgreso
-          ? <button type="button" className="gestion-perfiles__reanudar" onClick={() => onReanudar(perfil.id)}>Reanudar onboarding</button>
-          : <button type="button" className="gestion-perfiles__activar" onClick={() => onActivar(perfil.id)}>Activar</button>
+           ? <button type="button" className="gestion-perfiles__reanudar" disabled={deshabilitada} onClick={() => onReanudar(perfil.id)}>Reanudar onboarding</button>
+           : <button type="button" className="gestion-perfiles__activar" disabled={deshabilitada} onClick={() => onActivar(perfil.id)}>Activar</button>
       )}
     </li>
   );

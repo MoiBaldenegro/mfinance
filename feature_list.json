@@ -645,6 +645,85 @@
         29
       ],
       "status": "done"
+    },
+    {
+      "id": 36,
+      "name": "recuperacion-error-perfil",
+      "title": "Recuperar la gestión de perfiles desde el error de carga",
+      "description": "Cuando falta o no se puede leer el snapshot del perfil activo, SnapshotProvider desmonta AppShell y ErrorScreen deja al usuario solo con Reintentar; esta feature expone una acción visible para abrir la gestión existente de perfiles sin ocultar el error, eleva el contexto de perfiles fuera de AppShell y reutiliza PerfilPort, cambiarPerfil y los commands ya registrados. No muestra snapshots anteriores ni altera el activo por un fallo de lectura; una carga correcta devuelve a AppShell y una fallida conserva la recuperación disponible. Análisis completo en progress/research/recuperacion-error-perfil.md.",
+      "acceptance": [
+        "Test TDD de ErrorScreen/App verifica que un fallo de carga muestra el error nombrado junto a la acción visible «Gestionar perfiles» y que activar la acción mantiene visible el título y motivo originales mientras aparece la gestión (REQ-36-01 y REQ-36-02)",
+        "Test de estructura o integración verifica que el contexto de perfiles permanece montado fuera de AppShell, la lista marca el perfil activo y la gestión reutiliza PerfilPort/cargarPerfiles sin invocar invoke() desde components (REQ-36-02 y REQ-36-03)",
+        "Test de flujo con puerto falso verifica seleccionar perfil → confirmar selección → recargar snapshot; durante fallo o carga no se renderiza el snapshot anterior y Reintentar sigue disponible (REQ-36-03 y REQ-36-04)",
+        "Test de regresión con perfil seleccionado sin mfinance.json verifica que el nuevo error permanece en ErrorScreen con «Gestionar perfiles» disponible y que profiles.json conserva el perfil activo seleccionado sin borrar datos (REQ-36-05)",
+        "Test de integración con snapshot válido verifica que activar otro perfil termina mostrando AppShell con su snapshot y su nombre activo, sin datos del perfil anterior (REQ-36-06)",
+        "Test del caso de uso y de la UI verifica que un rechazo de seleccionar_perfil produce error nombrado en español, no cambia el activo visible y no solicita recarga de snapshot (REQ-36-07)",
+        "La suite pnpm test y el build pasan, ningún archivo tocado supera 100 líneas, no se añaden commands ni dependencias y ./init.sh termina verde"
+      ],
+      "depends_on": [
+        22,
+        35
+      ],
+      "status": "done"
+    },
+    {
+      "id": 37,
+      "name": "regresar-ajustes-error-perfil",
+      "title": "Regresar a Ajustes desde el error de carga de perfil",
+      "description": "Sustituye visual y comportamentalmente la recuperación incrustada de la feature 36: cuando falla el snapshot del perfil elegido desde Ajustes, ErrorScreen ofrece «Regresar a Ajustes» y la aplicación transiciona a una pantalla separada de Ajustes centrada en GestionPerfiles. La navegación conserva la sección ajustes, PerfilProvider conserva lista y activo, y la selección de otro perfil reutiliza PerfilPort/cambiarPerfil sin mostrar snapshots anteriores ni iniciar recargas automáticas. La feature 36 permanece en el backlog y en sus artefactos históricos; no se añaden commands ni dependencias.",
+      "acceptance": [
+        "TDD rojo→verde: un test de ErrorScreen/App verifica que el fallo de snapshot ofrece «Regresar a Ajustes» y que al activarlo la gestión aparece como pantalla separada, sin renderizar GestionPerfiles dentro del árbol del error (REQ-37-01 y REQ-37-02)",
+        "Test node:test de recuperación verifica que la pantalla de Ajustes muestra la lista conservada por PerfilProvider, marca el activo y permite seleccionar otro perfil mediante el flujo existente (REQ-37-03)",
+        "Test de navegación verifica que, tras una carga válida posterior, AppShell conserva `ajustes` como sección activa en SectionTabs y en el cuerpo renderizado, en lugar de reiniciar en Registro (REQ-37-04)",
+        "Test de aislamiento verifica que durante `cargando` y `error` no se monta AppShell ni ninguna sección financiera con el snapshot anterior (REQ-37-05)",
+        "Test de flujo con puerto falso verifica que una selección confirmada produce exactamente una solicitud de carga del snapshot y que una segunda solicitud solo ocurre por otra acción explícita del usuario (REQ-37-06)",
+        "Test de error de selección verifica que un rechazo de PerfilPort conserva el activo visible, muestra el error nombrado en español y no solicita carga de snapshot (REQ-37-07)",
+        "Test de remount verifica que entrar o permanecer en la pantalla de Ajustes de recuperación no llama automáticamente a recargar y que la recarga solo se origina en selección confirmada o Reintentar (REQ-37-08)",
+        "pnpm test y build pasan, no se modifican tests ni backend, `invoke()` continúa únicamente en adapters, los estilos usan tokens, no se añaden dependencias y ningún archivo de producción tocado supera 100 líneas (REQ-37-02 y REQ-37-03)"
+      ],
+      "depends_on": [
+        36
+      ],
+      "status": "done"
+    },
+    {
+      "id": 38,
+      "name": "rollback-perfil-vista",
+      "title": "Restaurar perfil y vista previos tras fallar la carga del perfil nuevo",
+      "description": "Refina y sustituye el comportamiento visual de recuperación de la feature 37: antes de confirmar un cambio se captura el id del perfil activo y la sección/vista actual; si el snapshot del perfil nuevo falla, la aplicación oculta toda la AppShell, revierte una sola vez la selección persistida al perfil anterior, recarga su snapshot aislado y restaura la AppShell completa en la vista original. Si la selección o carga del perfil anterior también falla, muestra ErrorScreen claro con reintento y gestión segura sin datos financieros ni bucles automáticos. La feature 37 y su historial permanecen intactos; no añade commands ni dependencias.",
+      "acceptance": [
+        "Test TDD de la transacción verifica que antes de seleccionar se captura el id del perfil activo y la sección/vista actual y que una selección nueva exitosa conserva el camino normal (REQ-38-01 y REQ-38-09)",
+        "Test de aislamiento verifica que durante la carga del perfil nuevo y durante el rollback no se monta AppShell ni ninguna sección financiera con el snapshot anterior (REQ-38-02 y REQ-38-07)",
+        "Test con puerto falso verifica que un fallo del snapshot nuevo ejecuta exactamente una reversión explícita mediante PerfilPort al id capturado y no reinicia esa reversión por remount o efectos (REQ-38-03 y REQ-38-08)",
+        "Test de secuencia verifica que la reversión confirma primero el perfil anterior y después solicita exactamente una carga de su snapshot sin publicar el snapshot fallido ni datos del perfil nuevo (REQ-38-04)",
+        "Test de recuperación completa verifica que al cargar el snapshot anterior se restaura el activo visible y se muestra la AppShell completa con SectionTabs, cuerpo y la sección/vista capturada antes del intento (REQ-38-05)",
+        "Test de error verifica que si falla la selección de rollback o la carga del snapshot anterior ErrorScreen muestra la fase y motivo concretos con «Reintentar» y «Gestionar perfiles», sin mostrar un fragmento financiero (REQ-38-06 y REQ-38-07)",
+        "Test de acciones explícitas verifica que Reintentar solo reintenta la recuperación solicitada y que Gestionar perfiles abre una gestión segura sin snapshot ni carga automática al montarse (REQ-38-08)"
+      ],
+      "depends_on": [
+        37
+      ],
+      "status": "done"
+    },
+    {
+      "id": 39,
+      "name": "modal-error-carga-perfil",
+      "title": "Confirmar rollback tras fallo de carga del perfil",
+      "description": "Refina la feature 38 para que un perfil objetivo cuyo snapshot no puede cargarse no ejecute un rollback silencioso: la aplicación mantiene el contexto de perfil y vista anteriores, desmonta toda superficie financiera y muestra un diálogo persistente con el perfil afectado y el motivo del error. Solo «Volver al perfil anterior» inicia el rollback completo existente; cerrar o cancelar deja una recuperación segura sin datos cruzados y sin cargas automáticas. Incluye accesibilidad mínima y una sola copia visible del diagnóstico, sin commands ni dependencias nuevas. Análisis completo en progress/research/modal-error-carga-perfil.md.",
+      "acceptance": [
+        "Test TDD de integración: al fallar la carga del snapshot objetivo aparece un diálogo persistente que identifica el perfil y muestra el motivo exacto, conserva el id y la sección originales y no presenta AppShell ni secciones financieras (REQ-39-01 y REQ-39-02)",
+        "Test de secuencia con puerto falso: mientras el diálogo está abierto no se selecciona el perfil anterior, no se solicita otra carga y no se inicia rollback o reintento automático (REQ-39-03)",
+        "Test TDD de acción explícita: activar «Volver al perfil anterior» ejecuta una sola selección del id capturado seguida de una carga aislada, y una carga válida publica AppShell con el perfil y la vista originales (REQ-39-04 y REQ-39-05)",
+        "Test de cancelación/teclado: cerrar, cancelar o pulsar Escape no ejecuta rollback, deja una pantalla segura sin AppShell ni datos financieros con el diagnóstico visible y ofrece recuperación explícita sin cargar por montaje (REQ-39-06)",
+        "Test estructural de accesibilidad: el diálogo tiene role=dialog, aria-modal=true, aria-labelledby, aria-describedby, foco gestionado, botones con nombre accesible y cierre por Escape sin permitir interacción fuera del diálogo (REQ-39-07)",
+        "Test de texto: el motivo normalizado aparece exactamente una vez en el diálogo y exactamente una vez en la salida segura, sin copias anidadas entre ErrorScreen y el diálogo (REQ-39-08)",
+        "Test de fallo de recuperación: si la selección o carga del perfil anterior falla después de confirmar, ErrorScreen conserva la fase y motivo con Reintentar/Gestionar perfiles y no renderiza AppShell ni secciones financieras (REQ-39-09)",
+        "Test estructural: la implementación reutiliza el rollback y los puertos de la feature 38, no añade commands ni dependencias, mantiene estilos solo con tokens y deja cada archivo nuevo o modificado en 100 líneas o menos (REQ-39-10)"
+      ],
+      "depends_on": [
+        38
+      ],
+      "status": "done"
     }
   ]
 }

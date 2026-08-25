@@ -1,96 +1,100 @@
-// Contexto React mínimo (design.md): snapshot compartido + acción de
-// recarga que relanza el caso de uso de carga (REQ-05-03/07). Glue de UI,
-// sin lógica de negocio: todo delega en src/domain/use-cases.
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
+import type { Perfil } from '../../domain/entities/perfil.ts';
 import type { OnboardingStatus } from '../../domain/entities/onboarding/index.ts';
 import { SnapshotLoadError } from '../../domain/errors/snapshot-errors.ts';
-
-/** Desenlace de la carga inicial expuesto a la UI. */
+import type { CargaAislada, ResultadoPerfilActivo } from '../../domain/use-cases/cargar-perfil-activo.ts';
+import { crearControladorSnapshot } from '../../domain/use-cases/snapshot-provider-controller.ts';
+import type { ResultadoCambio } from '../../domain/use-cases/rollback-perfil-vista.ts';
+// El adapter delega en snapshotPort.obtenerPerfilActivoConOnboarding; onboarding_status.nombre === 'Completed' abre la shell.
 export type EstadoSnapshot =
   | { readonly nombre: 'cargando' }
   | { readonly nombre: 'listo'; readonly snapshot: FinanceSnapshot }
-  | { readonly nombre: 'error'; readonly error: SnapshotLoadError }
-  | { readonly nombre: 'onboarding'; readonly snapshot: FinanceSnapshot; readonly onboardingStatus: OnboardingStatus };
-
+  | { readonly nombre: 'error'; readonly error: SnapshotLoadError; readonly recuperar?: () => void }
+  | { readonly nombre: 'fallo-perfil'; readonly perfilObjetivo: Perfil; readonly error: SnapshotLoadError;
+      readonly rollback: () => Promise<ResultadoCambio> }
+   | { readonly nombre: 'onboarding'; readonly snapshot: FinanceSnapshot; readonly onboardingStatus: OnboardingStatus };
 interface ValorSnapshot {
   readonly estado: EstadoSnapshot;
-  /** Relanza el caso de uso de carga (botón Reintentar). */
   readonly recargar: () => void;
-  /**
-   * Publica un snapshot ya persistido (p. ej. tras Confirmar en
-   * Registro) sin volver a pasar por IPC de carga.
-   */
-  readonly aplicarSnapshot: (snapshot: FinanceSnapshot) => void;
-  /**
-   * Transición explícita a AppShell tras completar onboarding:
-   * recarga el snapshot fresco y cambia el estado a 'listo'.
-   */
+  readonly cargarParaCambio: () => Promise<CargaAislada>;
+  readonly esCargaVigente: (generacion: number) => boolean;
+  readonly generacionActual: () => number;
+  readonly publicarSnapshot: (carga: CargaAislada, comprometer: () => void) => boolean;
+  readonly mostrarError: (error: SnapshotLoadError, generacion: number) => boolean;
+  readonly registrarReintento: (accion: () => void | Promise<void>) => void;
+  readonly reintento: () => void;
+  readonly aplicarSnapshot: (snapshot: FinanceSnapshot, generacion?: number) => boolean;
   readonly completarOnboarding: () => void;
+  readonly mostrarFalloPerfil: (perfil: Perfil, error: SnapshotLoadError,
+    rollback: () => Promise<ResultadoCambio>) => void;
+  readonly confirmarRollback: () => void;
+  readonly cerrarFalloPerfil: () => void;
 }
 
-const SnapshotContext = createContext<ValorSnapshot | null>(null);
+export const SnapshotContext = createContext<ValorSnapshot | null>(null);
+function estadoDeResultado(resultado: ResultadoPerfilActivo): EstadoSnapshot {
+  if (!resultado.ok) return { nombre: 'error', error: resultado.error };
+  const { snapshot, onboarding_status: status } = resultado.datos;
+  return status.nombre === 'Completed'
+    ? { nombre: 'listo', snapshot }
+    : { nombre: 'onboarding', snapshot, onboardingStatus: status };
+}
 
-/**
- * Composition root del frontend en miniatura: inyecta el adapter IPC al
- * caso de uso y publica el desenlace como estado compartido.
- */
-export function SnapshotProvider(
-  { children }: { readonly children: ReactNode },
-) {
+export function SnapshotProvider({ children }: { readonly children: ReactNode }) {
   const [estado, setEstado] = useState<EstadoSnapshot>({ nombre: 'cargando' });
-  const [intento, setIntento] = useState(0);
-
-  useEffect(() => {
-    let vigente = true;
-    setEstado({ nombre: 'cargando' });
-    snapshotPort.obtenerPerfilActivoConOnboarding().then((resultado) => {
-      if (!vigente) return;
-      setEstado({
-        nombre: resultado.onboarding_status.nombre === 'Completed' ? 'listo' : 'onboarding',
-        snapshot: resultado.snapshot,
-        onboardingStatus: resultado.onboarding_status,
-      });
-    }).catch((error: unknown) => {
-      if (!vigente) return;
-      setEstado({ nombre: 'error', error: new SnapshotLoadError(String(error)) });
-    });
-    return () => {
-      vigente = false;
-    };
-  }, [intento]);
-
-  const recargar = useCallback(() => setIntento((n) => n + 1), []);
-
-  const aplicarSnapshot = useCallback(
-    (snapshot: FinanceSnapshot) => setEstado({ nombre: 'listo', snapshot }),
-    [],
-  );
-
-  const completarOnboarding = useCallback(() => {
-    setIntento((n) => n + 1);
+  const rollbackEnCurso = useRef(false);
+  const controlador = useRef(crearControladorSnapshot(snapshotPort, estadoDeResultado,
+    (snapshot): EstadoSnapshot => ({ nombre: 'listo', snapshot }), setEstado,
+    { nombre: 'cargando' as const })).current;
+  const recargar = useCallback(() => { void controlador.solicitar(true); }, [controlador]);
+  useEffect(() => { recargar(); }, [recargar]);
+  const [reintento, setReintento] = useState<() => void>(() => recargar);
+  const cargarParaCambio = useCallback(() => controlador.solicitar(false), [controlador]);
+  const esCargaVigente = useCallback((actual: number) => controlador.esCargaVigente(actual), [controlador]);
+  const generacionActual = useCallback(() => controlador.generacionActual(), [controlador]);
+  const publicarSnapshot = useCallback((carga: CargaAislada, comprometer: () => void) =>
+    controlador.publicarSnapshot(carga, comprometer), [controlador]);
+  const registrarReintento = useCallback((accion: () => void | Promise<void>) => {
+    setReintento(() => () => { void accion(); });
   }, []);
-
-  return (
-    <SnapshotContext.Provider value={{ estado, recargar, aplicarSnapshot, completarOnboarding }}>
-      {children}
-    </SnapshotContext.Provider>
-  );
+  const mostrarError = useCallback((error: SnapshotLoadError, actual: number) =>
+    controlador.mostrarError(error, actual), [controlador]);
+  const aplicarSnapshot = useCallback((snapshot: FinanceSnapshot, actual?: number) =>
+    controlador.aplicarSnapshot(snapshot, actual), [controlador]);
+  // completarOnboarding reemplaza setIntento((n) => n + 1) con una generación explícita.
+  const completarOnboarding = useCallback(() => { void controlador.solicitar(true); }, [controlador]);
+  const iniciarRollback = useCallback((rollback: () => Promise<ResultadoCambio>) => {
+    if (rollbackEnCurso.current) return;
+    rollbackEnCurso.current = true; setEstado({ nombre: 'cargando' });
+    void rollback().catch((error: unknown) => {
+      const fallo = error instanceof SnapshotLoadError ? error : new SnapshotLoadError(`rollback: ${error instanceof Error ? error.message : String(error)}`);
+      setEstado({ nombre: 'error', error: fallo,
+        recuperar: () => iniciarRollback(rollback) });
+    }).finally(() => { rollbackEnCurso.current = false; });
+  }, []);
+  const mostrarFalloPerfil = useCallback((perfilObjetivo: Perfil, error: SnapshotLoadError,
+    rollback: () => Promise<ResultadoCambio>) => {
+    setEstado({ nombre: 'fallo-perfil', perfilObjetivo, error, rollback });
+  }, []);
+  const confirmarRollback = useCallback(() => {
+    if (estado.nombre === 'fallo-perfil') iniciarRollback(estado.rollback);
+  }, [estado, iniciarRollback]);
+  const cerrarFalloPerfil = useCallback(() => {
+    if (estado.nombre === 'fallo-perfil') {
+      setEstado({ nombre: 'error', error: estado.error,
+        recuperar: () => iniciarRollback(estado.rollback) });
+    }
+  }, [estado, iniciarRollback]);
+  const valor = { estado, recargar, cargarParaCambio, esCargaVigente, generacionActual, publicarSnapshot, mostrarError, registrarReintento,
+    aplicarSnapshot, completarOnboarding, reintento, mostrarFalloPerfil, confirmarRollback, cerrarFalloPerfil };
+  return <SnapshotContext.Provider value={valor}>{children}</SnapshotContext.Provider>;
 }
 
-/** Lee el estado del snapshot; falla nombrado si se usa fuera. */
 export function useSnapshot(): ValorSnapshot {
   const valor = useContext(SnapshotContext);
-  if (!valor) {
-    throw new Error('useSnapshot debe usarse dentro de SnapshotProvider');
-  }
+  if (!valor) throw new Error('useSnapshot debe usarse dentro de SnapshotProvider');
   return valor;
 }
