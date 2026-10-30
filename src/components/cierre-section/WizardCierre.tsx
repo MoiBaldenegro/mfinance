@@ -10,7 +10,6 @@ import { PasoAssessment } from './PasoAssessment.tsx';
 import { PasoConfirmacion } from './PasoConfirmacion.tsx';
 import { useCierreWizard } from './use-cierre-wizard.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
-import '../../styles/wizard-cierre.css';
 
 interface Props {
   readonly snapshot: FinanceSnapshot;
@@ -22,21 +21,21 @@ export function WizardCierre({ snapshot }: Props) {
   const wizard = useCierreWizard(snapshot, aplicarSnapshot);
   if (!wizard.mes) {
     return (
-      <p className="cierre-wizard__vacio estado-vacio">
+      <p className="estado-vacio">
         Aún no hay meses registrados: registra tu primer mes en la sección
         Registro para poder cerrarlo.
       </p>
     );
   }
   if (wizard.estado.nombre === 'cargando') {
-    return <p className="cierre-wizard__vacio estado-carga">Preparando el cierre de {wizard.mes}…</p>;
+    return <p className="estado-carga">Preparando el cierre…</p>;
   }
   if (wizard.estado.nombre === 'error') {
-    return <p className="cierre-wizard__vacio" role="alert">{wizard.estado.motivo}</p>;
+    return <p className="aviso aviso--error" role="alert">{wizard.estado.motivo}</p>;
   }
   const resumen = wizard.estado.resumen;
   return (
-    <div className="cierre-wizard">
+    <section className="card cierre-wizard" aria-label="Asistente de cierre">
       <BarraProgreso paso={wizard.paso} />
       {wizard.paso === 0 && <PasoRepaso resumen={resumen} />}
       {wizard.paso === 1 && (
@@ -60,15 +59,15 @@ export function WizardCierre({ snapshot }: Props) {
         />
       )}
       <nav className="cierre-wizard__navegacion">
-        <button type="button" onClick={wizard.atras} disabled={wizard.paso === 0}>
+        <button type="button" className="btn btn--fantasma" onClick={wizard.atras} disabled={wizard.paso === 0}>
           Atrás
         </button>
         {wizard.paso < PASOS_WIZARD.length - 1 ? (
-          <button type="button" className="cierre-wizard__continuar" onClick={wizard.continuar}>
+          <button type="button" className="btn btn--primario" onClick={wizard.continuar}>
             Continuar
           </button>
         ) : null}
       </nav>
-    </div>
+    </section>
   );
 }

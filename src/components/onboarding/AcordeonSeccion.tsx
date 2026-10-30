@@ -7,11 +7,13 @@ interface Props {
   /** Cabecera <summary>; debe ser el primer hijo de <details>. */
   readonly resumen: React.ReactNode;
   readonly children: React.ReactNode;
+  /** Estado inicial; el padre lo congela al montar para que no cambie entre renders. */
+  readonly abiertoInicial?: boolean;
 }
 
-export function AcordeonSeccion({ className, resumen, children }: Props) {
+export function AcordeonSeccion({ className, resumen, children, abiertoInicial = true }: Props) {
   return (
-    <details className={className} open>
+    <details className={className} open={abiertoInicial}>
       {resumen}
       {children}
     </details>

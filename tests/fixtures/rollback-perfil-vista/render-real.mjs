@@ -51,14 +51,14 @@ const recuperacion = async () => {
     resultado: n === 1 ? { ok: false, error } : { ok: true, datos: {} } }), flujo));
   assert.equal(pendiente.ok, false);
   assert.equal(pendiente.fase, 'snapshot-nuevo-pendiente');
-  assert.equal(flujo.transitorias.every((html) => !/app-shell|header-bar|section-tabs|balance-section/.test(html)), true);
+  assert.equal(flujo.transitorias.every((html) => !/app-shell|barra-lateral|balance-section/.test(html)), true);
   const resultado = await pendiente.rollback();
   assert.equal(resultado.ok, true);
   const html = flujo.vistas.at(-1);
   assert.equal(flujo.ui.activo, ana); assert.equal(flujo.ui.seccion, 'balance');
-  assert.match(html, /Perfil: Ana/); assert.match(html, /HeaderBar|mfinance/);
-  assert.match(html, /class="app-shell"/); assert.match(html, /class="header-bar"/);
-  assert.match(html, /class="section-tabs"/); assert.match(html, /class="balance-section"/);
+  assert.match(html, /Perfil: Ana/); assert.match(html, /BarraLateral|mfinance/);
+  assert.match(html, /class="app-shell"/); assert.match(html, /class="barra-lateral"/);
+  assert.match(html, /class="barra-lateral__nav"/); assert.match(html, /class="pagina balance-section"/);
   assert.match(html, /Secciones de mfinance/); assert.match(html, /aria-current="page"/);
   assert.match(html, /Balance/); assert.doesNotMatch(html, /ajustes-recuperacion/);
 };
@@ -70,7 +70,7 @@ const feliz = await ejecutarCambioPerfil(dependencias(async () => ({ generacion:
 assert.equal(feliz.ok, true);
 const felizHtml = felizFlujo.vistas.at(-1);
 assert.equal(felizFlujo.ui.activo, beto);
-assert.match(felizHtml, /Perfil: Beto/); assert.match(felizHtml, /app-shell|section-tabs|balance-section/);
+assert.match(felizHtml, /Perfil: Beto/); assert.match(felizHtml, /app-shell|barra-lateral|balance-section/);
 let antiguos = 0;
 const falloFlujo = crearFlujo('balance');
 const falloPendiente = await ejecutarCambioPerfil(dependencias(
@@ -86,8 +86,8 @@ const falloRollback = await falloPendiente.rollback();
 assert.equal(falloRollback.ok, false);
 const errorHtml = falloFlujo.vistas.at(-1);
 assert.match(errorHtml, /Gestionar perfiles/); assert.match(errorHtml, /rollback-seleccion|rollback temporal/);
-assert.match(errorHtml, /Reintentar/); assert.doesNotMatch(errorHtml, /balance-section|app-shell|section-tabs/);
-assert.equal(falloFlujo.transitorias.every((html) => !/app-shell|section-tabs|balance-section/.test(html)), true);
+assert.match(errorHtml, /Reintentar/); assert.doesNotMatch(errorHtml, /balance-section|app-shell|barra-lateral/);
+assert.equal(falloFlujo.transitorias.every((html) => !/app-shell|barra-lateral|balance-section/.test(html)), true);
 let gestionHtml; let gestiones = 0; let reintentos = 0;
 const antesGestion = falloFlujo.transitorias.length;
 const errorElement = ErrorScreen({ error: falloFlujo.ui.estado.error,
@@ -97,7 +97,7 @@ const botones = errorElement.props.children.filter((hijo) => hijo?.type === 'but
 botones[1].props.onClick();
 assert.equal(falloFlujo.transitorias.length, antesGestion);
 assert.match(gestionHtml, /class="ajustes-recuperacion"/); assert.match(gestionHtml, /Gestión de perfiles/);
-assert.doesNotMatch(gestionHtml, /app-shell|section-tabs|balance-section/);
+assert.doesNotMatch(gestionHtml, /app-shell|barra-lateral|balance-section/);
 await botones[0].props.onClick();
 assert.deepEqual([reintentos, gestiones], [1, 1]);
 assert.equal(falloFlujo.ui.activo, ana); assert.match(falloFlujo.vistas.at(-1), /Perfil: Ana/);

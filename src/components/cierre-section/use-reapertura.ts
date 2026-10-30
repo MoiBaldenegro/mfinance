@@ -2,11 +2,12 @@
 // puerto del cierre y publica el snapshot devuelto en el provider.
 import { useCallback, useState } from 'react';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
-import { cierrePort } from '../../adapters/cierre-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 
 export function useReapertura(
   aplicarSnapshot: (nuevo: FinanceSnapshot) => void,
 ) {
+  const { cierre: cierrePort } = usarPuertos();
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
 

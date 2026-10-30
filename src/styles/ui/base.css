@@ -1,0 +1,101 @@
+/* Base de elementos con especificidad cero (:where): cualquier control sin
+   estilo propio hereda el aspecto del sistema; las hojas de componente
+   siempre pueden sobrescribirlo. */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fuente-tamano-base);
+  line-height: var(--altura-linea);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(h1, h2, h3, h4) {
+  margin: 0;
+  line-height: var(--altura-linea-compacta);
+  font-family: var(--fuente-titulos);
+  /* Cal Sans tiene un solo peso: nunca negrita sintética. */
+  font-weight: var(--fuente-peso-regular);
+  letter-spacing: 0.01em;
+}
+:where(p) { margin: 0; }
+:where(a) { color: var(--color-primary-text); }
+
+::selection { background: var(--color-primary-bg); }
+
+:where(button, input, select, textarea) { font: inherit; color: inherit; }
+
+:where(button) {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-alto);
+  padding: 0 var(--space-4);
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  font-weight: var(--fuente-peso-medium);
+  cursor: pointer;
+  transition: background var(--transicion-rapida), border-color var(--transicion-rapida);
+}
+:where(button):hover:not(:disabled) { background: var(--color-surface-hover); }
+:where(button):disabled { opacity: 0.5; cursor: not-allowed; }
+
+:where(input:not([type='radio'], [type='checkbox'], [type='file'], [type='range']), select, textarea) {
+  min-height: var(--control-alto);
+  padding: var(--space-2) var(--space-3);
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+  transition: border-color var(--transicion-rapida), box-shadow var(--transicion-rapida);
+}
+:where(textarea) { resize: vertical; line-height: var(--altura-linea); }
+:where(input, select, textarea):hover:not(:disabled, :focus) { border-color: var(--color-subtle); }
+:where(input, select, textarea)::placeholder { color: var(--color-subtle); }
+:where(input, select, textarea):disabled { opacity: 0.6; cursor: not-allowed; }
+:where(input[type='number'], input[inputmode='decimal']) { font-variant-numeric: tabular-nums; }
+:where(input[type='month'], input[type='date']) { font-family: inherit; }
+::-webkit-calendar-picker-indicator { filter: invert(0.6); cursor: pointer; }
+[data-theme='claro'] ::-webkit-calendar-picker-indicator { filter: none; }
+
+:where(input[type='radio'], input[type='checkbox']) {
+  width: 16px; height: 16px; margin: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+:where(input[type='file']) { font-size: var(--fuente-tamano-sm); color: var(--color-muted); }
+::file-selector-button {
+  margin-right: var(--space-3);
+  min-height: var(--control-alto);
+  padding: 0 var(--space-4);
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font: inherit; font-weight: var(--fuente-peso-medium);
+  cursor: pointer;
+}
+::file-selector-button:hover { background: var(--color-surface-hover); }
+
+:where(fieldset) { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
+:where(legend) { padding: 0; }
+
+:where(table) { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--anillo-foco);
+  border-color: var(--color-primary);
+}
+
+/* Barras de desplazamiento discretas en ambos temas. */
+* { scrollbar-width: thin; scrollbar-color: var(--color-border-strong) transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}

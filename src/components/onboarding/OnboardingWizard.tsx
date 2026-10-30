@@ -1,23 +1,18 @@
-// REQ-24-04/25-01/26-01/27-01: shell del wizard de onboarding con barra
-// de progreso 5 pasos, navegación Atrás/Siguiente/Finalizar onboarding/
-// Saltar y reanudación con datos iniciales. El contenido de cada paso
-// vive en WizardContenido (regla dura ≤100 líneas).
-import { useCallback, useMemo, useState } from 'react';
+// REQ-24-04/25-01/26-01/27-01: shell del wizard de onboarding: indicador
+// de 5 pasos, tarjeta con la cabecera del paso, contenido y barra de
+// navegación Atrás / Saltar / Siguiente / Finalizar onboarding. El
+// contenido de cada paso vive en WizardContenido.
+import { useCallback, useState } from 'react';
 import { useOnboarding } from '../../hooks/use-onboarding.ts';
+import { Icono } from '../shell/Icono.tsx';
+import { Marca } from '../ui/Marca.tsx';
 import { WizardErrorCarga } from './WizardErrorCarga.tsx';
 import { WizardContenido } from './WizardContenido.tsx';
 import { esPaso1Completo } from './validarPaso.ts';
+import { PASOS } from './steps.ts';
 import type { OnboardingData } from '../../domain/entities/onboarding/index.ts';
 import type { GoalEntry } from '../../domain/entities/goal-entry.ts';
 import '../../styles/onboarding-wizard.css';
-
-const PASOS = [
-  { id: 1, titulo: 'Datos personales', key: 'paso1' },
-  { id: 2, titulo: 'Balance inicial', key: 'paso2' },
-  { id: 3, titulo: 'Deuda y proyección', key: 'paso3' },
-  { id: 4, titulo: 'Umbrales y metas', key: 'paso4' },
-  { id: 5, titulo: 'Resumen y finalizar', key: 'paso5' },
-] as const;
 
 export interface OnboardingWizardProps {
   readonly alCompletar: (nombre?: string) => void;
@@ -41,15 +36,10 @@ export function OnboardingWizard({
     actualizarPaso2, actualizarPaso3, actualizarPaso4, completar, saltar, recargar,
   } = useOnboarding({ datosIniciales, pasoInicial, perfilId });
   const [metas, setMetas] = useState<readonly GoalEntry[]>(metasIniciales ?? []);
-  const info = useMemo(() => PASOS.find((p) => p.id === currentStep) ?? PASOS[0], [currentStep]);
+  const info = PASOS.find((p) => p.id === currentStep) ?? PASOS[0];
   // Solo el paso 1 exige datos mínimos; los pasos 2-5 son opcionales.
-  const pasoValido = useMemo(() => {
-    if (!pasoActual) return false;
-    if (currentStep === 1) return esPaso1Completo(pasoActual);
-    if (currentStep === 3) return true;
-    return true;
-  }, [pasoActual, currentStep]);
-  const esUltimoPaso = currentStep === 5;
+  const pasoValido = currentStep !== 1 || esPaso1Completo(pasoActual);
+  const esUltimoPaso = currentStep === PASOS.length;
 
   const manejarSiguiente = useCallback(async () => {
     if (!esUltimoPaso) { siguientePaso(); return; }
@@ -67,33 +57,71 @@ export function OnboardingWizard({
 
   return (
     <div className="onboarding-wizard">
-      <nav className="onboarding-wizard__progreso" aria-label="Progreso del onboarding">
+      <header className="onboarding-wizard__bienvenida">
+        <Marca tamano={56} conNombre={false} />
+        <div className="onboarding-wizard__textos">
+          <h1 className="onboarding-wizard__titulo-app">
+            Te damos la bienvenida a <span className="onboarding-wizard__nombre-app">mfinance</span>
+          </h1>
+          <p className="onboarding-wizard__subtitulo">Configura tu perfil en cinco pasos. Solo el primero es obligatorio.</p>
+        </div>
+      </header>
+
+      <nav aria-label="Progreso del onboarding">
         <ol className="onboarding-wizard__pasos">
-          {PASOS.map((p) => (
-            <li key={p.id} className={`onboarding-wizard__paso ${p.id === currentStep ? 'onboarding-wizard__paso--actual' : ''} ${p.id < currentStep ? 'onboarding-wizard__paso--completado' : ''}`}><span className="onboarding-wizard__paso-numero">{p.id}</span><span className="onboarding-wizard__paso-titulo">{p.titulo}</span></li>
-          ))}
+          {PASOS.map((p) => {
+            const estado = p.id < currentStep ? 'hecho' : p.id === currentStep ? 'actual' : 'pendiente';
+            return (
+              <li key={p.id} className={`onboarding-wizard__paso onboarding-wizard__paso--${estado}`}
+                aria-current={estado === 'actual' ? 'step' : undefined}>
+                <span className="onboarding-wizard__paso-numero" aria-hidden="true">
+                  {estado === 'hecho' ? <Icono nombre="check" tamano={14} /> : p.id}
+                </span>
+                <span className="onboarding-wizard__paso-titulo">{p.titulo}</span>
+              </li>
+            );
+          })}
         </ol>
-        <div className="onboarding-wizard__barra">
-          <div className="onboarding-wizard__barra-progreso" style={{ '--progreso': `${((currentStep - 1) / 4) * 100}%` } as React.CSSProperties} aria-hidden="true" />
-        </div>
       </nav>
-      <WizardContenido
-        keyPaso={info.key} titulo={info.titulo} pasoId={info.id}
-        datos={datos} pasoActual={pasoActual} paso2Actual={paso2Actual}
-        paso3Actual={paso3Actual} paso4Actual={paso4Actual}
-        alCambiarPaso1={actualizarPaso1} alCambiarPaso2={actualizarPaso2}
-        alCambiarPaso3={actualizarPaso3} alCambiarPaso4={actualizarPaso4}
-        metas={metas} alCambiarMetas={setMetas} deshabilitado={operacionEnCurso}
-        perfilId={perfilId} alSaltar={() => void manejarSaltar()}
-      />
-      <footer className="onboarding-wizard__navegacion">
-        <button className="onboarding-wizard__btn onboarding-wizard__btn--atras" onClick={pasoAnterior} disabled={currentStep === 1 || operacionEnCurso} aria-disabled={currentStep === 1 || operacionEnCurso}>Atrás</button>
-        <div className="onboarding-wizard__acciones-principales">
-          {currentStep === 1 && <button className="onboarding-wizard__btn onboarding-wizard__btn--saltar" onClick={() => void manejarSaltar()} disabled={operacionEnCurso}>Saltar onboarding</button>}
-          <button className={`onboarding-wizard__btn onboarding-wizard__btn--principal ${!pasoValido ? 'onboarding-wizard__btn--deshabilitado' : ''}`} onClick={() => void manejarSiguiente()} disabled={!pasoValido || operacionEnCurso} aria-disabled={!pasoValido || operacionEnCurso}>{esUltimoPaso ? 'Finalizar onboarding' : 'Siguiente'}</button>
-        </div>
-      </footer>
-      {guardando && <div className="onboarding-wizard__guardando" aria-live="polite">Guardando cambios…</div>}
+
+      <section className="card onboarding-wizard__tarjeta" aria-labelledby="onboarding-paso-titulo">
+        <header className="onboarding-wizard__cabecera">
+          <p className="onboarding-wizard__eyebrow">
+            Paso {info.id} de {PASOS.length}
+            {info.opcional ? <span className="badge">Opcional</span> : null}
+          </p>
+          <h2 id="onboarding-paso-titulo" className="onboarding-wizard__titulo-paso">{info.titulo}</h2>
+          <p className="onboarding-wizard__descripcion">{info.descripcion}</p>
+        </header>
+
+        <WizardContenido
+          keyPaso={info.key}
+          datos={datos} pasoActual={pasoActual} paso2Actual={paso2Actual}
+          paso3Actual={paso3Actual} paso4Actual={paso4Actual}
+          alCambiarPaso1={actualizarPaso1} alCambiarPaso2={actualizarPaso2}
+          alCambiarPaso3={actualizarPaso3} alCambiarPaso4={actualizarPaso4}
+          metas={metas} alCambiarMetas={setMetas} deshabilitado={operacionEnCurso}
+          perfilId={perfilId}
+        />
+
+        <footer className="onboarding-wizard__navegacion">
+          <button type="button" className="btn btn--fantasma" onClick={pasoAnterior}
+            disabled={currentStep === 1 || operacionEnCurso}>
+            <Icono nombre="anterior" tamano={16} /> Atrás
+          </button>
+          <div className="onboarding-wizard__acciones">
+            {currentStep === 1 && (
+              <button type="button" className="btn btn--fantasma" onClick={() => void manejarSaltar()}
+                disabled={operacionEnCurso}>Saltar por ahora</button>
+            )}
+            <button type="button" className="btn btn--primario" onClick={() => void manejarSiguiente()}
+              disabled={!pasoValido || operacionEnCurso}>
+              {esUltimoPaso ? 'Finalizar' : <>Siguiente <Icono nombre="siguiente" tamano={16} /></>}
+            </button>
+          </div>
+        </footer>
+      </section>
+      {guardando && <div className="onboarding-wizard__guardando" role="status">Guardando cambios…</div>}
     </div>
   );
 }

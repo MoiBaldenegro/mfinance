@@ -37,8 +37,15 @@ export function TarjetaMontos({
 }: Props) {
   const moneda = usarMoneda();
   return (
-    <fieldset className="tarjeta-montos">
-      <legend className="tarjeta-montos__titulo">{titulo}</legend>
+    <fieldset className="card tarjeta-montos">
+      <legend className="solo-lectores">{titulo}</legend>
+      <div className="card__cabecera" aria-hidden="true">
+        <h2 className="card__titulo">{titulo}</h2>
+        <span className={`num tarjeta-montos__subtotal tarjeta-montos__subtotal--${prefijo}`}>
+          {formatoMoneda(subtotal, moneda)}
+        </span>
+      </div>
+      <div className="tarjeta-montos__campos">
       {claves.map((clave) => (
         <CampoImporte
           key={clave}
@@ -50,9 +57,8 @@ export function TarjetaMontos({
           alCambiar={alCambiar}
         />
       ))}
-      <p className={`tarjeta-montos__subtotal tarjeta-montos__subtotal--${prefijo}`}>
-        Subtotal: <strong>{formatoMoneda(subtotal, moneda)}</strong>
-      </p>
+      </div>
+      <p className="solo-lectores">Subtotal {titulo}: {formatoMoneda(subtotal, moneda)}</p>
     </fieldset>
   );
 }

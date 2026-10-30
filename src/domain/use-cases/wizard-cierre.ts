@@ -19,7 +19,7 @@ export interface EstadoWizard {
 export const ETIQUETAS_PASOS: readonly string[] = [
   'Repaso',
   'Presupuesto',
-  'Assessment',
+  'Evaluación',
   'Confirmación',
 ];
 

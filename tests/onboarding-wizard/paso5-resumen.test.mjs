@@ -82,3 +82,16 @@ describe('construirResumenOnboarding — secciones, checks y totales (REQ-27-05)
     for (const s of secciones) assert.equal(s.completo, false, s.id);
   });
 });
+
+describe('resumen: etiquetas legibles de fuentes y categorías', () => {
+  it('traduce las claves en minúsculas a sus rótulos con tilde', () => {
+    const datos = datosCompletos();
+    const resumen = construirResumenOnboarding({
+      ...datos,
+      paso1: { ...datos.paso1, categorias_gasto_usadas: ['vivienda', 'alimentacion'] },
+    }, METAS);
+    const gastos = resumen.find((s) => s.lineas.some((l) => l.includes('Vivienda')));
+    assert.ok(gastos, 'debe mostrar «Vivienda»');
+    assert.match(gastos.lineas[0], /Alimentación/);
+  });
+});

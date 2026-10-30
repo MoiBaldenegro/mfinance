@@ -20,20 +20,20 @@ export function ErrorScreen({ error, reintentar, alGestionarPerfiles, alRegresar
       <p className="error-screen__mensaje">{error.message}</p>
       {reintentar ? <button
         type="button"
-        className="error-screen__boton"
+        className="btn btn--primario"
         onClick={reintentar}
       >
         Reintentar
       </button> : null}
       <button
         type="button"
-        className="error-screen__boton"
+        className="btn"
         aria-label="Gestionar perfiles (Regresar a Ajustes)"
         onClick={gestionar}
       >
         Gestionar perfiles
       </button>
-      {alVolverPerfilAnterior ? <button type="button" className="error-screen__boton"
+      {alVolverPerfilAnterior ? <button type="button" className="btn btn--fantasma"
         onClick={alVolverPerfilAnterior}>Volver al perfil anterior</button> : null}
     </div>
   );

@@ -3,6 +3,7 @@ import type { KeyboardEvent } from 'react';
 import type { Perfil } from '../../domain/entities/perfil.ts';
 import { enfocarPrimario, mantenerFoco } from './foco-dialogo.ts';
 import type { DocumentoFoco } from './foco-dialogo.ts';
+import { Icono } from '../shell/Icono.tsx';
 import '../../styles/perfil-carga-error-dialog.css';
 
 interface Props {
@@ -29,15 +30,18 @@ export function PerfilCargaErrorDialog({ perfilObjetivo, motivo,
     aria-labelledby="perfil-carga-error-titulo" aria-describedby="perfil-carga-error-descripcion"
     ref={dialogo} onKeyDown={alTecla}>
     <div className="perfil-carga-error-dialog__superficie">
-      <h1 id="perfil-carga-error-titulo" tabIndex={-1}>No se pudo cargar el perfil</h1>
-      <div id="perfil-carga-error-descripcion">
+      <h1 id="perfil-carga-error-titulo" className="perfil-carga-error-dialog__titulo" tabIndex={-1}>No se pudo cargar el perfil</h1>
+      <div id="perfil-carga-error-descripcion" className="perfil-carga-error-dialog__descripcion">
         <p>El perfil afectado es <strong>{perfilObjetivo.nombre}</strong>.</p>
         <p className="perfil-carga-error-dialog__motivo">{motivo}</p>
       </div>
       <button ref={primario} type="button" autoFocus onClick={alVolverPerfilAnterior}
+        className="btn btn--primario perfil-carga-error-dialog__volver"
         aria-label="Volver al perfil anterior">Volver al perfil anterior</button>
-      <button type="button" onClick={alCerrar} aria-label="Cerrar diálogo">Cerrar</button>
-      <button type="button" onClick={alCerrar}>Cancelar</button>
+      <button type="button" onClick={alCerrar} aria-label="Cerrar diálogo" title="Cerrar"
+        className="btn btn--fantasma btn--icono perfil-carga-error-dialog__cerrar"><Icono nombre="cerrar" /></button>
+      <button type="button" onClick={alCerrar}
+        className="btn perfil-carga-error-dialog__cancelar">Cancelar</button>
     </div>
   </div>;
 }

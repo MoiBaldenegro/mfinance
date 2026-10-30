@@ -1,0 +1,23 @@
+/* Tarjetas de activos/pasivos del Balance: formulario en línea y acciones. */
+.balance-tabla { align-content: start; }
+
+.balance-tabla__acciones { width: 1%; white-space: nowrap; text-align: right; }
+
+.balance-form {
+  display: grid; gap: var(--space-3);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: var(--space-4);
+  background: var(--color-sunken);
+  border: var(--borde);
+  border-radius: var(--radius-md);
+}
+.balance-form__error { grid-column: 1 / -1; }
+.balance-form__acciones {
+  grid-column: 1 / -1;
+  display: flex; justify-content: flex-end; gap: var(--space-2);
+}
+
+@media (max-width: 1300px) {
+  .balance-form { grid-template-columns: minmax(0, 1fr); }
+}
+.balance-tabla__eliminar:hover:not(:disabled) { color: var(--color-negative); }

@@ -12,13 +12,16 @@ pub struct DeudaPlan {
     pub saldo_pendiente: f64,
     /// Tasa de interés anual en %.
     pub tasa_interes_anual: f64,
-    /// Pago mínimo mensual estimado (2% del saldo o 25€, el mayor).
+    /// Pago mínimo mensual estimado: el mayor entre el 2 % del saldo, el
+    /// interés del mes más un 1 % de capital y 25. Siempre amortiza.
     pub pago_minimo_mensual: f64,
 }
 
 impl DeudaPlan {
     pub(crate) fn desde_liability(liability: &crate::domain::liability::Liability) -> Self {
-        let pago_minimo = (liability.saldo_pendiente() * 0.02).max(25.0);
+        let saldo = liability.saldo_pendiente();
+        let interes_mes = saldo * liability.tasa_interes_anual() / 100.0 / 12.0;
+        let pago_minimo = (saldo * 0.02).max(interes_mes + saldo * 0.01).max(25.0);
         Self {
             nombre: liability.nombre().to_string(),
             saldo_pendiente: liability.saldo_pendiente(),

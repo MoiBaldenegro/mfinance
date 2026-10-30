@@ -1,0 +1,16 @@
+/* Lista de consejos con franja de color según severidad. */
+.consejos { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+
+.consejo {
+  display: grid; gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: var(--borde);
+  border-left: var(--borde-ancho-fuerte) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+.consejo--positivo { border-left-color: var(--color-positive); }
+.consejo--aviso { border-left-color: var(--color-warn); }
+.consejo--negativo { border-left-color: var(--color-negative); background: var(--color-negative-bg); }
+
+.consejo__titulo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.consejo__texto { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }

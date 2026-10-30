@@ -14,7 +14,8 @@ import { mesEstaCerrado } from '../../domain/use-cases/mes-cerrado.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import { useSnapshot } from '../shell/SnapshotProvider.tsx';
 import { BloqueoCierre } from './BloqueoCierre.tsx';
-import { MonthSelector } from './MonthSelector.tsx';
+import { CabeceraPagina } from '../ui/CabeceraPagina';
+import { SelectorMes } from '../ui/SelectorMes';
 import { TarjetaMontos } from './TarjetaMontos.tsx';
 import { useRegistroMensual } from './use-registro-mensual.ts';
 import '../../styles/registro-section.css';
@@ -31,15 +32,14 @@ export function RegistroSection({ snapshot }: Props) {
   // REQ-16-07: mes cerrado = registro solo lectura hasta reabrirlo.
   const cerrado = mesEstaCerrado(snapshot, formulario.mes);
   return (
-    <section className="registro-section">
-      <h2 className="registro-section__titulo">Registro</h2>
-      <p className="registro-section__ayuda">
-        Captura tus ingresos y gastos de un mes y confirma para guardarlos.
-      </p>
-      <MonthSelector mes={formulario.mes} alCambiar={formulario.alCambiarMes} />
+    <section className="pagina registro-section">
+      <CabeceraPagina titulo="Registro"
+        descripcion="Captura tus ingresos y gastos del mes y confirma para guardarlos.">
+        <SelectorMes mes={formulario.mes} alCambiar={formulario.alCambiarMes} etiqueta="Mes del registro" />
+      </CabeceraPagina>
       {cerrado ? <BloqueoCierre mes={formulario.mes} /> : null}
       <fieldset
-        className="registro-section__tarjetas registro-section__fieldset"
+        className="rejilla rejilla--2 registro-section__tarjetas"
         disabled={cerrado}
       >
         <TarjetaMontos
@@ -64,21 +64,22 @@ export function RegistroSection({ snapshot }: Props) {
         />
       </fieldset>
       {formulario.aviso ? (
-        <p className="registro-section__aviso" role="alert">
+        <p className="aviso aviso--error" role="alert">
           {formulario.aviso}
         </p>
       ) : null}
-      <footer className="registro-section__totales">
-        <span>Total ingresos: {formatoMoneda(formulario.totales.ingresos, moneda)}</span>
-        <span>Total gastos: {formatoMoneda(formulario.totales.gastos, moneda)}</span>
-        <strong>Utilidad del mes: {formatoMoneda(formulario.totales.utilidad, moneda)}</strong>
-        <button
-          type="button"
-          className="registro-section__confirmar"
+      <footer className="card registro-section__resumen">
+        <dl className="registro-section__totales">
+          <div><dt>Ingresos</dt><dd className="num">{formatoMoneda(formulario.totales.ingresos, moneda)}</dd></div>
+          <div><dt>Gastos</dt><dd className="num">{formatoMoneda(formulario.totales.gastos, moneda)}</dd></div>
+          <div><dt>Utilidad del mes</dt>
+            <dd className={formulario.totales.utilidad < 0 ? 'num negativo' : 'num positivo'}>
+              {formatoMoneda(formulario.totales.utilidad, moneda)}</dd></div>
+        </dl>
+        <button type="button" className="btn btn--primario registro-section__confirmar"
           disabled={formulario.ocupado || cerrado}
-          onClick={() => void formulario.confirmar()}
-        >
-          {formulario.ocupado ? 'Guardando…' : 'Confirmar'}
+          onClick={() => void formulario.confirmar()}>
+          {formulario.ocupado ? 'Guardando…' : 'Confirmar mes'}
         </button>
       </footer>
     </section>

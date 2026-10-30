@@ -43,3 +43,21 @@ fn negative_value_is_rejected_with_named_error() {
         "valor negativo no permitido: Asset.valor_actual = -1"
     );
 }
+
+/// Contrato IPC: el frontend usa 'liquido' | 'inversion' | 'propiedad'.
+#[test]
+fn categoria_se_serializa_en_minusculas_para_el_frontend() {
+    let json = serde_json::to_string(&AssetCategory::Liquido).unwrap();
+    assert_eq!(json, "\"liquido\"");
+    assert_eq!(serde_json::to_string(&AssetCategory::Inversion).unwrap(), "\"inversion\"");
+    assert_eq!(serde_json::to_string(&AssetCategory::Propiedad).unwrap(), "\"propiedad\"");
+}
+
+/// Los snapshots guardados antes del cambio («Liquido») siguen cargando.
+#[test]
+fn categoria_legada_en_pascal_case_sigue_deserializando() {
+    let legado: AssetCategory = serde_json::from_str("\"Propiedad\"").unwrap();
+    assert_eq!(legado, AssetCategory::Propiedad);
+    let nuevo: AssetCategory = serde_json::from_str("\"inversion\"").unwrap();
+    assert_eq!(nuevo, AssetCategory::Inversion);
+}

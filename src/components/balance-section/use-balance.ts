@@ -1,77 +1,64 @@
-// REQ-08-03/07: hook React para la sección Balance: carga la serie
-// de balance, expone operaciones CRUD y refresca el snapshot tras cambios.
+// Hook de la sección Balance: carga la serie de patrimonio y expone el
+// CRUD de activos/pasivos. Cada mutación publica el snapshot devuelto por
+// el backend (las tablas se refrescan al instante) y recalcula la serie
+// sin volver a la pantalla de carga. Los fallos de una operación no
+// sustituyen la sección: se muestran junto a ella.
 import { useCallback, useEffect, useState } from 'react';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
-import type { BalanceCompleto } from '../../domain/entities/balance-serie.ts';
+import { usarPuertos } from '../../app/puertos.ts';
+import type { BalanceCompleto, TotalesBalance } from '../../domain/entities/balance-serie.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { CategoriaActivo } from '../../domain/entities/asset.ts';
-import type { TotalesBalance } from '../../domain/entities/balance-serie.ts';
+import { useSnapshot } from '../shell/SnapshotProvider.tsx';
 
-interface UseBalanceReturn {
-  readonly balance: BalanceCompleto | null;
-  readonly totales: TotalesBalance | null;
-  readonly cargando: boolean;
-  readonly error: string | null;
-  readonly recargar: () => Promise<void>;
-  readonly assetUpsert: (nombre: string, categoria: CategoriaActivo, valorActual: number) => Promise<void>;
-  readonly assetEliminar: (nombre: string) => Promise<void>;
-  readonly liabilityUpsert: (nombre: string, saldoPendiente: number, tasaInteresAnual: number) => Promise<void>;
-  readonly liabilityEliminar: (nombre: string) => Promise<void>;
-}
+const motivo = (e: unknown, defecto: string) => (e instanceof Error ? e.message : defecto);
 
-export function useBalance(): UseBalanceReturn {
+export function useBalance() {
+  const { snapshot: snapshotPort } = usarPuertos();
+  const { aplicarSnapshot } = useSnapshot();
   const [balance, setBalance] = useState<BalanceCompleto | null>(null);
   const [cargando, setCargando] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [errorCarga, setErrorCarga] = useState<string | null>(null);
+  const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
+  const [ocupado, setOcupado] = useState(false);
 
-  const recargar = useCallback(async () => {
-    setCargando(true);
-    setError(null);
+  const cargarSerie = useCallback(async () => {
     try {
-      const data = await snapshotPort.balanceSerie();
-      setBalance(data);
+      setBalance(await snapshotPort.balanceSerie());
+      setErrorCarga(null);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Error cargando balance');
+      setErrorCarga(motivo(e, 'No se pudo cargar el balance'));
     } finally {
       setCargando(false);
     }
   }, []);
 
-  useEffect(() => { recargar(); }, [recargar]);
+  useEffect(() => { void cargarSerie(); }, [cargarSerie]);
 
-  const mutarYRecargar = useCallback(
-    async (fn: () => Promise<FinanceSnapshot>) => {
-      setError(null);
-      try { await fn(); await recargar(); }
-      catch (e: unknown) { setError(e instanceof Error ? e.message : 'Error en la operación'); throw e; }
-    },
-    [recargar],
-  );
+  /** Ejecuta la mutación; resuelve true si se guardó. */
+  const mutar = useCallback(async (fn: () => Promise<FinanceSnapshot>): Promise<boolean> => {
+    setOcupado(true);
+    setErrorOperacion(null);
+    try {
+      aplicarSnapshot(await fn());
+      await cargarSerie();
+      return true;
+    } catch (e: unknown) {
+      setErrorOperacion(motivo(e, 'No se pudo guardar el cambio'));
+      return false;
+    } finally {
+      setOcupado(false);
+    }
+  }, [aplicarSnapshot, cargarSerie]);
 
-  const assetUpsert = useCallback(
-    (nombre: string, categoria: CategoriaActivo, valorActual: number) =>
-      mutarYRecargar(() => snapshotPort.assetUpsert(nombre, categoria, valorActual)),
-    [mutarYRecargar],
-  );
-
-  const assetEliminar = useCallback(
-    (nombre: string) => mutarYRecargar(() => snapshotPort.assetEliminar(nombre)),
-    [mutarYRecargar],
-  );
-
-  const liabilityUpsert = useCallback(
-    (nombre: string, saldoPendiente: number, tasaInteresAnual: number) =>
-      mutarYRecargar(() => snapshotPort.liabilityUpsert(nombre, saldoPendiente, tasaInteresAnual)),
-    [mutarYRecargar],
-  );
-
-  const liabilityEliminar = useCallback(
-    (nombre: string) => mutarYRecargar(() => snapshotPort.liabilityEliminar(nombre)),
-    [mutarYRecargar],
-  );
-
+  const totales: TotalesBalance | null = balance?.totales ?? null;
   return {
-    balance, totales: balance?.totales ?? null, cargando, error, recargar,
-    assetUpsert, assetEliminar, liabilityUpsert, liabilityEliminar,
+    balance, totales, cargando, errorCarga, errorOperacion, ocupado,
+    reintentar: cargarSerie,
+    assetUpsert: (nombre: string, categoria: CategoriaActivo, valor: number) =>
+      mutar(() => snapshotPort.assetUpsert(nombre, categoria, valor)),
+    assetEliminar: (nombre: string) => mutar(() => snapshotPort.assetEliminar(nombre)),
+    liabilityUpsert: (nombre: string, saldo: number, tasa: number) =>
+      mutar(() => snapshotPort.liabilityUpsert(nombre, saldo, tasa)),
+    liabilityEliminar: (nombre: string) => mutar(() => snapshotPort.liabilityEliminar(nombre)),
   };
 }

@@ -4,7 +4,7 @@ import type { CambiosFila, FilaTabla } from '../../domain/use-cases/diagnostico-
 import { celdaFecha, concepto, importe, categoria, botones } from './DiagnosticoFila.tsx';
 import { simboloDe } from '../../domain/entities/moneda.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
-import '../../styles/diagnostico-tabla.css';
+import '../../styles/diagnostico.css';
 
 export interface PropsTabla {
   readonly filas: readonly FilaTabla[];
@@ -34,8 +34,10 @@ export function DiagnosticoTabla(props: PropsTabla) {
     );
   }
   return (
-    <div className="diagnostico-tabla">
-      <table className="diagnostico-tabla__tabla">
+    <section className="card diagnostico-tabla" aria-label="Movimientos detectados">
+      <h2 className="card__titulo">Movimientos detectados</h2>
+      <div className="tabla-contenedor">
+      <table className="tabla diagnostico-tabla__tabla">
         <thead>
           <tr>
             <th scope="col">Fecha</th>
@@ -60,6 +62,7 @@ export function DiagnosticoTabla(props: PropsTabla) {
           ))}
         </tbody>
       </table>
+      </div>
       <div className="diagnostico-tabla__pie">
         <span className="diagnostico-tabla__conteo">
           {resumen.confirmadas} confirmadas · {resumen.descartadas} descartadas ·{' '}
@@ -67,13 +70,13 @@ export function DiagnosticoTabla(props: PropsTabla) {
         </span>
         <button
           type="button"
-          className="diagnostico-tabla__confirmar-todo"
+          className="btn btn--primario"
           onClick={alConfirmarSeleccion}
           disabled={confirmando || resumen.confirmadas === 0}
         >
           Confirmar selección
         </button>
       </div>
-    </div>
+    </section>
   );
 }

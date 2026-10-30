@@ -1,6 +1,7 @@
-//! Simulación de un mes del plan: interés compuesto mensual, pagos
-//! mínimos por deuda y extra dedicado a la primera deuda con saldo
-//! (la objetivo según el orden elegido).
+//! Simulación de un mes del plan: interés compuesto mensual y un
+//! presupuesto constante (suma de los mínimos iniciales + extra). Tras los
+//! mínimos, lo que sobra —incluido el mínimo liberado por deudas ya
+//! liquidadas (rollover)— cae en cascada según el orden de la estrategia.
 
 use crate::application::plan_deuda_simulacion::tipos::DeudaPlan;
 
@@ -26,38 +27,40 @@ impl DeudaMut {
     }
 }
 
-/// Simula un mes de pagos sobre una lista de deudas mutables.
+/// Simula un mes de pagos sobre deudas ordenadas por la estrategia.
 /// Devuelve (pago_total, intereses_mes, todas_liquidadas).
 pub(crate) fn simular_mes(deudas: &mut [DeudaMut], extra_mensual: f64) -> (f64, f64, bool) {
-    let mut pago_total = 0.0;
+    let presupuesto: f64 = deudas.iter().map(|d| d.pago_minimo).sum::<f64>() + extra_mensual.max(0.0);
     let mut intereses_totales = 0.0;
-
-    // Primero calcular intereses de todas las deudas
-    for deuda in deudas.iter_mut() {
+    for deuda in deudas.iter_mut().filter(|d| d.saldo > 0.0) {
         let interes = deuda.interes_mes();
         deuda.saldo += interes;
         intereses_totales += interes;
     }
 
-    // Luego aplicar pagos mínimos
+    let mut disponible = presupuesto;
+    // Mínimos de cada deuda viva.
     for deuda in deudas.iter_mut() {
-        let pago = deuda.pago_minimo.min(deuda.saldo);
+        let pago = deuda.pago_minimo.min(deuda.saldo).min(disponible);
         deuda.saldo -= pago;
-        pago_total += pago;
+        disponible -= pago;
     }
-
-    // Aplicar pago extra a la primera deuda con saldo > 0 (la objetivo)
-    if extra_mensual > 0.0 {
-        for deuda in deudas.iter_mut() {
-            if deuda.saldo > 0.01 {
-                let pago_extra = extra_mensual.min(deuda.saldo);
-                deuda.saldo -= pago_extra;
-                pago_total += pago_extra;
-                break;
-            }
+    // Sobrante (extra + mínimos liberados) en cascada por orden de ataque.
+    for deuda in deudas.iter_mut() {
+        if disponible <= 0.0 {
+            break;
+        }
+        let pago = disponible.min(deuda.saldo);
+        deuda.saldo -= pago;
+        disponible -= pago;
+    }
+    for deuda in deudas.iter_mut() {
+        if deuda.saldo < 0.01 {
+            deuda.saldo = 0.0;
         }
     }
 
-    let todas_cero = deudas.iter().all(|d| d.saldo < 0.01);
+    let pago_total = presupuesto - disponible;
+    let todas_cero = deudas.iter().all(|d| d.saldo == 0.0);
     (pago_total, intereses_totales, todas_cero)
 }

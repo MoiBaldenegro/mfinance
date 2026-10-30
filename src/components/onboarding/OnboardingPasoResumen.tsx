@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import type { OnboardingData } from '../../domain/entities/onboarding/index.ts';
 import type { GoalEntry } from '../../domain/entities/goal-entry.ts';
 import { construirResumenOnboarding } from '../../domain/use-cases/onboarding/onboarding-resumen.ts';
+import { Icono } from '../shell/Icono.tsx';
 import '../../styles/onboarding-paso-resumen.css';
 
 interface Props {
@@ -16,17 +17,18 @@ interface Props {
 export function OnboardingPasoResumen({ datos, metas }: Props) {
   const secciones = useMemo(() => construirResumenOnboarding(datos, metas), [datos, metas]);
   return (
-    <section className="onboarding-paso-resumen">
-      <h3 className="onboarding-paso-resumen__titulo">Resumen de tu onboarding</h3>
-      <p className="onboarding-paso-resumen__ayuda">
-        Revisa todo lo capturado. Al finalizar se consolidará en tu perfil.
-      </p>
+    <div className="onboarding-paso-resumen">
       <ul className="onboarding-paso-resumen__lista">
         {secciones.map((seccion) => (
           <li key={seccion.id} className={`resumen-seccion ${seccion.completo ? 'resumen-seccion--completo' : 'resumen-seccion--incompleto'}`}>
-            <span className="resumen-seccion__check" aria-hidden="true">{seccion.completo ? '✓' : '○'}</span>
+            <span className="resumen-seccion__check" aria-hidden="true">
+              {seccion.completo ? <Icono nombre="check" tamano={14} /> : null}
+            </span>
             <div className="resumen-seccion__cuerpo">
-              <span className="resumen-seccion__titulo">{seccion.titulo}</span>
+              <span className="resumen-seccion__titulo">
+                {seccion.titulo}
+                <span className="solo-lectores">{seccion.completo ? ' (completo)' : ' (pendiente)'}</span>
+              </span>
               {seccion.lineas.map((linea) => (
                 <span key={linea} className="resumen-seccion__linea">{linea}</span>
               ))}
@@ -36,9 +38,10 @@ export function OnboardingPasoResumen({ datos, metas }: Props) {
       </ul>
       {metas.length > 0 && (
         <p className="onboarding-paso-resumen__metas">
-          Tus metas: {metas.map((m) => m.titulo).join(' · ')}
+          <span className="onboarding-paso-resumen__metas-titulo">Tus metas:</span>
+          {metas.map((m) => <span key={m.id} className="badge badge--primario">{m.titulo}</span>)}
         </p>
       )}
-    </section>
+    </div>
   );
 }

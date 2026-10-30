@@ -1,0 +1,54 @@
+/* Simulador de créditos (sandbox) dentro de la sección Deuda. */
+.simulador { display: grid; gap: var(--space-4); }
+.simulador__intro { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.simulador__modo { display: grid; gap: var(--space-4); }
+.simulador__tablas { align-items: start; }
+.simulador__accion { justify-self: start; }
+
+.simulador-formulario {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  align-items: end;
+}
+.simulador-formulario__titulo,
+.simulador-formulario__error { grid-column: 1 / -1; }
+.simulador-formulario__boton { align-self: end; }
+
+.simulador-tarjeta {
+  display: grid; gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: var(--borde); border-radius: var(--radius-lg);
+}
+.simulador-tarjeta--optimizada { border-color: var(--color-primary); background: var(--color-primary-bg); }
+.simulador-tarjeta__titulo { grid-column: 1 / -1; font-size: var(--fuente-tamano-md); }
+.simulador-tarjeta__metrica { display: grid; gap: 2px; }
+.simulador-tarjeta__etiqueta { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+.simulador-tarjeta__valor { font-size: var(--fuente-tamano-lg); font-variant-numeric: tabular-nums; }
+
+.simulador-amortizacion {
+  border: var(--borde); border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.simulador-amortizacion > summary {
+  padding: var(--space-3) var(--space-4);
+  font-weight: var(--fuente-peso-medium);
+  cursor: pointer;
+}
+.simulador-amortizacion__scroll { max-height: 320px; overflow-y: auto; margin: 0 var(--space-4) var(--space-4); }
+
+.simulador-plan__lista { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.simulador-plan__lista li {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--borde); border-radius: var(--radius-md);
+}
+.simulador-plan__escenario {
+  display: grid; gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--borde); border-radius: var(--radius-lg);
+  color: var(--color-muted); font-size: var(--fuente-tamano-sm);
+}
+.simulador-plan__escenario h5 { margin: 0 0 var(--space-1); color: var(--color-text); font-size: var(--fuente-tamano-md); }
+.simulador-plan__escenario--activa { border-color: var(--color-primary); background: var(--color-primary-bg); }
+.simulador-plan__ahorro { color: var(--color-positive); }

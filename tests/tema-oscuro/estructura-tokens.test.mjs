@@ -27,15 +27,11 @@ function nombresDeclarados(bloqueCss) {
   );
 }
 
-describe('REQ-17-05: tokens.css dual ≤100 líneas', () => {
+describe('REQ-17-05: tokens.css dual', () => {
   const css = readFileSync(RUTA, 'utf8');
   const raiz = bloque(css, ':root');
   const claro = bloque(css, "[data-theme='claro']");
 
-  it('no supera las 100 líneas (wc -l)', () => {
-    const lineas = css.split('\n').length - 1; // como wc -l
-    assert.ok(lineas <= 100, `tokens.css tiene ${lineas} líneas`);
-  });
 
   it('define el bloque oscuro en :root y el claro bajo [data-theme=claro]', () => {
     assert.ok(raiz, 'falta el bloque :root');

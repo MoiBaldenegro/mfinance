@@ -1,7 +1,7 @@
 // REQ-12-04: panel de subida múltiple de PDFs con input nativo y botón
 // Analizar. Solo presentación: los bytes van al puerto como transporte.
 import type { ComprobanteSubida } from '../../domain/entities/diagnostico.ts';
-import '../../styles/diagnostico-subida.css';
+import '../../styles/diagnostico.css';
 
 interface Props {
   readonly seleccionados: readonly ComprobanteSubida[];
@@ -17,14 +17,17 @@ export function DiagnosticoSubida({
 }: Props) {
   const sinArchivos = seleccionados.length === 0;
   return (
-    <div className="diagnostico-subida">
-      <label className="diagnostico-subida__campo">
-        <span className="diagnostico-subida__etiqueta">
-          Extractos PDF del mes
-        </span>
+    <section className="card diagnostico-subida" aria-label="Extractos PDF">
+      <div className="card__cabecera">
+        <h2 className="card__titulo">Extractos del mes</h2>
+        <span className="card__descripcion">Solo PDF con texto (no escaneados)</span>
+      </div>
+      <label className="diagnostico-subida__zona">
+        <span className="btn">Elegir PDFs…</span>
+        <span className="card__descripcion">Puedes seleccionar varios archivos a la vez.</span>
         <input
           type="file"
-          className="diagnostico-subida__input"
+          className="solo-lectores"
           accept="application/pdf,.pdf"
           multiple
           disabled={preparando || analizando}
@@ -35,13 +38,11 @@ export function DiagnosticoSubida({
         />
       </label>
       {sinArchivos ? (
-        <p className="estado-vacio diagnostico-subida__vacio">
-          Todavía no hay PDFs seleccionados para este mes.
-        </p>
+        <p className="card__descripcion">Todavía no hay PDFs seleccionados para este mes.</p>
       ) : (
         <ul className="diagnostico-subida__lista">
           {seleccionados.map((archivo) => (
-            <li key={archivo.nombre} className="diagnostico-subida__item">
+            <li key={archivo.nombre} className="badge diagnostico-subida__item">
               {archivo.nombre}
             </li>
           ))}
@@ -49,7 +50,7 @@ export function DiagnosticoSubida({
       )}
       <button
         type="button"
-        className="diagnostico-subida__analizar"
+        className="btn btn--primario diagnostico-subida__analizar"
         onClick={alAnalizar}
         disabled={sinArchivos || preparando || analizando}
       >
@@ -58,6 +59,6 @@ export function DiagnosticoSubida({
       {preparando && (
         <p className="estado-carga">Preparando los archivos…</p>
       )}
-    </div>
+    </section>
   );
 }

@@ -18,12 +18,13 @@ import {
   editarFila as editarFilaCaso,
   reabrirFila as reabrirFilaCaso,
 } from '../../domain/use-cases/diagnostico-tabla-acciones.ts';
-import { diagnosticoPort } from '../../adapters/diagnostico-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import { archivoABase64 } from '../../lib/base64.ts';
 import { useSnapshot } from '../shell/SnapshotProvider.tsx';
 
 /** Hook principal: mes, selección de archivos, informe y filas. */
 export function useDiagnostico(mes: string) {
+  const { diagnostico: diagnosticoPort } = usarPuertos();
   const { aplicarSnapshot } = useSnapshot();
   const [seleccionados, setSeleccionados] = useState<readonly ComprobanteSubida[]>([]);
   const [preparando, setPreparando] = useState(false);

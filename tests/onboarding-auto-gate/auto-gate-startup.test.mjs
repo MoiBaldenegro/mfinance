@@ -105,7 +105,7 @@ describe('Gate automático onboarding al arrancar (REQ-29)', () => {
   describe('Botón Saltar en gate de arranque (REQ-29-07)', () => {
     it('OnboardingWizard tiene botón Saltar en paso 1', () => {
       const contenido = readFileSync(ONBOARDING_WIZARD_PATH, 'utf8');
-      assert.match(contenido, /Saltar onboarding/);
+      assert.match(contenido, /Saltar por ahora/);
     });
 
     it('alSaltar se llama al pulsar Saltar en paso 1', () => {

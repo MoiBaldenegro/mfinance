@@ -78,7 +78,7 @@ export function FormularioSupuestos({ supuestos, onCambio }: Props) {
       <p className="formulario-supuestos__ayuda">
         Variación % aplicada cada mes. Positivo = crecimiento, negativo =
         decrecimiento. Vacío o 0% = continuación plana del último mes real.
-        Pulsa Confirmar para recalcular tablas y gráficas.
+        Pulsa Recalcular para actualizar tablas y gráficas.
       </p>
     </div>
   );

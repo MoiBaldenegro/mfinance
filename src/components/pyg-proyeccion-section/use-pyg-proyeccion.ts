@@ -3,7 +3,7 @@
 // confirmados. Glue de UI: el cálculo vive en el backend y las
 // transformaciones puras en los use-cases del dominio.
 import { useEffect, useState } from 'react';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { ProyeccionPyg, BalanceFuturo, SupuestosProyeccion } from '../../domain/entities/pyg-proyeccion.ts';
 
@@ -23,6 +23,7 @@ export function usePygProyeccion(
   snapshot: FinanceSnapshot,
   supuestos: SupuestosProyeccion,
 ): UsePygProyeccionResultado {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [estado, setEstado] = useState<EstadoProyeccion>({ nombre: 'calculando' });
 
   useEffect(() => {

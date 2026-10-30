@@ -4,12 +4,10 @@
 // de persistencia parcial está en vuelo (REQ-33-01..06).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { OnboardingData, OnboardingStatus, Paso1Data, Paso2Data, Paso3Data, Paso4Data } from '../domain/entities/onboarding/index.ts';
-import { onboardingPort } from '../adapters/onboarding-adapter.ts';
+import { usarPuertos } from '../app/puertos.ts';
 import { gestionarOnboarding } from '../domain/use-cases/onboarding/gestionar-onboarding.ts';
 import { DEBOUNCE_MS, estadoInicialDatos, paso1PorDefecto, paso3DataPorDefecto, cargarEstadoOnboarding, actualizarPaso1, actualizarPaso2, actualizarPaso3, actualizarPaso4, umbralesPorDefecto, completarOnboarding, saltarOnboarding, type PuertosOnboarding } from '../domain/use-cases/onboarding/index.ts';
 import { crearOcupacionOnboarding, type GestionOcupacion } from '../domain/use-cases/onboarding/onboarding-ocupacion.ts';
-
-const puertos: PuertosOnboarding = { onboarding: onboardingPort };
 
 export interface UseOnboardingOptions { readonly datosIniciales?: OnboardingData; readonly pasoInicial?: number; readonly perfilId?: string; }
 
@@ -29,6 +27,7 @@ export interface UseOnboardingReturn {
 
 export function useOnboarding(opciones: UseOnboardingOptions = {}): UseOnboardingReturn {
   const { datosIniciales, pasoInicial = 1, perfilId } = opciones;
+  const puertos: PuertosOnboarding = usarPuertos();
   const [status, setStatus] = useState<OnboardingStatus>({ nombre: 'NotStarted' });
   const [datos, setDatos] = useState<OnboardingData>(datosIniciales ?? estadoInicialDatos());
   const [guardando, setGuardando] = useState(false);

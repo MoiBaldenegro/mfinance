@@ -1,0 +1,33 @@
+/* Sección Diagnóstico: zona de subida, informe por archivo y revisión. */
+.diagnostico-subida__zona {
+  display: grid; justify-items: center; gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  border: var(--borde-ancho) dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-sunken);
+  cursor: pointer;
+  text-align: center;
+}
+.diagnostico-subida__zona:hover { border-color: var(--color-primary); }
+.diagnostico-subida__zona:focus-within { box-shadow: var(--anillo-foco); }
+.diagnostico-subida__lista { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.diagnostico-subida__item { font-weight: var(--fuente-peso-medium); }
+.diagnostico-subida__analizar { justify-self: start; }
+
+.diagnostico-informe__lista { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.diagnostico-informe__item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--space-1) var(--space-3);
+  align-items: center;
+  padding: var(--space-3); border: var(--borde); border-radius: var(--radius-md);
+}
+.diagnostico-informe__nombre { font-weight: var(--fuente-peso-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.diagnostico-informe__mensaje { grid-column: 2 / -1; color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+
+.diagnostico-tabla__fila--confirmada > td { background: var(--color-positive-bg); }
+.diagnostico-tabla__fila--descartada > td { color: var(--color-subtle); text-decoration: line-through; }
+.diagnostico-tabla__campo { width: 100%; min-height: var(--control-alto-sm); padding: var(--space-1) var(--space-2); }
+.diagnostico-tabla__campo--ancho { min-width: 12rem; }
+.diagnostico-tabla__campo--importe { max-width: 8rem; text-align: right; }
+.diagnostico-tabla__acciones { display: flex; gap: var(--space-1); justify-content: flex-end; white-space: nowrap; }
+.diagnostico-tabla__pie { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.diagnostico-tabla__conteo { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }

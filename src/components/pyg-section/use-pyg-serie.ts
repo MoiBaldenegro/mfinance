@@ -2,7 +2,7 @@
 // que cambia el snapshot publicado (REQ-07-05). Glue de UI: el cálculo
 // vive en el backend y las transformaciones en use-cases.
 import { useEffect, useState } from 'react';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { SeriePyg } from '../../domain/entities/pyg-serie.ts';
 
@@ -15,6 +15,7 @@ export type EstadoSerie =
 const MOTIVO_POR_OMISION = 'No se pudo calcular la serie mensual.';
 
 export function usePygSerie(snapshot: FinanceSnapshot): EstadoSerie {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [estado, setEstado] = useState<EstadoSerie>({ nombre: 'calculando' });
 
   useEffect(() => {

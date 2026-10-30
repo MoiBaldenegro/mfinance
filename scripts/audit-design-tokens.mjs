@@ -3,7 +3,7 @@
 // color fuera de tokens.css: hex #rrggbb (3-8 dígitos), rgb( o rgba(.
 // Uso: node scripts/audit-design-tokens.mjs
 
-import { readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -13,7 +13,15 @@ const COLOR_RE = /#[0-9a-fA-F]{3,8}\b|rgba?\(/g;
 
 const errores = [];
 
-for (const hoja of readdirSync(STYLES_DIR).filter((f) => f.endsWith('.css'))) {
+function* hojas(dir, prefijo = '') {
+  for (const nombre of readdirSync(dir)) {
+    const ruta = join(dir, nombre);
+    if (statSync(ruta).isDirectory()) yield* hojas(ruta, `${prefijo}${nombre}/`);
+    else if (nombre.endsWith('.css')) yield `${prefijo}${nombre}`;
+  }
+}
+
+for (const hoja of hojas(STYLES_DIR)) {
   if (hoja === TOKENS_FILE) continue;
   const lineas = readFileSync(join(STYLES_DIR, hoja), 'utf8').split(/\r?\n/);
   lineas.forEach((linea, i) => {

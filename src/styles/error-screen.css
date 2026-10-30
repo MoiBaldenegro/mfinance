@@ -1,28 +1,22 @@
-/* Hoja de la pantalla de error de carga (ErrorScreen, REQ-05-07). */
+/* Pantalla de error de carga (ErrorScreen, REQ-05-07): mensaje centrado y
+   acciones en fila; los botones son hijos directos del contenedor. */
 .error-screen {
-  display: grid;
-  place-content: center;
-  gap: var(--space-4);
+  display: flex; flex-wrap: wrap; align-content: center; justify-content: center;
+  gap: var(--space-3);
   min-height: 100vh;
   padding: var(--space-6);
   text-align: center;
 }
-
-.error-screen__titulo {
-  margin: 0;
-}
-
+.error-screen__titulo { flex-basis: 100%; font-size: var(--fuente-tamano-2xl); }
 .error-screen__mensaje {
-  margin: 0;
-  color: var(--color-negative);
-}
-
-.error-screen__boton {
-  justify-self: center;
-  padding: var(--space-3) var(--space-6);
-  border: none;
+  flex-basis: 100%;
+  max-width: 36rem;
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: var(--borde);
+  border-left: var(--borde-ancho-fuerte) solid var(--color-negative);
   border-radius: var(--radius-md);
-  background: var(--color-primary);
-  color: var(--color-primary-contrast);
-  cursor: pointer;
+  background: var(--color-negative-bg);
+  color: var(--color-text);
+  text-align: left;
 }

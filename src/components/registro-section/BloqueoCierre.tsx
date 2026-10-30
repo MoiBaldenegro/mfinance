@@ -17,21 +17,13 @@ export function BloqueoCierre({ mes }: Props) {
   const { aplicarSnapshot } = useSnapshot();
   const { ocupado, aviso, reabrir } = useReapertura(aplicarSnapshot);
   return (
-    <div className="registro-section__cierre">
-      <p className="registro-section__aviso" role="alert">
-        {avisoMesCerrado(mes)}
-      </p>
-      <button
-        type="button"
-        className="registro-section__reabrir"
-        disabled={ocupado}
-        onClick={() => void reabrir(mes)}
-      >
+    <div className="aviso aviso--aviso registro-section__cierre" role="status">
+      <p>{avisoMesCerrado(mes)}</p>
+      <button type="button" className="btn btn--sm" disabled={ocupado}
+        onClick={() => void reabrir(mes)}>
         {ocupado ? 'Reabriendo…' : 'Reabrir mes'}
       </button>
-      {aviso ? (
-        <p className="registro-section__aviso" role="alert">{aviso}</p>
-      ) : null}
+      {aviso ? <p className="registro-section__error" role="alert">{aviso}</p> : null}
     </div>
   );
 }

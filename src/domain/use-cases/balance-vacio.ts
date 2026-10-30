@@ -4,7 +4,7 @@ import type { SerieBalance } from '../entities/balance-serie.ts';
 
 /** Mensaje mostrado cuando no hay datos de patrimonio para graficar. */
 export const MENSAJE_SIN_PATRIMONIO =
-  'Aún no hay datos de patrimonio. Crea tu primer activo o pasivo en la sección Balance.';
+  'Aún no hay datos de patrimonio. Añade tu primer activo o pasivo para ver su evolución.';
 
 /** Indica si la serie de balance está vacía (sin filas). */
 export function estaVacio(serie: SerieBalance): boolean {

@@ -1,21 +1,10 @@
-/* Estilos globales mínimos: reset suave sobre los tokens. */
+/* Punto de entrada de estilos: tokens + primitivas compartidas del sistema. */
 @import "./tokens.css";
+@import "./ui/base.css";
+@import "./ui/layout.css";
+@import "./ui/controles.css";
+@import "./ui/datos.css";
+@import "./ui/marca.css";
+@import "./ui/pestanas.css";
 
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-}
-
-#root {
-  min-height: 100vh;
-}
-
-button {
-  font-family: inherit;
-}
+#root { min-height: 100vh; }

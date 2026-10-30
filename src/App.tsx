@@ -12,13 +12,15 @@ import {
   SeccionActivaProvider,
   usarSeccionActiva,
 } from "./hooks/use-seccion-activa";
+import { Marca } from "./components/ui/Marca";
 import "./styles/app.css";
 import { useEffect, useState } from "react";
 
 /** Pantalla transitoria mientras llega el snapshot por IPC. */
 function PantallaCargando() {
   return (
-    <div className="app__cargando">
+    <div className="app__cargando" role="status">
+      <Marca tamano={56} className="app__cargando-marca" />
       <p>Cargando tus finanzas…</p>
     </div>
   );

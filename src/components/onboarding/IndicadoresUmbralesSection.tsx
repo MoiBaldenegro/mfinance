@@ -26,25 +26,24 @@ interface Props {
 export function IndicadoresUmbralesSection({ paso4, alCambiar, deshabilitado }: Props) {
   const avisos = validarUmbrales(paso4.umbrales);
   return (
-    <fieldset className="indicadores-umbrales">
-      <legend className="indicadores-umbrales__titulo">Umbrales de indicadores</legend>
-      <p className="indicadores-umbrales__ayuda">
-        Personaliza cuándo cada semáforo se pone verde o rojo. Los valores por defecto son los estándar.
-      </p>
-      <div className="indicadores-umbrales__tarjetas">
+    <section className="indicadores-umbrales" aria-labelledby="umbrales-titulo">
+      <div className="indicadores-umbrales__cabecera">
+        <div>
+          <h3 id="umbrales-titulo" className="indicadores-umbrales__titulo">Umbrales de indicadores</h3>
+          <p className="campo__ayuda">Cuándo se pone en verde o en rojo cada semáforo. Los valores por defecto son los estándar.</p>
+        </div>
+        <button type="button" className="btn btn--fantasma btn--sm"
+          onClick={() => alCambiar({ umbrales: restaurarUmbralesDefecto() })} disabled={deshabilitado}>
+          Restaurar valores por defecto
+        </button>
+      </div>
+      <div className="rejilla rejilla--2">
         {INDICADORES.map((ind) => (
           <TarjetaUmbral key={ind.id} ind={ind} paso4={paso4} alCambiar={alCambiar}
             deshabilitado={deshabilitado} avisos={avisos.filter((a) => a.campo === ind.id)} />
         ))}
       </div>
-      <button
-        type="button" className="indicadores-umbrales__restaurar"
-        onClick={() => alCambiar({ umbrales: restaurarUmbralesDefecto() })}
-        disabled={deshabilitado}
-      >
-        Restaurar valores por defecto
-      </button>
-    </fieldset>
+    </section>
   );
 }
 
@@ -58,12 +57,14 @@ function TarjetaUmbral({ ind, paso4, alCambiar, deshabilitado, avisos }: {
   readonly avisos: readonly { readonly mensaje: string }[];
 }) {
   return (
-    <article className="indicadores-umbrales__tarjeta">
-      <h4 className="indicadores-umbrales__nombre">{ind.nombre}</h4>
-      <p className="indicadores-umbrales__descripcion">{ind.ayuda}</p>
+    <article className="card card--compacta card--hundida indicadores-umbrales__tarjeta">
+      <div>
+        <h4 className="indicadores-umbrales__nombre">{ind.nombre}</h4>
+        <p className="indicadores-umbrales__descripcion">{ind.ayuda}</p>
+      </div>
       {([['verde', ind.verde, ind.campoVerde], ['rojo', ind.rojo, ind.campoRojo]] as const).map(([clave, etiqueta, campo]) => (
-        <label key={clave} className="indicadores-umbrales__campo">
-          <span>{etiqueta}</span>
+        <label key={clave} className={`indicadores-umbrales__campo indicadores-umbrales__campo--${clave}`}>
+          <span className="indicadores-umbrales__etiqueta">{etiqueta}</span>
           <input
             type="number" inputMode="decimal" className="indicadores-umbrales__input"
             aria-label={`${ind.nombre}: ${etiqueta}`}
@@ -74,11 +75,11 @@ function TarjetaUmbral({ ind, paso4, alCambiar, deshabilitado, avisos }: {
             }}
             disabled={deshabilitado}
           />
-          <span>{ind.unidad}</span>
+          <span className="indicadores-umbrales__unidad">{ind.unidad}</span>
         </label>
       ))}
       {avisos.map((a) => (
-        <p key={a.mensaje} className="indicadores-umbrales__error" role="alert">{a.mensaje}</p>
+        <p key={a.mensaje} className="campo__error" role="alert">{a.mensaje}</p>
       ))}
     </article>
   );

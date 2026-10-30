@@ -12,6 +12,9 @@ import { TablaPyg } from './TablaPyg.tsx';
 import { usePygSerie } from './use-pyg-serie.ts';
 import { ProyeccionSection } from '../pyg-proyeccion-section/ProyeccionSection.tsx';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
+import { CabeceraPagina } from '../ui/CabeceraPagina';
+import { Pestanas } from '../ui/Pestanas.tsx';
+import { VistaGraficaTabla } from '../ui/VistaGraficaTabla.tsx';
 import '../../styles/pyg-section.css';
 
 interface Props {
@@ -25,35 +28,25 @@ function cuerpo(
 ) {
   if (estado.nombre === 'calculando') {
     return (
-      <p className="pyg-section__aviso estado-carga">
+      <p className="estado-carga">
         Calculando la serie mensual…
       </p>
     );
   }
   if (estado.nombre === 'error') {
     return (
-      <p className="pyg-section__aviso" role="alert">
+      <p className="aviso aviso--error" role="alert">
         No se pudo calcular la serie mensual: {estado.motivo}
       </p>
     );
   }
   if (serieVacia(estado.serie)) {
-    return <p className="pyg-section__aviso estado-vacio">{MENSAJE_SIN_REGISTROS}</p>;
+    return <p className="estado-vacio">{MENSAJE_SIN_REGISTROS}</p>;
   }
   const filas = filasDeTabla(estado.serie, moneda);
   return (
-    <div className="pyg-section__paneles">
-      <section className="pyg-section__tarjeta" aria-label="Tabla P&G">
-        <h3 className="pyg-section__subtitulo">Detalle mensual</h3>
-        <TablaPyg filas={filas} />
-      </section>
-      <section className="pyg-section__tarjeta" aria-label="Gráfica P&G">
-        <h3 className="pyg-section__subtitulo">
-          Ingresos, gastos y ahorro acumulado
-        </h3>
-        <PygChart serie={estado.serie} />
-      </section>
-    </div>
+    <VistaGraficaTabla titulo="Ingresos, gastos y ahorro acumulado"
+      grafica={<PygChart serie={estado.serie} />} tabla={<TablaPyg filas={filas} />} />
   );
 }
 
@@ -62,15 +55,14 @@ export function PygSection({ snapshot }: Props) {
   const estado = usePygSerie(snapshot);
   const moneda = usarMoneda();
   return (
-    <section className="pyg-section">
-      <h2 className="pyg-section__titulo">PyG</h2>
-      <p className="pyg-section__ayuda">
-        Tu cuenta de resultados mes a mes, calculada automáticamente a partir
-        de tus registros.
-      </p>
-      {cuerpo(estado, moneda)}
-      {/* REQ-14: proyección editable reutilizando el motor de P&G. */}
-      <ProyeccionSection snapshot={snapshot} />
+    <section className="pagina pyg-section">
+      <CabeceraPagina titulo="Pérdidas y ganancias"
+        descripcion="Tu cuenta de resultados mes a mes, calculada a partir de tus registros." />
+      <Pestanas id="pyg" etiqueta="Vistas de PyG" pestanas={[
+        { id: 'historico', titulo: 'Histórico', contenido: cuerpo(estado, moneda) },
+        // REQ-14: proyección editable reutilizando el motor de P&G.
+        { id: 'proyeccion', titulo: 'Proyección 12 meses', contenido: <ProyeccionSection snapshot={snapshot} /> },
+      ]} />
     </section>
   );
 }

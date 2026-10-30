@@ -21,20 +21,15 @@ export function OnboardingPasoMetas({
   datos, alCambiar, deshabilitado, perfilId, metasIniciales, alCambiarMetas,
 }: Props) {
   return (
-    <section className="onboarding-paso-metas">
-      <h3 className="onboarding-paso-metas__titulo">Paso 4: Umbrales y metas (opcional)</h3>
-      <p className="onboarding-paso-metas__ayuda">
-        Ajusta los semáforos a tu criterio y anota tus metas. Puedes continuar sin cambiar nada.
-      </p>
-      <div className="onboarding-paso-metas__secciones">
-        <IndicadoresUmbralesSection paso4={datos} alCambiar={alCambiar} deshabilitado={deshabilitado} />
-        <MetasJournalSection
-          perfilId={perfilId}
-          metasIniciales={metasIniciales}
-          alCambiar={alCambiarMetas}
-          deshabilitado={deshabilitado}
-        />
-      </div>
-    </section>
+    <div className="onboarding-paso-metas">
+      <IndicadoresUmbralesSection paso4={datos} alCambiar={alCambiar} deshabilitado={deshabilitado} />
+      <hr className="separador" />
+      <MetasJournalSection
+        perfilId={perfilId}
+        metasIniciales={metasIniciales}
+        alCambiar={alCambiarMetas}
+        deshabilitado={deshabilitado}
+      />
+    </div>
   );
 }

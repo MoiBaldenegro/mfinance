@@ -1,9 +1,5 @@
-// REQ-05-04 + REQ-20-02 + REQ-22-01..03: shell con cabecera fija
-// (indicador permanente del titular), pestañas horizontales y el área
-// central de la sección activa. PUNTO ÚNICO de propagación de la moneda
-// activa desde el snapshot (patrón use-tema) y del estado compartido de
-// perfiles: ahora vive en PerfilProvider, y cabecera/Ajustes lo leen vía
-// usarPerfiles() incluso durante un error de carga.
+// Shell principal: barra lateral fija + área de contenido de la sección
+// activa. Punto único de propagación de la moneda del snapshot.
 import { useCallback } from 'react';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import { mesDeTrabajo } from '../../domain/use-cases/resumenes-secciones.ts';
@@ -22,9 +18,8 @@ import { IndicadoresSection } from '../indicadores-section/IndicadoresSection';
 import { InversionesSection } from '../inversiones-section/InversionesSection';
 import { PygSection } from '../pyg-section/PygSection';
 import { RegistroSection } from '../registro-section/RegistroSection';
-import HeaderBar from './HeaderBar';
-import SectionTabs from './SectionTabs';
-import { SECCIONES } from './secciones.ts';
+import { BarraLateral } from './BarraLateral';
+import { seccionPorId } from './secciones.ts';
 import '../../styles/app-shell.css';
 
 /** Cuerpo de la sección activa sobre datos reales del snapshot cargado. */
@@ -35,10 +30,10 @@ function cuerpo(id: string, snapshot: FinanceSnapshot) {
     case 'balance': return <BalanceSection snapshot={snapshot} />;
     case 'deuda': return <DeudaSection snapshot={snapshot} />;
     case 'inversiones': return <InversionesSection snapshot={snapshot} />;
-    case 'indicadores': return <IndicadoresSection />;
-    case 'conciliacion': return <ConciliacionSection />;
+    case 'indicadores': return <IndicadoresSection snapshot={snapshot} />;
+    case 'conciliacion': return <ConciliacionSection snapshot={snapshot} />;
     case 'cierre': return <CierreSection snapshot={snapshot} />;
-    case 'diagnostico': return <DiagnosticoSection />;
+    case 'diagnostico': return <DiagnosticoSection snapshot={snapshot} />;
     case 'ajustes': return <AjustesSection snapshot={snapshot} />;
     default: return null;
   }
@@ -50,13 +45,11 @@ export function AppShell({ snapshot }: { readonly snapshot: FinanceSnapshot }) {
   // REQ-27-07/08: navegación programática (post-onboarding → Registro)
   // y toasts globales publicados desde cualquier sección.
   const toast = usarBusUi(useCallback(elegir, [elegir]));
-  const actual = SECCIONES.find((seccion) => seccion.id === activa)
-    ?? SECCIONES[0];
+  const actual = seccionPorId(activa);
   return (
     <MonedaContext.Provider value={monedaDeSnapshot(snapshot)}>
       <div className="app-shell">
-        <HeaderBar mesTrabajo={mesDeTrabajo(snapshot)} />
-        <SectionTabs activa={activa} alElegir={elegir} />
+        <BarraLateral activa={actual.id} mesTrabajo={mesDeTrabajo(snapshot)} alElegir={elegir} />
         <main className="app-shell__contenido">
           {cuerpo(actual.id, snapshot)}
         </main>

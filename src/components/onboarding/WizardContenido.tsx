@@ -1,20 +1,18 @@
 // REQ-24-04 + REQ-27-01/05: contenido del wizard según el paso activo.
-// Extraído de OnboardingWizard para respetar la regla dura de ≤100 líneas.
+// Los pasos 2-3 formatean importes con la moneda elegida en el paso 1
+// (el perfil todavía no la tiene hasta finalizar).
 import type { GoalEntry } from '../../domain/entities/goal-entry.ts';
 import type { OnboardingData, Paso1Data, Paso2Data, Paso3Data, Paso4Data } from '../../domain/entities/onboarding/index.ts';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import { OnboardingPaso1 } from './OnboardingPaso1.tsx';
 import { OnboardingPasoBalance } from './OnboardingPasoBalance.tsx';
 import { OnboardingPasoDeudaProyeccion } from './OnboardingPasoDeudaProyeccion.tsx';
 import { OnboardingPasoMetas } from './OnboardingPasoMetas.tsx';
 import { OnboardingPasoResumen } from './OnboardingPasoResumen.tsx';
-import { OnboardingPasoPlaceholder } from './OnboardingPasoPlaceholder.tsx';
 import '../../styles/onboarding-wizard.css';
 
 export interface WizardContenidoProps {
   readonly keyPaso: string;
-  readonly titulo: string;
-  readonly pasoId: number;
   readonly datos: OnboardingData;
   readonly pasoActual: Paso1Data;
   readonly paso2Actual: Paso2Data;
@@ -28,54 +26,32 @@ export interface WizardContenidoProps {
   readonly alCambiarMetas: (metas: readonly GoalEntry[]) => void;
   readonly deshabilitado: boolean;
   readonly perfilId?: string;
-  readonly alSaltar: () => void;
 }
 
-/** Renderiza el paso activo dentro del área central del wizard. */
+/** Renderiza el paso activo dentro de la tarjeta del wizard. */
 export function WizardContenido(props: WizardContenidoProps) {
-  const {
-    keyPaso, titulo, pasoId, datos, pasoActual, paso2Actual, paso3Actual,
-    paso4Actual, alCambiarPaso1, alCambiarPaso2, alCambiarPaso3,
-    alCambiarPaso4, metas, alCambiarMetas, deshabilitado, perfilId, alSaltar,
-  } = props;
+  const { snapshot } = usarPuertos();
+  const { keyPaso, pasoActual, deshabilitado } = props;
+  const moneda = pasoActual.moneda;
   return (
-    <main className="onboarding-wizard__contenido">
-      {contenido({ keyPaso, titulo, pasoId, datos, pasoActual, paso2Actual, paso3Actual,
-        paso4Actual, alCambiarPaso1, alCambiarPaso2, alCambiarPaso3,
-        alCambiarPaso4, metas, alCambiarMetas, deshabilitado, perfilId, alSaltar })}
-    </main>
+    <div className="onboarding-wizard__contenido">
+      {keyPaso === 'paso1' && (
+        <OnboardingPaso1 datos={pasoActual} alCambiar={props.alCambiarPaso1} deshabilitado={deshabilitado} />
+      )}
+      {keyPaso === 'paso2' && (
+        <OnboardingPasoBalance datos={props.paso2Actual} alCambiar={props.alCambiarPaso2}
+          moneda={moneda} deshabilitado={deshabilitado} />
+      )}
+      {keyPaso === 'paso3' && (
+        <OnboardingPasoDeudaProyeccion datos={props.paso3Actual} alCambiar={props.alCambiarPaso3}
+          deshabilitado={deshabilitado} snapshotPort={snapshot} paso1Data={pasoActual} moneda={moneda} />
+      )}
+      {keyPaso === 'paso4' && (
+        <OnboardingPasoMetas datos={props.paso4Actual} alCambiar={props.alCambiarPaso4}
+          deshabilitado={deshabilitado} perfilId={props.perfilId}
+          metasIniciales={props.metas} alCambiarMetas={props.alCambiarMetas} />
+      )}
+      {keyPaso === 'paso5' && <OnboardingPasoResumen datos={props.datos} metas={props.metas} />}
+    </div>
   );
-}
-
-function contenido({
-  keyPaso, titulo, pasoId, datos, pasoActual, paso2Actual, paso3Actual,
-  paso4Actual, alCambiarPaso1, alCambiarPaso2, alCambiarPaso3,
-  alCambiarPaso4, metas, alCambiarMetas, deshabilitado, perfilId, alSaltar,
-}: WizardContenidoProps) {
-  if (keyPaso === 'paso1') {
-    return <OnboardingPaso1 datos={pasoActual} alCambiar={alCambiarPaso1} alSaltar={alSaltar} deshabilitado={deshabilitado} />;
-  }
-  if (keyPaso === 'paso2') {
-    return <OnboardingPasoBalance datos={paso2Actual} alCambiar={alCambiarPaso2} deshabilitado={deshabilitado} />;
-  }
-  if (keyPaso === 'paso3') {
-    return (
-      <OnboardingPasoDeudaProyeccion
-        datos={paso3Actual} alCambiar={alCambiarPaso3} deshabilitado={deshabilitado}
-        snapshotPort={snapshotPort} paso1Data={pasoActual}
-      />
-    );
-  }
-  if (keyPaso === 'paso4') {
-    return (
-      <OnboardingPasoMetas
-        datos={paso4Actual} alCambiar={alCambiarPaso4} deshabilitado={deshabilitado}
-        perfilId={perfilId} metasIniciales={metas} alCambiarMetas={alCambiarMetas}
-      />
-    );
-  }
-  if (keyPaso === 'paso5') {
-    return <OnboardingPasoResumen datos={datos} metas={metas} />;
-  }
-  return <OnboardingPasoPlaceholder titulo={titulo} paso={pasoId} />;
 }

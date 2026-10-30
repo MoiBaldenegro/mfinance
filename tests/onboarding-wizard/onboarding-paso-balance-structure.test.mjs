@@ -61,16 +61,11 @@ describe('F25 — Componentes paso 2: estructura y estilos', () => {
   });
 
   describe('Estilos - hojas separadas ≤100 líneas', () => {
-    it('activos-section.css existe y ≤100 líneas', () => {
-      const contenido = readFileSync(join(STYLES_DIR, 'activos-section.css'), 'utf-8');
-      const lineas = contenido.split('\n').length;
-      assert.ok(lineas <= 100, `activos-section.css tiene ${lineas} líneas, debe ser ≤100`);
-    });
-
-    it('pasivos-section.css existe y ≤100 líneas', () => {
-      const contenido = readFileSync(join(STYLES_DIR, 'pasivos-section.css'), 'utf-8');
-      const lineas = contenido.split('\n').length;
-      assert.ok(lineas <= 100, `pasivos-section.css tiene ${lineas} líneas, debe ser ≤100`);
+    it('las tres secciones comparten la hoja del paso 2 (sin hojas propias)', () => {
+      for (const seccion of ['ActivosSection.tsx', 'PasivosSection.tsx', 'InversionesSection.tsx']) {
+        const contenido = readFileSync(join(COMPONENTS_DIR, seccion), 'utf-8');
+        assert.match(contenido, /styles\/onboarding-paso-balance\.css/, seccion);
+      }
     });
 
     it('inversiones-section.css existe y ≤100 líneas', () => {

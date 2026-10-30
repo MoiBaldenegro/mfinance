@@ -4,7 +4,6 @@
 import { simboloDe } from '../../../domain/entities/moneda.ts';
 import { usarMoneda } from '../../../hooks/use-moneda.ts';
 import type { CamposSimulador } from './use-simulador.ts';
-import '../../../styles/simulador-formulario.css';
 
 interface Props {
   readonly campos: CamposSimulador;
@@ -22,8 +21,8 @@ function Campo(
   step = '0.01',
 ) {
   return (
-    <div className="simulador-campo">
-      <label htmlFor={id}>{etiqueta}</label>
+    <div className="campo">
+      <label className="campo__etiqueta" htmlFor={id}>{etiqueta}</label>
       <input
         id={id}
         type="number"
@@ -39,18 +38,19 @@ function Campo(
 export function FormularioCredito({ campos, onCampo, onCalcular, mensajeError }: Props) {
   const simbolo = simboloDe(usarMoneda());
   return (
-    <section className="simulador-formulario" aria-label="Crédito hipotético">
+    <section className="card simulador-formulario" aria-label="Crédito hipotético">
+      <h3 className="card__titulo simulador-formulario__titulo">Crédito hipotético</h3>
       {Campo(`Importe (${simbolo})`, 'sim-importe', campos.importe, (v) => onCampo('importe', v), '1')}
       {Campo('Plazo (meses)', 'sim-plazo', campos.plazoMeses, (v) => onCampo('plazoMeses', v), '1', '1')}
       {Campo('Tasa anual (%)', 'sim-tasa', campos.tasaInteresAnual, (v) => onCampo('tasaInteresAnual', v), '0')}
       {Campo(`Extra mensual (${simbolo})`, 'sim-extra', campos.extraMensual, (v) => onCampo('extraMensual', v), '0')}
       {Campo('Extraordinario: mes', 'sim-ext-mes', campos.extraordinarioMes, (v) => onCampo('extraordinarioMes', v), '1', '1')}
       {Campo(`Extraordinario: importe (${simbolo})`, 'sim-ext-importe', campos.extraordinarioImporte, (v) => onCampo('extraordinarioImporte', v), '0')}
-      <button type="button" className="simulador-boton" onClick={onCalcular}>
+      <button type="button" className="btn btn--primario simulador-formulario__boton" onClick={onCalcular}>
         Calcular simulación
       </button>
       {mensajeError !== null && (
-        <p className="simulador-error" role="alert">
+        <p className="aviso aviso--error simulador-formulario__error" role="alert">
           {mensajeError}
         </p>
       )}

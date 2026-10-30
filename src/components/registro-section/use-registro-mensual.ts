@@ -14,7 +14,7 @@ import {
 import { textosDelMes, type Textos } from '../../domain/use-cases/textos-registro.ts';
 import { mesActualDesde } from '../../domain/use-cases/navegacion-meses.ts';
 import { mesDeTrabajo } from '../../domain/use-cases/resumenes-flujo.ts';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 
 const CLAVES_GLOBALES = [CLAVE_ERROR_GUARDADO, 'mes'] as const;
 
@@ -22,6 +22,7 @@ export function useRegistroMensual(
   snapshot: FinanceSnapshot,
   aplicarSnapshot: (snapshot: FinanceSnapshot) => void,
 ) {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [mes, setMes] = useState(
     () => mesDeTrabajo(snapshot) ?? mesActualDesde(new Date()),
   );

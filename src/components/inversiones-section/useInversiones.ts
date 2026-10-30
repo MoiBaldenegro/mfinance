@@ -1,95 +1,83 @@
-// Hook para gestionar inversiones (REQ-11-01/03/06/07).
-import { useEffect, useState } from 'react';
+// Hook de Inversiones: edición por familia como TEXTO (permite decimales
+// y campos vacíos mientras se escribe), validación al guardar, guardado
+// en el snapshot publicado y recarga de la proyección.
+import { useEffect, useMemo, useState } from 'react';
 import { useSnapshot } from '../shell/SnapshotProvider';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import { cargarProyeccionInversiones } from '../../domain/use-cases/cargar-proyeccion-inversiones.ts';
+import { INVESTMENT_FAMILY_LABELS } from '../../domain/entities/catalogs.ts';
 import type { InvestmentFamily } from '../../domain/entities/catalogs.ts';
+import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { ProyeccionInversiones } from '../../domain/entities/proyeccion-inversiones.ts';
-import { validarTasa, sumarAportes } from '../../domain/use-cases/inversiones-proyeccion.ts';
+import { importeDeTexto, validarTasa } from '../../domain/use-cases/inversiones-proyeccion.ts';
 
-interface FilaTabla {
-  familia: InvestmentFamily;
-  aporte_mensual: number;
-  valor_actual: number;
-  tasa_esperada_anual: number;
+export const FAMILIAS: readonly InvestmentFamily[] = ['RentaFija', 'RentaVariable', 'FincaRaiz'];
+export type CampoInversion = 'aporte_mensual' | 'valor_actual' | 'tasa_esperada_anual';
+export type FilaEditable = { readonly familia: InvestmentFamily } & Readonly<Record<CampoInversion, string>>;
+
+function filasDesde(snapshot: FinanceSnapshot): FilaEditable[] {
+  return FAMILIAS.map((familia) => {
+    const inv = snapshot.investments.find((i) => i.familia === familia);
+    return {
+      familia,
+      aporte_mensual: String(inv?.aporte_mensual ?? 0),
+      valor_actual: String(inv?.valor_actual ?? 0),
+      tasa_esperada_anual: String(inv?.tasa_esperada_anual ?? 0),
+    };
+  });
 }
 
-interface UseInversionesReturn {
-  readonly filas: FilaTabla[];
-  readonly proyeccion: ProyeccionInversiones | null;
-  readonly cargando: boolean;
-  readonly error: string | null;
-  readonly guardando: boolean;
-  readonly confirmar: () => Promise<void>;
-  readonly actualizarCampo: (
-    familia: InvestmentFamily,
-    campo: keyof Omit<FilaTabla, 'familia'>,
-    valor: number,
-  ) => void;
-  readonly totalAportes: number;
-}
+const aNumeros = (f: FilaEditable) => ({
+  familia: f.familia,
+  aporte_mensual: importeDeTexto(f.aporte_mensual),
+  valor_actual: importeDeTexto(f.valor_actual),
+  tasa_esperada_anual: importeDeTexto(f.tasa_esperada_anual),
+});
 
-export function useInversiones(inversionesIniciales: readonly FilaTabla[]): UseInversionesReturn {
-  const [filas, setFilas] = useState<FilaTabla[]>([...inversionesIniciales]);
+export function useInversiones(snapshot: FinanceSnapshot) {
+  const { snapshot: snapshotPort } = usarPuertos();
+  const { aplicarSnapshot } = useSnapshot();
+  const [filas, setFilas] = useState<FilaEditable[]>(() => filasDesde(snapshot));
   const [proyeccion, setProyeccion] = useState<ProyeccionInversiones | null>(null);
-  const [cargando, setCargando] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
-  const { aplicarSnapshot } = useSnapshot();
+  const [cambios, setCambios] = useState(false);
 
   useEffect(() => {
     let vigente = true;
     cargarProyeccionInversiones(snapshotPort)
       .then((p) => { if (vigente) setProyeccion(p); })
-      .catch((e) => { if (vigente) setError(e.message); })
-      .finally(() => { if (vigente) setCargando(false); });
+      .catch((e: unknown) => { if (vigente) setError(e instanceof Error ? e.message : 'No se pudo calcular la proyección'); });
     return () => { vigente = false; };
-  }, []);
+  }, [snapshot]);
 
-  const confirmar = async () => {
-    for (const fila of filas) {
-      const validacion = validarTasa(fila.tasa_esperada_anual);
-      if (!validacion.valida) {
-        setError(`${fila.familia}: ${validacion.mensaje}`);
-        return;
-      }
+  const numericas = useMemo(() => filas.map(aNumeros), [filas]);
+
+  const guardar = async () => {
+    const invalida = numericas.find((f) => !validarTasa(f.tasa_esperada_anual).valida);
+    if (invalida) {
+      setError(`${INVESTMENT_FAMILY_LABELS[invalida.familia]}: ${validarTasa(invalida.tasa_esperada_anual).mensaje}`);
+      return;
     }
     setError(null);
     setGuardando(true);
     try {
-      const snapshot = await snapshotPort.load();
-      const inversionesActualizadas = filas.map((f) => ({
-        familia: f.familia,
-        aporte_mensual: f.aporte_mensual,
-        valor_actual: f.valor_actual,
-        tasa_esperada_anual: f.tasa_esperada_anual,
-      }));
-      const nuevoSnapshot = { ...snapshot, investments: inversionesActualizadas };
-      await snapshotPort.save(nuevoSnapshot);
-      const p = await cargarProyeccionInversiones(snapshotPort);
-      setProyeccion(p);
-      aplicarSnapshot(await snapshotPort.load());
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error al guardar');
+      const nuevo = { ...snapshot, investments: numericas };
+      await snapshotPort.save(nuevo);
+      aplicarSnapshot(nuevo);
+      setCambios(false);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'No se pudieron guardar las inversiones');
     } finally {
       setGuardando(false);
     }
   };
 
-  const actualizarCampo = (
-    familia: InvestmentFamily,
-    campo: keyof Omit<FilaTabla, 'familia'>,
-    valor: number,
-  ) => {
-    setFilas((prev) =>
-      prev.map((f) =>
-        f.familia === familia ? { ...f, [campo]: Math.max(0, valor) } : f,
-      ),
-    );
+  const editar = (familia: InvestmentFamily, campo: CampoInversion, texto: string) => {
+    setFilas((prev) => prev.map((f) => (f.familia === familia ? { ...f, [campo]: texto } : f)));
+    setCambios(true);
     setError(null);
   };
 
-  const totalAportes = sumarAportes(filas);
-
-  return { filas, proyeccion, cargando, error, guardando, confirmar, actualizarCampo, totalAportes };
+  return { filas, numericas, proyeccion, error, guardando, cambios, guardar, editar };
 }

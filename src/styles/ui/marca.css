@@ -1,0 +1,16 @@
+/* Marca: isotipo + nombre en Pacifico. Pacifico tiene un único peso: se
+   fuerza 400 para evitar negrita sintética. */
+.marca { display: inline-flex; align-items: center; gap: var(--space-2); color: var(--color-text); }
+.marca__isotipo { flex: none; display: block; }
+.marca__fondo { fill: var(--color-primary); }
+.marca__trazo { stroke: var(--color-primary-contrast); }
+.marca__moneda { fill: var(--color-warn); }
+.marca__nombre {
+  font-family: var(--fuente-marca);
+  font-weight: var(--fuente-peso-regular);
+  font-size: 1.4em;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  /* Pacifico baja mucho: compensa para alinear con el isotipo. */
+  padding-bottom: 0.15em;
+}

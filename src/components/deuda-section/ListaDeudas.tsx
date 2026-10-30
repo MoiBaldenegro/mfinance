@@ -1,8 +1,8 @@
-// Lista de deudas con objetivo destacado para la sección Deuda.
-import { formatoMoneda } from '../../domain/use-cases/formato-moneda.ts';
-import { usarMoneda } from '../../hooks/use-moneda.ts';
+// Deudas en el orden de ataque de la estrategia, con la objetivo destacada.
 import type { DebtStrategy } from '../../domain/entities/catalogs.ts';
-import '../../styles/deuda-lista.css';
+import { formatoMoneda } from '../../domain/use-cases/formato-moneda.ts';
+import { formatoPorcentaje } from '../../domain/use-cases/formato-porcentaje.ts';
+import { usarMoneda } from '../../hooks/use-moneda.ts';
 
 interface DeudaItem {
   readonly nombre: string;
@@ -20,28 +20,34 @@ interface Props {
 export function ListaDeudas({ deudas, deudaObjetivo, estrategia }: Props) {
   const moneda = usarMoneda();
   return (
-    <section className="deuda-section__tarjeta" aria-label="Lista de deudas">
-      <h3 className="deuda-section__subtitulo">
-        Tus deudas ordenadas por {estrategia === 'Avalanche' ? 'tasa (avalancha)' : 'saldo (bola de nieve)'}
-      </h3>
-      <ul className="deuda-section__lista">
-        {deudas.map((deuda) => {
-          const esObjetivo = deudaObjetivo?.nombre === deuda.nombre;
+    <section className="card" aria-label="Orden de pago">
+      <div className="card__cabecera">
+        <h2 className="card__titulo">Orden de pago</h2>
+        <span className="card__descripcion">
+          Por {estrategia === 'Avalanche' ? 'tasa de interés' : 'saldo pendiente'}
+        </span>
+      </div>
+      <ol className="deuda-lista">
+        {deudas.map((deuda, i) => {
+          const objetivo = deudaObjetivo?.nombre === deuda.nombre;
           return (
-            <li key={deuda.nombre} className={`deuda-section__item${esObjetivo ? ' deuda-section__item--objetivo' : ''}`}>
-              <div className="deuda-section__item-info">
-                <span className="deuda-section__item-nombre">{deuda.nombre}</span>
-                {esObjetivo && <span className="deuda-section__badge">OBJETIVO</span>}
+            <li key={deuda.nombre} className={objetivo ? 'deuda-lista__item deuda-lista__item--objetivo' : 'deuda-lista__item'}>
+              <span className="deuda-lista__orden">{i + 1}</span>
+              <div className="deuda-lista__info">
+                <span className="deuda-lista__nombre">
+                  {deuda.nombre}
+                  {objetivo ? <span className="badge badge--primario">Objetivo</span> : null}
+                </span>
+                <span className="deuda-lista__detalle">
+                  {formatoPorcentaje(deuda.tasa_interes_anual, moneda, 2)} anual ·
+                  mínimo {formatoMoneda(deuda.pago_minimo_mensual, moneda)}/mes
+                </span>
               </div>
-              <div className="deuda-section__item-detalles">
-                <span>Saldo: {formatoMoneda(deuda.saldo_pendiente, moneda)}</span>
-                <span>Tasa: {deuda.tasa_interes_anual.toFixed(2)} %</span>
-                <span>Pago mínimo: {formatoMoneda(deuda.pago_minimo_mensual, moneda)}/mes</span>
-              </div>
+              <span className="num deuda-lista__saldo">{formatoMoneda(deuda.saldo_pendiente, moneda)}</span>
             </li>
           );
         })}
-      </ul>
+      </ol>
     </section>
   );
 }

@@ -1,11 +1,11 @@
-// REQ-13-01..07: tarjeta de una cuenta en conciliación.
+// Tarjeta de una cuenta en conciliación: resumen de saldos, diferencia,
+// movimientos y alta de movimiento.
 import { useState } from 'react';
 import type { Movement } from '../../../domain/entities/account-statement.ts';
-import { formatearImporte, claseEstadoConciliada, textoEstadoConciliada } from '../../../domain/use-cases/conciliacion-logic.ts';
+import { formatearImporte, textoEstadoConciliada } from '../../../domain/use-cases/conciliacion-logic.ts';
 import { usarMoneda } from '../../../hooks/use-moneda.ts';
-import { MovimientoLista } from './MovimientoLista.tsx';
 import { MovimientoFormulario } from './MovimientoFormulario.tsx';
-import '../../../styles/cuenta-conciliada-card.css';
+import { MovimientoLista } from './MovimientoLista.tsx';
 
 interface Props {
   readonly cuenta: {
@@ -23,77 +23,44 @@ interface Props {
 }
 
 export function CuentaConciliadaCard({ cuenta, onAgregarMovimiento, guardando, errorAgregar }: Props) {
-  const [mostrarMovimientos, setMostrarMovimientos] = useState(true);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [formulario, setFormulario] = useState(false);
   const moneda = usarMoneda();
-
+  const importe = (n: number) => formatearImporte(n, moneda);
   return (
-    <article className={`cuenta-conciliada-card ${cuenta.conciliada ? 'conciliada' : 'descuadrada'}`}>
-      <header className="cuenta-conciliada-card__header">
-        <h3 className="cuenta-conciliada-card__nombre">{cuenta.cuenta}</h3>
-        <span className={`cuenta-conciliada-card__estado ${claseEstadoConciliada(cuenta.conciliada)}`}>
+    <article className="card cuenta-conciliada">
+      <div className="card__cabecera">
+        <h2 className="card__titulo">{cuenta.cuenta}</h2>
+        <span className={cuenta.conciliada ? 'badge badge--positivo' : 'badge badge--aviso'}>
           {textoEstadoConciliada(cuenta.conciliada)}
         </span>
-      </header>
-
-      <dl className="cuenta-conciliada-card__resumen">
-        <div className="cuenta-conciliada-card__campo">
-          <dt>Saldo inicial</dt><dd>{formatearImporte(cuenta.saldo_inicial, moneda)}</dd>
-        </div>
-        <div className="cuenta-conciliada-card__campo">
-          <dt>Saldo teórico</dt><dd>{formatearImporte(cuenta.saldo_teorico, moneda)}</dd>
-        </div>
-        <div className="cuenta-conciliada-card__campo">
-          <dt>Saldo real (banco)</dt><dd>{formatearImporte(cuenta.saldo_final, moneda)}</dd>
-        </div>
-        <div className={`cuenta-conciliada-card__campo cuenta-conciliada-card__campo--diferencia ${cuenta.diferencia < 0 ? 'negativa' : 'positiva'}`}>
+      </div>
+      <dl className="cuenta-conciliada__resumen">
+        <div><dt>Saldo inicial</dt><dd className="num">{importe(cuenta.saldo_inicial)}</dd></div>
+        <div><dt>Saldo según registros</dt><dd className="num">{importe(cuenta.saldo_teorico)}</dd></div>
+        <div><dt>Saldo real (banco)</dt><dd className="num">{importe(cuenta.saldo_final)}</dd></div>
+        <div>
           <dt>Diferencia</dt>
-          <dd>{formatearImporte(cuenta.diferencia, moneda)}</dd>
+          <dd className={cuenta.conciliada ? 'num' : 'num negativo'}>{importe(cuenta.diferencia)}</dd>
         </div>
       </dl>
-
-      {!cuenta.conciliada && (
-        <div className="cuenta-conciliada-card__ajuste">
-          <label>
-            Ajuste para cuadrar:
-            <input
-              type="number"
-              step="0.01"
-              value={Math.abs(cuenta.diferencia).toFixed(2)}
-              readOnly
-              className="cuenta-conciliada-card__input-ajuste"
-            />
-            <span className="cuenta-conciliada-card__ajuste-nota">
-              {cuenta.diferencia < 0
-                ? `Faltan ${formatearImporte(Math.abs(cuenta.diferencia), moneda)} para cuadrar`
-                : `Sobran ${formatearImporte(cuenta.diferencia, moneda)} para cuadrar`}
-            </span>
-          </label>
-        </div>
-      )}
-
-      <details className="cuenta-conciliada-card__movimientos" open={mostrarMovimientos}>
-        <summary onClick={() => setMostrarMovimientos(!mostrarMovimientos)}>
-          Movimientos ({cuenta.movimientos.length})
-        </summary>
+      {!cuenta.conciliada ? (
+        <p className="aviso aviso--aviso">
+          {cuenta.diferencia < 0
+            ? `Faltan ${importe(Math.abs(cuenta.diferencia))} por registrar para cuadrar.`
+            : `Sobran ${importe(cuenta.diferencia)} respecto al banco.`}
+        </p>
+      ) : null}
+      <details className="cuenta-conciliada__movimientos" open>
+        <summary>Movimientos ({cuenta.movimientos.length})</summary>
         <MovimientoLista movimientos={cuenta.movimientos} />
-        <button
-          type="button"
-          className="cuenta-conciliada-card__btn-nuevo-movimiento"
-          onClick={() => setMostrarFormulario(true)}
-        >
-          + Registrar movimiento
-        </button>
       </details>
-
-      {mostrarFormulario && (
-        <MovimientoFormulario
-          cuenta={cuenta.cuenta}
-          onSubmit={onAgregarMovimiento}
-          guardando={guardando}
-          error={errorAgregar}
-          onCancel={() => setMostrarFormulario(false)}
-        />
+      {formulario ? (
+        <MovimientoFormulario cuenta={cuenta.cuenta} onSubmit={onAgregarMovimiento} guardando={guardando}
+          error={errorAgregar} onCancel={() => setFormulario(false)} />
+      ) : (
+        <button type="button" className="btn btn--sm cuenta-conciliada__nuevo" onClick={() => setFormulario(true)}>
+          Registrar movimiento
+        </button>
       )}
     </article>
   );

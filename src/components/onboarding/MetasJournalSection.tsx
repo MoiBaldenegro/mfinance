@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import type { GoalEntry } from '../../domain/entities/goal-entry.ts';
 import { useMetas } from '../../hooks/use-metas.ts';
 import { FormularioMeta } from './FormularioMeta.tsx';
+import { Icono } from '../shell/Icono.tsx';
 import '../../styles/metas-journal.css';
 
 interface Props {
@@ -20,27 +21,37 @@ export function MetasJournalSection({ perfilId, metasIniciales = [], alCambiar, 
   const { metas, ocupado, aviso, avisos, agregar, guardar, eliminar } = useMetas(perfilId, metasIniciales);
   useEffect(() => { alCambiar?.(metas); }, [metas]); // eslint-disable-line react-hooks/exhaustive-deps
   const [editandoId, setEditandoId] = useState<string | null>(null);
+  // Alta bajo demanda: el formulario se abre solo si aún no hay metas.
+  const [altaAbierta, setAltaAbierta] = useState(metasIniciales.length === 0);
+  const cerrar = () => { setEditandoId(null); setAltaAbierta(false); };
+  const formularioVisible = editandoId !== null || altaAbierta || metas.length === 0;
   return (
     <fieldset className="metas-journal" disabled={deshabilitado || ocupado}>
-      <legend className="metas-journal__titulo">Mis metas (Journal)</legend>
+      <legend className="metas-journal__titulo">Mis metas</legend>
       <p className="metas-journal__ayuda">
-        Escribe tus objetivos financieros en tus propias palabras. Sin formato rígido.
+        Escribe tus objetivos financieros con tus palabras. Se guardan con tu perfil.
       </p>
-      <FormularioMeta
+      <ListaMetas metas={metas} alEditar={(id) => { setEditandoId(id); setAltaAbierta(false); }} alEliminar={(id) => void eliminar(id)} />
+      {formularioVisible ? <FormularioMeta
+        key={editandoId ?? "nueva"}
         inicial={metas.find((m) => m.id === editandoId)}
         ocupado={ocupado}
-        onCancelar={() => setEditandoId(null)}
+        onCancelar={cerrar}
+        cancelable={metas.length > 0}
         onGuardar={async (entrada) => {
           const ok = editandoId ? await guardar(editandoId, entrada) : await agregar(entrada);
-          if (ok) setEditandoId(null);
+          if (ok) cerrar();
         }}
         modoEdicion={editandoId !== null}
         errorTitulo={textoDe(avisos, 'titulo')}
         errorDescripcion={textoDe(avisos, 'descripcion')}
         errorTags={textoDe(avisos, 'tags')}
         avisoGeneral={aviso}
-      />
-      <ListaMetas metas={metas} alEditar={setEditandoId} alEliminar={(id) => void eliminar(id)} />
+      /> : (
+        <button type="button" className="btn btn--sm metas-journal__anadir" onClick={() => setAltaAbierta(true)}>
+          <Icono nombre="mas" tamano={14} /> Añadir meta
+        </button>
+      )}
     </fieldset>
   );
 }
@@ -61,12 +72,14 @@ function ListaMetas({ metas, alEditar, alEliminar }: {
         <li key={meta.id} className="metas-journal__entrada">
           <div className="metas-journal__cabecera">
             <span className="metas-journal__titulo-meta">{meta.titulo}</span>
-            <button type="button" className="metas-journal__accion" onClick={() => alEditar(meta.id)}>Editar</button>
-            <button type="button" className="metas-journal__accion metas-journal__accion--peligro" aria-label={`Eliminar meta ${meta.titulo}`} onClick={() => alEliminar(meta.id)}>Eliminar</button>
+            <button type="button" className="btn btn--fantasma btn--sm btn--icono" title="Editar"
+              aria-label={`Editar meta ${meta.titulo}`} onClick={() => alEditar(meta.id)}><Icono nombre="editar" tamano={16} /></button>
+            <button type="button" className="btn btn--fantasma btn--sm btn--icono metas-journal__eliminar" title="Eliminar"
+              aria-label={`Eliminar meta ${meta.titulo}`} onClick={() => alEliminar(meta.id)}><Icono nombre="eliminar" tamano={16} /></button>
           </div>
           {meta.descripcion && <p className="metas-journal__descripcion">{meta.descripcion}</p>}
           {meta.tags.length > 0 && (
-            <p className="metas-journal__tags">{meta.tags.map((t) => `#${t}`).join(' ')}</p>
+            <p className="metas-journal__tags">{meta.tags.map((t) => <span key={t} className="badge">#{t}</span>)}</p>
           )}
         </li>
       ))}

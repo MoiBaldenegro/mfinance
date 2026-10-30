@@ -59,7 +59,7 @@ assert.match(seguro, /rollback-carga: snapshot anterior corrupto/);
 assert.equal(seguro.split('snapshot anterior corrupto').length - 1, 1);
 assert.match(seguro, />Reintentar</);
 assert.match(seguro, /Volver al perfil anterior/);
-assert.doesNotMatch(seguro, /app-shell|balance-section|section-tabs/);
+assert.doesNotMatch(seguro, /app-shell|balance-section|barra-lateral/);
 await assert.rejects(pantalla.props.reintentar(), /rollback-carga/);
 assert.equal(ejecuciones, 1);
 await pantalla.props.reintentar();

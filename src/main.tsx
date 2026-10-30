@@ -3,6 +3,10 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { iniciarTema } from "./lib/estado-tema.ts";
 import { temaPort } from "./adapters/tema-local-storage-adapter.ts";
+import "@fontsource/cal-sans/latin-400.css";
+import "@fontsource/cal-sans/latin-ext-400.css";
+import "@fontsource/pacifico/latin-400.css";
+import "@fontsource/pacifico/latin-ext-400.css";
 import "./styles/global.css";
 
 // REQ-17-08: data-theme se fija sobre <html> ANTES del primer render para

@@ -12,7 +12,6 @@ import type { SerieBalance } from '../../domain/entities/balance-serie.ts';
 import { Chart } from '../../lib/chart-setup.ts';
 import { conAlpha, coloresDeEjes, token } from '../../lib/chart-colores.ts';
 import { usarTema } from '../../hooks/use-tema.ts';
-import '../../styles/balance-chart.css';
 
 interface Props {
   readonly serie: SerieBalance;
@@ -73,7 +72,7 @@ export function BalanceChart({ serie }: Props) {
   }, [serie, tema, moneda]);
 
   return (
-    <div className="balance-chart">
+    <div className="grafica">
       <canvas ref={lienzo} role="img"
         aria-label="Gráfica de evolución mensual del patrimonio" />
     </div>

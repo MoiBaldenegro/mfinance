@@ -2,7 +2,7 @@
 // cambie a error, para permitir recuperar la sesión sin datos financieros.
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { perfilPort } from '../../adapters/perfil-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import type { Perfil } from '../../domain/entities/perfil.ts';
 import { cargarPerfiles } from '../../domain/use-cases/cargar-perfiles.ts';
 import { PerfilContext } from '../../hooks/use-perfil.ts';
@@ -10,6 +10,7 @@ import type { ValorPerfiles } from '../../hooks/use-perfil.ts';
 import '../../styles/perfil-provider.css';
 
 export function PerfilProvider({ children }: { readonly children: ReactNode }) {
+  const { perfil: perfilPort } = usarPuertos();
   const [perfiles, setPerfiles] = useState<readonly Perfil[]>([]);
   const [activo, setActivo] = useState<Perfil | null>(null);
   const [avisoCarga, setAvisoCarga] = useState<string | null>(null);

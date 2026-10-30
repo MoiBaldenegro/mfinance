@@ -1,0 +1,27 @@
+/* Sección Deuda: estrategia + orden de pago, lista ordenada y tabla. */
+.deuda-section__fila { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: start; }
+@media (max-width: 1100px) {
+  .deuda-section__fila { grid-template-columns: minmax(0, 1fr); }
+}
+
+.deuda-section__vacio { justify-items: center; }
+.deuda-section__tabla { max-height: 360px; overflow-y: auto; }
+
+.deuda-lista { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.deuda-lista__item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center; gap: var(--space-3);
+  padding: var(--space-3);
+  border: var(--borde); border-radius: var(--radius-md);
+}
+.deuda-lista__item--objetivo { border-color: var(--color-primary); background: var(--color-primary-bg); }
+.deuda-lista__orden {
+  display: grid; place-items: center;
+  width: 24px; height: 24px; border-radius: var(--radius-full);
+  background: var(--color-surface-hover); color: var(--color-muted);
+  font-size: var(--fuente-tamano-xs); font-weight: var(--fuente-peso-semibold);
+}
+.deuda-lista__info { display: grid; gap: 2px; min-width: 0; }
+.deuda-lista__nombre { display: flex; align-items: center; gap: var(--space-2); font-weight: var(--fuente-peso-medium); }
+.deuda-lista__detalle { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+.deuda-lista__saldo { font-weight: var(--fuente-peso-semibold); }

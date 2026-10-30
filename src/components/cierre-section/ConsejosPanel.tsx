@@ -4,17 +4,15 @@ import { useEffect, useState } from 'react';
 import type { Recomendacion } from '../../domain/entities/cierre.ts';
 import {
   cargarConsejos,
-  claseSeveridad,
-  visibles,
   CONSEJOS_INICIALES,
 } from '../../domain/use-cases/consejos-logic.ts';
-import { cierrePort } from '../../adapters/cierre-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import { useSnapshot } from '../shell/SnapshotProvider.tsx';
-import '../../styles/consejos-panel.css';
-import '../../styles/consejo-item.css';
+import { ListaConsejos } from './ListaConsejos.tsx';
 
 /** Lista priorizada de consejos siempre visible en la sección Cierre. */
 export function ConsejosPanel() {
+  const { cierre: cierrePort } = usarPuertos();
   const { estado } = useSnapshot();
   const [consejos, setConsejos] =
     useState<readonly Recomendacion[]>(CONSEJOS_INICIALES);
@@ -33,29 +31,16 @@ export function ConsejosPanel() {
   }, [estado]);
 
   return (
-    <section className="consejos-panel">
-      <h3 className="consejos-panel__titulo">Consejos</h3>
-      <p className="consejos-panel__ayuda">
-        Recomendaciones vigentes según tus indicadores; los riesgos rojos
-        encabezan la lista.
-      </p>
-      {motivo ? <p className="consejos-panel__error" role="alert">{motivo}</p> : null}
+    <section className="card consejos-panel" aria-label="Consejos">
+      <h2 className="card__titulo">Consejos</h2>
+      <p className="card__descripcion">Según tus indicadores actuales; lo prioritario, primero.</p>
+      {motivo ? <p className="aviso aviso--error" role="alert">{motivo}</p> : null}
       {!motivo && consejos.length === 0 ? (
-        <p className="consejos-panel__vacio">
+        <p className="card__descripcion">
           Sin recomendaciones todavía: registra tu actividad para evaluarlas.
         </p>
       ) : null}
-      <ul className="consejos-panel__lista">
-        {visibles(consejos).map((consejo) => (
-          <li key={consejo.titulo} className={`consejo consejo--${claseSeveridad(consejo.severidad)}`}>
-            <strong className="consejo__titulo">
-              {consejo.severidad === 'rojo' ? 'Prioritario: ' : ''}
-              {consejo.titulo}
-            </strong>
-            <span className="consejo__texto">{consejo.texto}</span>
-          </li>
-        ))}
-      </ul>
+      <ListaConsejos consejos={consejos} />
     </section>
   );
 }

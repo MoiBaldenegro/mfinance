@@ -88,3 +88,22 @@ fn escenario_todo_verde_refuerza_el_buen_camino() {
     assert!(!consejos.is_empty());
     assert!(consejos.iter().all(|c| c.severidad == Severidad::Verde));
 }
+
+/// El título acompaña a la severidad: un consejo verde nunca dice «crítico».
+#[test]
+fn el_titulo_de_un_consejo_verde_no_contradice_su_estado() {
+    let consejos = evaluar_recomendaciones(&todo(Semaphore::Verde));
+    for consejo in &consejos {
+        let titulo = consejo.titulo.to_lowercase();
+        for alarma in ["crítico", "fuera de control", "insuficiente"] {
+            assert!(!titulo.contains(alarma), "título verde alarmista: {}", consejo.titulo);
+        }
+    }
+}
+
+#[test]
+fn el_titulo_de_un_consejo_rojo_comunica_el_riesgo() {
+    let consejos = evaluar_recomendaciones(&todo(Semaphore::Rojo));
+    let deuda = consejos.iter().find(|c| c.texto.contains("cuotas de deuda")).expect("consejo de deuda");
+    assert!(deuda.titulo.to_lowercase().contains("fuera de control"));
+}

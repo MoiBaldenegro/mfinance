@@ -1,7 +1,4 @@
-// Ronda 2 fix transversal feature 26: vista de error de carga del wizard,
-// extraída de OnboardingWizard.tsx (regla dura ≤100 líneas por archivo).
-// Reutiliza las clases BEM de la hoja onboarding-wizard.css; sin estilos
-// propios ni embebidos.
+// Vista de error de carga del wizard con botón Reintentar.
 import '../../styles/onboarding-wizard.css';
 
 interface WizardErrorCargaProps {
@@ -12,9 +9,12 @@ interface WizardErrorCargaProps {
 /** Estado de error al cargar el onboarding guardado, con botón Reintentar. */
 export function WizardErrorCarga({ mensaje, alReintentar }: WizardErrorCargaProps) {
   return (
-    <div className="onboarding-wizard onboarding-wizard--error" role="alert">
-      <p className="onboarding-wizard__error">{mensaje}</p>
-      <button className="onboarding-wizard__reintentar" onClick={alReintentar}>Reintentar</button>
+    <div className="onboarding-wizard">
+      <div className="aviso aviso--error onboarding-wizard--error" role="alert">
+        <strong>No se pudo cargar tu onboarding</strong>
+        <p>{mensaje}</p>
+        <button type="button" className="btn btn--sm" onClick={alReintentar}>Reintentar</button>
+      </div>
     </div>
   );
 }

@@ -3,14 +3,12 @@
 // wizard (paso 4) y Ajustes («Mis metas») compartan el mismo flujo.
 import { useCallback, useState } from 'react';
 import type { EntradaMeta, GoalEntry, AvisoCampoMeta } from '../domain/entities/goal-entry.ts';
-import { onboardingPort } from '../adapters/onboarding-adapter.ts';
+import { usarPuertos } from '../app/puertos.ts';
 import {
   agregarMeta,
   actualizarMeta,
   eliminarMeta,
 } from '../domain/use-cases/onboarding/gestionar-metas.ts';
-
-const puertos = { onboarding: onboardingPort };
 
 export interface UseMetasReturn {
   readonly metas: readonly GoalEntry[];
@@ -27,6 +25,7 @@ export function useMetas(
   perfilId: string | undefined,
   metasIniciales: readonly GoalEntry[] = [],
 ): UseMetasReturn {
+  const puertos = usarPuertos();
   const [metas, setMetas] = useState<readonly GoalEntry[]>(metasIniciales);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);

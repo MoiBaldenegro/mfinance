@@ -1,58 +1,27 @@
-/* Hoja del campo de importe (REQ-06-02/06): solo tokens de tokens.css.
-   Refino F18: foco visible uniforme con el anillo del sistema; el
-   contorno hairline del input es la excepción registrada en impl_6.md. */
+/* Campo de importe: etiqueta a la izquierda, importe con prefijo de moneda. */
 .campo-importe {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) var(--campo-importe-ancho);
   align-items: center;
-  gap: var(--space-1) var(--space-2);
+  gap: var(--space-1) var(--space-3);
 }
 
-.campo-importe__etiqueta {
-  color: var(--color-text);
-  font-size: var(--fuente-tamano-base);
-}
+.campo-importe__etiqueta { color: var(--color-text); }
 
-.campo-importe__control {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-1);
-  justify-self: end;
+.campo-importe__control { position: relative; display: block; }
+.campo-importe__prefijo {
+  position: absolute; inset: 0 auto 0 var(--space-3);
+  display: grid; place-items: center;
+  color: var(--color-subtle); pointer-events: none;
 }
-
 .campo-importe__entrada {
-  width: calc(var(--space-8) * 2);
-  padding: var(--space-1) var(--space-2);
-  font: inherit;
+  width: 100%;
+  padding-left: var(--space-6);
   text-align: right;
-  color: var(--color-text);
-  background: var(--color-surface);
-  border: 1px solid var(--color-muted); /* hairline: excepción registrada */
-  border-radius: var(--radius-md);
-  transition:
-    border-color var(--transicion-rapida),
-    box-shadow var(--transicion-rapida);
+  -moz-appearance: textfield;
 }
+.campo-importe__entrada::-webkit-inner-spin-button,
+.campo-importe__entrada::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* REQ-18-02: anillo + borde primario al navegar con teclado. */
-.campo-importe__entrada:focus-visible,
-.campo-importe__entrada:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: var(--anillo-foco);
-}
-
-.campo-importe--invalido .campo-importe__entrada {
-  border-color: var(--color-negative);
-}
-
-.campo-importe__sufijo {
-  color: var(--color-muted);
-}
-
-/* El error ocupa las dos columnas, pegado al campo afectado. */
-.campo-importe__error {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: var(--color-negative);
-}
+.campo-importe--invalido .campo-importe__entrada { border-color: var(--color-negative); }
+.campo-importe__error { grid-column: 1 / -1; justify-self: end; color: var(--color-negative); font-size: var(--fuente-tamano-xs); }

@@ -4,7 +4,6 @@ import { formatoMoneda } from '../../domain/use-cases/formato-moneda.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
 import { resumenesHistorico } from '../../domain/use-cases/cierre-historico.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
-import '../../styles/consejos-panel.css';
 
 interface Props {
   readonly snapshot: FinanceSnapshot;
@@ -15,19 +14,19 @@ export function HistoricoCierres({ snapshot }: Props) {
   const moneda = usarMoneda();
   const historico = resumenesHistorico(snapshot);
   return (
-    <section className="historico-cierres">
-      <h3 className="historico-cierres__titulo">Cierres anteriores</h3>
+    <section className="card" aria-label="Cierres anteriores">
+      <h2 className="card__titulo">Cierres anteriores</h2>
       {historico.length === 0 ? (
-        <p className="historico-cierres__vacio">
+        <p className="card__descripcion">
           Todavía no hay ningún mes cerrado.
         </p>
       ) : (
-        <table className="historico-cierres__tabla">
+        <div className="tabla-contenedor"><table className="tabla">
           <thead>
             <tr>
               <th scope="col">Mes</th>
               <th scope="col">Fecha de cierre</th>
-              <th scope="col">Presupuesto siguiente</th>
+              <th scope="col" className="num">Presupuesto siguiente</th>
             </tr>
           </thead>
           <tbody>
@@ -35,11 +34,11 @@ export function HistoricoCierres({ snapshot }: Props) {
               <tr key={fila.mes}>
                 <th scope="row">{fila.mes}</th>
                 <td>{fila.fecha}</td>
-                <td>{formatoMoneda(fila.totalPresupuesto, moneda)}</td>
+                <td className="num">{formatoMoneda(fila.totalPresupuesto, moneda)}</td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </section>
   );

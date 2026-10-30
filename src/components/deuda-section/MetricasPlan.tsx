@@ -1,6 +1,4 @@
-// Métricas resumen del plan de deuda.
-import '../../styles/deuda-metricas.css';
-
+// KPIs del plan de deuda.
 interface Metricas {
   readonly mesesHastaLibre: string;
   readonly interesesTotales: string;
@@ -13,27 +11,20 @@ interface Props {
 }
 
 export function MetricasPlan({ metricas }: Props) {
+  const kpis = [
+    ['Meses hasta quedar libre', metricas.mesesHastaLibre, ''],
+    ['Intereses totales', metricas.interesesTotales, ''],
+    ['Intereses ahorrados', metricas.interesesAhorrados, 'positivo'],
+    ['Total a pagar', metricas.totalPagado, ''],
+  ] as const;
   return (
-    <section className="deuda-section__tarjeta" aria-label="Métricas del plan">
-      <h3 className="deuda-section__subtitulo">Resumen del plan</h3>
-      <div className="deuda-section__metricas">
-        <div className="deuda-section__metrica">
-          <span className="deuda-section__metrica-label">Meses hasta libre</span>
-          <span className="deuda-section__metrica-valor">{metricas.mesesHastaLibre}</span>
+    <div className="rejilla rejilla--4" aria-label="Resumen del plan">
+      {kpis.map(([etiqueta, valor, tono]) => (
+        <div key={etiqueta} className="kpi">
+          <span className="kpi__etiqueta">{etiqueta}</span>
+          <strong className={tono ? `kpi__valor ${tono}` : 'kpi__valor'}>{valor}</strong>
         </div>
-        <div className="deuda-section__metrica">
-          <span className="deuda-section__metrica-label">Intereses totales</span>
-          <span className="deuda-section__metrica-valor">{metricas.interesesTotales}</span>
-        </div>
-        <div className="deuda-section__metrica">
-          <span className="deuda-section__metrica-label">Intereses ahorrados</span>
-          <span className="deuda-section__metrica-valor">{metricas.interesesAhorrados}</span>
-        </div>
-        <div className="deuda-section__metrica">
-          <span className="deuda-section__metrica-label">Total pagado</span>
-          <span className="deuda-section__metrica-valor">{metricas.totalPagado}</span>
-        </div>
-      </div>
-    </section>
+      ))}
+    </div>
   );
 }

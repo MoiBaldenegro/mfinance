@@ -350,3 +350,19 @@ fn load_state_error_sin_perfil_activo_mensaje_exacto() {
 
     cleanup(&base);
 }
+/// Instalación nueva: el arranque de la UI (perfil activo + estado de
+/// onboarding) funciona aunque el snapshot aún no exista, devolviendo un
+/// snapshot vacío y NotStarted para que se muestre el asistente.
+#[test]
+fn arranque_en_frio_obtiene_perfil_activo_sin_snapshot_en_disco() {
+    use crate::application::obtener_perfil_activo_con_onboarding::obtener_perfil_activo_con_onboarding;
+    let base = temp_dir("arranque_frio_obtener_activo");
+    let mut store = JsonSnapshotRepository::new(base.clone());
+    preparar_arranque(&mut store).expect("preparar_arranque ok");
+
+    let activo = obtener_perfil_activo_con_onboarding(&mut store).expect("debe arrancar sin snapshot");
+    assert_eq!(activo.onboarding_status, OnboardingStatus::NotStarted);
+    assert_eq!(activo.snapshot, FinanceSnapshot::new());
+
+    cleanup(&base);
+}

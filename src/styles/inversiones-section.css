@@ -1,0 +1,2 @@
+/* Sección Inversiones: inputs numéricos alineados dentro de la tabla. */
+.inversiones-tabla__input { width: 100%; max-width: 11rem; text-align: right; }

@@ -24,9 +24,10 @@ fn indice(indicador: &IndicadorResultado) -> usize {
 
 fn consejo(indicador: &IndicadorResultado) -> Option<Recomendacion> {
     let regla = REGLAS.get(indice(indicador))?;
-    let (severidad, texto) = if indicador.sin_datos {
+    let (severidad, titulo, texto) = if indicador.sin_datos {
         (
             Severidad::Verde,
+            format!("Sin datos de {}", indicador.nombre.to_lowercase()),
             format!(
                 "Falta dato para calcular {}: registra ingresos y gastos completos del mes.",
                 indicador.nombre
@@ -38,9 +39,9 @@ fn consejo(indicador: &IndicadorResultado) -> Option<Recomendacion> {
             Semaphore::Amarillo => (Severidad::Amarillo, 1),
             Semaphore::Verde => (Severidad::Verde, 2),
         };
-        (nivel.0, regla.textos[nivel.1].to_string())
+        (nivel.0, regla.titulos[nivel.1].to_string(), regla.textos[nivel.1].to_string())
     };
-    Some(Recomendacion { severidad, titulo: regla.titulo.into(), texto })
+    Some(Recomendacion { severidad, titulo, texto })
 }
 
 /// Evalúa las cuatro reglas sobre los indicadores y devuelve los consejos
