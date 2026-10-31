@@ -1,38 +1,24 @@
-// Barra de progreso del wizard de cierre (REQ-16-01): elemento nativo
-// <progress> con el porcentaje completado más los rótulos de los cuatro
-// pasos del ritual. Sin estilos inline: la hoja vive en src/styles/.
-import { ETIQUETAS_PASOS, progresoWizard } from '../../domain/use-cases/wizard-cierre.ts';
-import '../../styles/wizard-cierre.css';
+// Indicador de pasos del asistente de cierre: hechos, actual y pendientes.
+import { ETIQUETAS_PASOS } from '../../domain/use-cases/wizard-cierre.ts';
+import { Icono } from '../shell/Icono.tsx';
 
 interface Props {
   readonly paso: number;
 }
 
-/** Barra horizontal con el avance del ritual de cierre. */
 export function BarraProgreso({ paso }: Props) {
-  const progreso = progresoWizard(paso);
   return (
-    <div className="cierre-wizard__progreso">
-      <progress
-        className="cierre-wizard__barra"
-        value={progreso}
-        max={100}
-        aria-label={`Progreso del cierre: paso ${paso + 1} de ${ETIQUETAS_PASOS.length}`}
-      />
-      <ol className="cierre-wizard__pasos">
-        {ETIQUETAS_PASOS.map((etiqueta, indice) => (
-          <li
-            key={etiqueta}
-            className={
-              indice === paso
-                ? 'cierre-wizard__paso cierre-wizard__paso--activo'
-                : 'cierre-wizard__paso'
-            }
-          >
-            {etiqueta}
+    <ol className="pasos-cierre" aria-label={`Paso ${paso + 1} de ${ETIQUETAS_PASOS.length}`}>
+      {ETIQUETAS_PASOS.map((etiqueta, indice) => {
+        const estado = indice < paso ? 'hecho' : indice === paso ? 'actual' : 'pendiente';
+        return (
+          <li key={etiqueta} className={`pasos-cierre__paso pasos-cierre__paso--${estado}`}
+            aria-current={estado === 'actual' ? 'step' : undefined}>
+            <span className="pasos-cierre__numero" aria-hidden="true">{estado === 'hecho' ? <Icono nombre="check" tamano={12} /> : indice + 1}</span>
+            <span className="pasos-cierre__etiqueta">{etiqueta}</span>
           </li>
-        ))}
-      </ol>
-    </div>
+        );
+      })}
+    </ol>
   );
 }

@@ -1,12 +1,11 @@
-/* Hoja del shell principal (AppShell): rejilla cabecera + pestañas +
-   área central a ancho completo. */
+/* Shell principal: barra lateral fija + contenido con scroll de documento. */
 .app-shell {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: var(--sidebar-ancho) minmax(0, 1fr);
   min-height: 100vh;
 }
 
 .app-shell__contenido {
-  flex: 1;
-  padding: var(--space-5) var(--space-6) var(--space-7);
+  min-width: 0;
+  padding: var(--space-6) var(--space-6) var(--space-8);
 }

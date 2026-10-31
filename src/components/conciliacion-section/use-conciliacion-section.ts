@@ -5,6 +5,8 @@ import type { ConciliacionMensual } from '../../domain/entities/conciliacion-men
 import { useConciliacion, useHistoricoConciliacion, useAgregarMovimientoConciliacion } from '../../hooks/use-conciliacion.ts';
 import { todasConciliadas } from '../../domain/use-cases/conciliacion-logic.ts';
 import { useSnapshot } from '../shell/SnapshotProvider.tsx';
+import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
+import { mesDeTrabajo } from '../../domain/use-cases/resumenes-secciones.ts';
 
 interface UseConciliacionSectionReturn {
   mesSeleccionado: string;
@@ -22,9 +24,11 @@ interface UseConciliacionSectionReturn {
   conciliacion: ConciliacionMensual;
 }
 
-export function useConciliacionSection(): UseConciliacionSectionReturn {
+export function useConciliacionSection(snapshot: FinanceSnapshot): UseConciliacionSectionReturn {
   const { aplicarSnapshot } = useSnapshot();
   const [mesSeleccionado, setMesSeleccionado] = useState<string>(() => {
+    const trabajo = mesDeTrabajo(snapshot);
+    if (trabajo) return trabajo;
     const hoy = new Date();
     return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
   });
@@ -37,7 +41,7 @@ export function useConciliacionSection(): UseConciliacionSectionReturn {
     (nuevoSnapshot) => aplicarSnapshot(nuevoSnapshot),
   );
 
-  useEffect(() => { recargarConciliacion(); }, [mesSeleccionado, recargarConciliacion]);
+  useEffect(() => { recargarConciliacion(); }, [mesSeleccionado, recargarConciliacion, snapshot]);
   useEffect(() => { if (mostrarHistorico) recargarHistorico(); }, [mostrarHistorico, recargarHistorico]);
 
   const conciliacion: ConciliacionMensual = estado.nombre === 'listo'
@@ -55,8 +59,7 @@ export function useConciliacionSection(): UseConciliacionSectionReturn {
     const concepto = (form.elements.namedItem('concepto') as HTMLInputElement).value;
     const importe = parseFloat((form.elements.namedItem('importe') as HTMLInputElement).value);
     const movimiento: Movement = { fecha, concepto, importe };
-    agregar(cuenta, movimiento);
-    form.reset();
+    void agregar(cuenta, movimiento).then((ok) => { if (ok) form.reset(); });
   }, [agregar]);
 
   return {

@@ -1,7 +1,6 @@
 // Tarjeta de escenario Base u Optimizado (REQ-15-04): métricas grandes
 // formateadas en euros por el use-case comparativo.
 import type { MetricasEscenarioVista } from '../../../domain/use-cases/simulador-comparativa.ts';
-import '../../../styles/simulador-tarjetas.css';
 
 interface Props {
   readonly titulo: string;

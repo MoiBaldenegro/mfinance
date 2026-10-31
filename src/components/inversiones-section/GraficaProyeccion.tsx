@@ -7,9 +7,9 @@ import { Chart } from '../../lib/chart-setup.ts';
 import { coloresDeEjes, token } from '../../lib/chart-colores.ts';
 import { usarTema } from '../../hooks/use-tema.ts';
 import { formatoMoneda } from '../../domain/use-cases/formato-moneda.ts';
+import { etiquetaFamiliaProyeccion } from '../../domain/use-cases/inversiones-proyeccion.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
 import type { ProyeccionInversiones } from '../../domain/entities/proyeccion-inversiones.ts';
-import '../../styles/inversiones-grafica.css';
 
 interface Props {
   readonly proyeccion: ProyeccionInversiones | null;
@@ -33,11 +33,9 @@ export function GraficaProyeccion({ proyeccion }: Props) {
     ];
     const ejes = coloresDeEjes();
     const datasets = proyeccion.familias.map((fam, i) => ({
-      label: fam.familia.replace('_', ' '),
+      label: etiquetaFamiliaProyeccion(fam.familia),
       data: [fam.valor_futuro_5, fam.valor_futuro_10, fam.valor_futuro_20],
       backgroundColor: fondos[i],
-      borderColor: token('--chart-border'),
-      borderWidth: 1,
     }));
 
     const chart = new Chart(ctx, {
@@ -50,11 +48,6 @@ export function GraficaProyeccion({ proyeccion }: Props) {
           legend: {
             position: 'top',
             labels: { color: ejes.ticks },
-          },
-          title: {
-            display: true,
-            text: 'Valor futuro proyectado por familia',
-            color: ejes.ticks,
           },
         },
         scales: {
@@ -75,11 +68,11 @@ export function GraficaProyeccion({ proyeccion }: Props) {
     return () => { chart.destroy(); };
   }, [proyeccion, tema, moneda]);
 
-  if (!proyeccion) return <p className="inversiones-grafica__vacia estado-carga">Cargando proyección…</p>;
+  if (!proyeccion) return <p className="estado-carga">Cargando proyección…</p>;
 
   return (
-    <div className="inversiones-grafica-wrap">
-      <canvas ref={canvasRef} className="inversiones-grafica" />
+    <div className="grafica">
+      <canvas ref={canvasRef} />
     </div>
   );
 }

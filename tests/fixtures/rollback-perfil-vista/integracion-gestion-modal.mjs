@@ -24,7 +24,7 @@ assert.match(html, /role="dialog"/);
 assert.match(html, /aria-modal="true"/);
 assert.match(html, /aria-labelledby="perfil-carga-error-titulo"/);
 assert.match(html, /aria-describedby="perfil-carga-error-descripcion"/);
-assert.doesNotMatch(html, /app-shell|section-tabs|balance-section|Perfil: Ana/);
+assert.doesNotMatch(html, /app-shell|barra-lateral|balance-section|Perfil: Ana/);
 
 // Escape real del diálogo: salida segura explícita sin shell.
 vista.tecla((el) => el.props.className === 'perfil-carga-error-dialog', { key: 'Escape' });
@@ -34,7 +34,7 @@ assert.equal(escenario.selecciones.length, 1);
 assert.equal(escenario.cargas, 2);
 assert.match(html, /No se pudieron cargar tus datos/);
 assert.match(html, /Reintentar/);
-assert.doesNotMatch(html, /app-shell|section-tabs|balance-section/);
+assert.doesNotMatch(html, /app-shell|barra-lateral|balance-section/);
 
 // Cancelar real sobre el diálogo reabierto: misma salida segura, sin cargas extra.
 pulsarEn(gestion, 'Activar');
@@ -75,7 +75,7 @@ html = vista.html();
 assert.equal(escenario.fallosAna, 0);
 assert.match(html, /snapshot anterior corrupto|rollback/);
 assert.match(html, /Reintentar/);
-assert.doesNotMatch(html, /app-shell|section-tabs|balance-section/);
+assert.doesNotMatch(html, /app-shell|barra-lateral|balance-section/);
 const antesDelReintento = escenario.selecciones.length;
 pulsarEn(vista, 'Reintentar');
 await asentarTodo();

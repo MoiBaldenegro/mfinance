@@ -1,95 +1,58 @@
-// REQ-08-02/06: formulario de Pasivo (crear/editar) con validación inline.
-import { useState, FormEvent } from 'react';
+// Formulario de pasivo (alta/edición). En edición el nombre es la clave
+// del upsert y no se puede cambiar (evita duplicados al «renombrar»).
+import { useState } from 'react';
+import type { FormEvent } from 'react';
+import type { Liability } from '../../domain/entities/liability.ts';
 import { validarPasivo } from '../../domain/use-cases/balance-validaciones.ts';
 import { simboloDe } from '../../domain/entities/moneda.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
-import '../../styles/pasivos-table.css';
+import '../../styles/balance-tablas.css';
 
 interface Props {
-  readonly modo: { tipo: 'crear' } | { tipo: 'editar'; nombreOriginal: string };
-  readonly initialData: { nombre: string; saldoPendiente: string; tasaInteresAnual: string };
+  readonly inicial: Liability | null;
   readonly onSubmit: (nombre: string, saldoPendiente: number, tasaInteresAnual: number) => Promise<void>;
   readonly onCancel: () => void;
   readonly ocupando: boolean;
 }
 
-export function PasivoForm({
-  modo,
-  initialData,
-  onSubmit,
-  onCancel,
-  ocupando,
-}: Props) {
+export function PasivoForm({ inicial, onSubmit, onCancel, ocupando }: Props) {
   const simbolo = simboloDe(usarMoneda());
-  const [form, setForm] = useState(initialData);
+  const [nombre, setNombre] = useState(inicial?.nombre ?? '');
+  const [saldo, setSaldo] = useState(inicial ? String(inicial.saldo_pendiente) : '');
+  const [tasa, setTasa] = useState(inicial ? String(inicial.tasa_interes_anual) : '');
   const [error, setError] = useState<string | undefined>();
 
-  const manejarSubmit = async (e: FormEvent) => {
+  const enviar = (e: FormEvent) => {
     e.preventDefault();
-    const saldo = Number(form.saldoPendiente);
-    const tasa = Number(form.tasaInteresAnual);
-    const errorVal = validarPasivo(form.nombre, saldo, tasa);
-    if (errorVal) {
-      setError(errorVal);
-      return;
-    }
-    try {
-      await onSubmit(form.nombre, saldo, tasa);
-      onCancel();
-    } catch {
-      // error manejado en hook
-    }
+    const importe = Number(saldo);
+    const anual = Number(tasa);
+    const fallo = validarPasivo(nombre.trim(), importe, anual);
+    setError(fallo ?? undefined);
+    if (!fallo) void onSubmit(nombre.trim(), importe, anual);
   };
 
   return (
-    <form className="balance-form" onSubmit={manejarSubmit}>
-      <div className="balance-form__fila">
-        <label className="balance-form__label">
-          Nombre
-          <input
-            type="text"
-            className="balance-form__input"
-            value={form.nombre}
-            onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-            required
-            disabled={ocupando}
-          />
-        </label>
-        <label className="balance-form__label">
-          Saldo pendiente ({simbolo})
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            className="balance-form__input"
-            value={form.saldoPendiente}
-            onChange={(e) => setForm({ ...form, saldoPendiente: e.target.value })}
-            required
-            disabled={ocupando}
-          />
-        </label>
-        <label className="balance-form__label">
-          Tasa interés anual (%)
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            className="balance-form__input"
-            value={form.tasaInteresAnual}
-            onChange={(e) => setForm({ ...form, tasaInteresAnual: e.target.value })}
-            required
-            disabled={ocupando}
-          />
-        </label>
-      </div>
-      {error && <p className="balance-form__error" role="alert">{error}</p>}
+    <form className="balance-form" onSubmit={enviar}
+      aria-label={inicial ? `Editar ${inicial.nombre}` : 'Nuevo pasivo'}>
+      <label className="campo">
+        <span className="campo__etiqueta">Nombre</span>
+        <input value={nombre} onChange={(e) => setNombre(e.target.value)} required autoFocus
+          disabled={ocupando || inicial !== null} placeholder="Tarjeta de crédito" />
+      </label>
+      <label className="campo">
+        <span className="campo__etiqueta">Saldo pendiente ({simbolo})</span>
+        <input type="number" step="0.01" min="0" value={saldo} required disabled={ocupando}
+          onChange={(e) => setSaldo(e.target.value)} />
+      </label>
+      <label className="campo">
+        <span className="campo__etiqueta">Tasa anual (%)</span>
+        <input type="number" step="0.01" min="0" value={tasa} required disabled={ocupando}
+          onChange={(e) => setTasa(e.target.value)} />
+      </label>
+      {error ? <p className="campo__error balance-form__error" role="alert">{error}</p> : null}
       <div className="balance-form__acciones">
-        <button type="submit" className="btn btn--primario" disabled={ocupando}>
-          {modo.tipo === 'crear' ? 'Crear' : 'Guardar'}
-        </button>
-        <button type="button" className="btn btn--secundario" onClick={onCancel} disabled={ocupando}>
-          Cancelar
-        </button>
+        <button type="button" className="btn btn--fantasma" onClick={onCancel} disabled={ocupando}>Cancelar</button>
+        <button type="submit" className="btn btn--primario" disabled={ocupando}>{inicial ? 'Guardar' : 'Añadir'}</button>
       </div>
     </form>
   );

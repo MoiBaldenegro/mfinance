@@ -1,6 +1,5 @@
 // REQ-13-07: componente de histórico mensual de conciliación.
 import { HistoricoPanel } from './components/HistoricoPanel.tsx';
-import '../../styles/conciliacion-historico-wrapper.css';
 
 interface Props {
   readonly estado: ReturnType<typeof import('../../hooks/use-conciliacion.ts').useHistoricoConciliacion>['estado'];

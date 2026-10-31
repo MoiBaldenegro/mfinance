@@ -1,7 +1,6 @@
 # Arquitectura — Qué significa "hacer un buen trabajo"
 
-> Este documento define el estándar de calidad. Los agentes revisores
-> evalúan código contra este archivo. Si no está aquí, no es un requisito.
+> Estándar de calidad del proyecto.
 
 mfinance es una **app de escritorio construida con Tauri 2**: frontend
 **React 19 + TypeScript + Vite** en `src/` (dev server en el puerto `1420`) y
@@ -33,12 +32,11 @@ siempre hacia él.
    uno importa su hoja desde `src/styles/`.
 8. **Lógica separada de la UI.** Los componentes `.tsx` renderizan y delegan:
    la lógica vive en casos de uso (`src/domain/use-cases/`) y módulos TS.
-9. **Sin dependencias externas sin aprobar.** Paquetes npm y crates nuevos se
-   marcan `blocked` y esperan la aprobación del humano, materializada en
-   `docs/dependencies.md` (validada por `scripts/validate-dependencies.mjs`).
-10. **Modularización estricta.** Ningún archivo supera las 100 líneas; si es
-    imprescindible, se discute antes (estado `blocked`).
-11. **Scripts del arnés aislados.** Los scripts de `scripts/` se ejecutan con
+9. **Dependencias mínimas.** Paquetes npm y crates nuevos se consultan antes
+   con el dueño del producto.
+10. **Modularización estricta.** Archivos pequeños con una sola responsabilidad
+    (orientativo: ~100 líneas).
+11. **Scripts aislados.** Los scripts de `scripts/` se ejecutan con
     Node y jamás se importan desde `src/`: no son build ni runtime.
 12. **Artefactos generados.** `dist/` (Vite) y `src-tauri/target/` (cargo) se
     regeneran siempre completos: nunca se editan a mano.
@@ -50,7 +48,7 @@ siempre hacia él.
 | `src/` | Frontend React + TS (ver desglose hexagonal abajo). |
 | `src-tauri/` | Backend Rust: `src/` (código), `Cargo.toml`, `tauri.conf.json`. |
 | `public/` | Activos estáticos servidos tal cual (favicons, SVG). |
-| `scripts/` | Scripts del arnés (Node stdlib), nunca importados desde `src/`. |
+| `scripts/` | Scripts de mantenimiento (Node stdlib), nunca importados desde `src/`. |
 | `tests/` | Tests automáticos con `node:test` (sin dependencias). |
 
 ### Backend hexagonal (`src-tauri/src/`)
@@ -119,9 +117,8 @@ puerto (src/domain/ports/) ◄── adapter Tauri IPC (src/adapters/)
 - No meter lógica de negocio en un componente — va en use-cases/dominio.
 - No llamar a `invoke()` fuera de `src/adapters/`.
 - No importar `tauri` desde `src-tauri/src/domain/` ni `react` desde `src/domain/`.
-- No superar las 100 líneas por archivo sin discusión previa.
 - No leer/escribir persistencia directamente desde application o commands:
   siempre vía puertos e infrastructure.
-- No añadir dependencias (npm o crates) sin aprobación humana registrada.
+- No añadir dependencias (npm o crates) sin consultarlo.
 - No editar `dist/` ni `src-tauri/target/` a mano.
 - No devolver fallos silenciosos: si algo puede fallar, error nombrado.

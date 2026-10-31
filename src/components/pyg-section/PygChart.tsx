@@ -13,7 +13,6 @@ import type { SeriePyg } from '../../domain/entities/pyg-serie.ts';
 import { Chart } from '../../lib/chart-setup.ts';
 import { coloresDeEjes, token } from '../../lib/chart-colores.ts';
 import { usarTema } from '../../hooks/use-tema.ts';
-import '../../styles/grafica-pyg.css';
 
 interface Props {
   readonly serie: SeriePyg;
@@ -66,7 +65,7 @@ export function PygChart({ serie }: Props) {
   }, [serie, tema, moneda]);
 
   return (
-    <div className="grafica-pyg">
+    <div className="grafica">
       <canvas ref={lienzo} role="img"
         aria-label="Gráfica de ingresos, gastos y ahorro acumulado por mes" />
     </div>

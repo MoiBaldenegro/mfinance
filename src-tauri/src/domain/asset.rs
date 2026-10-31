@@ -5,14 +5,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::negative_value::{ensure_non_negative, NegativeValueError};
 
-/// Categoría del activo patrimonial.
+/// Categoría del activo patrimonial. En JSON viaja en minúsculas (contrato
+/// con el frontend); el alias PascalCase lee snapshots guardados antes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum AssetCategory {
     /// Efectivo, cuentas corrientes, depósitos a la vista.
+    #[serde(alias = "Liquido")]
     Liquido,
     /// Acciones, fondos, ETFs, cripto, etc.
+    #[serde(alias = "Inversion")]
     Inversion,
     /// Inmuebles, terrenos, vehículos.
+    #[serde(alias = "Propiedad")]
     Propiedad,
 }
 

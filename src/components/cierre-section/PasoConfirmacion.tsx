@@ -2,7 +2,7 @@
 // decisiones y botón «Cerrar mes» que persiste el assessment.
 import { formatoMoneda } from '../../domain/use-cases/formato-moneda.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
-import '../../styles/pasos-wizard.css';
+import { etiquetaMes } from '../../domain/use-cases/etiqueta-mes.ts';
 
 interface Props {
   readonly mes: string;
@@ -24,10 +24,10 @@ export function PasoConfirmacion({
 }: Props) {
   const moneda = usarMoneda();
   return (
-    <div className="paso-confirmacion">
-      <h3 className="paso-confirmacion__titulo">Confirmar cierre de {mes}</h3>
-      <ul className="paso-confirmacion__resumen">
-        <li>Se marcará {mes} como cerrado y su registro quedará solo lectura.</li>
+    <div className="paso-cierre">
+      <h3 className="paso-cierre__titulo">Confirmar cierre de {etiquetaMes(mes)}</h3>
+      <ul className="paso-cierre__resumen">
+        <li>El mes quedará cerrado y su registro, en solo lectura.</li>
         <li>
           Presupuesto decidido para el mes siguiente:{' '}
           <strong>{formatoMoneda(totalPresupuesto, moneda)}</strong>.
@@ -35,14 +35,14 @@ export function PasoConfirmacion({
         <li>
           Assessment con fecha e indicadores quedará guardado y consultable.
         </li>
-        <li>{riesgosRojos > 0 ? `${riesgosRojos} riesgo(s) rojo(s) prioritario(s) detectados.` : 'Sin riesgos rojos detectados.'}</li>
+        <li>{riesgosRojos > 0 ? `${riesgosRojos} ${riesgosRojos === 1 ? 'riesgo prioritario detectado' : 'riesgos prioritarios detectados'}.` : 'Sin riesgos rojos detectados.'}</li>
       </ul>
       {aviso ? (
-        <p className="paso-confirmacion__aviso" role="alert">{aviso}</p>
+        <p className="aviso aviso--error" role="alert">{aviso}</p>
       ) : null}
       <button
         type="button"
-        className="paso-confirmacion__boton"
+        className="btn btn--primario paso-cierre__accion"
         disabled={ocupado}
         onClick={() => void confirmar()}
       >

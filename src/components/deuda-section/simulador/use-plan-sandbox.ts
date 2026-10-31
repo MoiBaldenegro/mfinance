@@ -4,7 +4,7 @@
 import { useCallback, useState } from 'react';
 import type { CreditoSimulado, EstrategiaSandbox } from '../../../domain/entities/simulador-credito.ts';
 import type { PlanCreditosSimulados } from '../../../domain/entities/simulador-plan.ts';
-import { simuladorPort } from '../../../adapters/simulador-ipc-adapter.ts';
+import { usarPuertos } from '../../../app/puertos.ts';
 
 export type EstadoPlanSandbox =
   | { readonly nombre: 'inactivo' }
@@ -15,6 +15,7 @@ const MOTIVO_POR_OMISION = 'No se pudo calcular el plan de créditos simulados.'
 
 /** Lista local de créditos hipotéticos y su comparación por estrategia. */
 export function usePlanSandbox() {
+  const { simulador: simuladorPort } = usarPuertos();
   const [creditos, setCreditos] = useState<readonly CreditoSimulado[]>([]);
   const [estrategia, setEstrategia] = useState<EstrategiaSandbox>('Avalanche');
   const [estado, setEstado] = useState<EstadoPlanSandbox>({ nombre: 'inactivo' });

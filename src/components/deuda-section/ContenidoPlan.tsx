@@ -1,78 +1,53 @@
-// Contenido principal del plan de deuda según estado.
-import { Fragment } from 'react';
-import { usarMoneda } from '../../hooks/use-moneda.ts';
-import type { DebtStrategy } from '../../domain/entities/catalogs.ts';
+// Contenido del plan de deuda según el estado del cálculo.
+import { navegarA } from '../../lib/bus-ui.ts';
 import {
   filasDeTablaProyeccion,
   metricasDePlan,
   proyeccionVacia,
-  MENSAJE_SIN_DEUDAS,
 } from '../../domain/use-cases/deuda-tabla.ts';
-import type { EstadoPlanDeuda } from './use-plan-deuda.ts';
+import { usarMoneda } from '../../hooks/use-moneda.ts';
 import { DeudaChart } from './DeudaChart.tsx';
-import { PanelEstrategia } from './PanelEstrategia.tsx';
 import { ListaDeudas } from './ListaDeudas.tsx';
 import { MetricasPlan } from './MetricasPlan.tsx';
+import { PanelEstrategia } from './PanelEstrategia.tsx';
+import { VistaGraficaTabla } from '../ui/VistaGraficaTabla.tsx';
 import { TablaProyeccion } from './TablaProyeccion.tsx';
-import '../../styles/deuda-section.css';
+import type { EstadoPlanDeuda } from './use-plan-deuda.ts';
+import type { useEstrategiaDeuda } from './use-estrategia-deuda.ts';
 
 interface Props {
   readonly estado: EstadoPlanDeuda;
-  readonly estrategia: DebtStrategy;
-  readonly extra: number;
-  readonly onCambioEstrategia: (nueva: DebtStrategy) => void;
-  readonly onCambioExtra: (nuevo: number) => void;
+  readonly control: ReturnType<typeof useEstrategiaDeuda>;
 }
 
-export function ContenidoPlan({
-  estado,
-  estrategia,
-  extra,
-  onCambioEstrategia,
-  onCambioExtra,
-}: Props) {
+export function ContenidoPlan({ estado, control }: Props) {
   const moneda = usarMoneda();
   if (estado.nombre === 'calculando') {
-    return <p className="deuda-section__aviso">Calculando el plan de deuda…</p>;
+    return <p className="estado-carga">Calculando el plan de deuda…</p>;
   }
   if (estado.nombre === 'error') {
+    return <p className="aviso aviso--error" role="alert">No se pudo calcular el plan de deuda: {estado.motivo}</p>;
+  }
+  const { proyeccion, deuda_objetivo, orden_avalancha, orden_bola_nieve } = estado.plan;
+  if (proyeccionVacia(proyeccion)) {
     return (
-      <p className="deuda-section__aviso" role="alert">
-        No se pudo calcular el plan de deuda: {estado.motivo}
-      </p>
+      <div className="estado-vacio deuda-section__vacio">
+        <p><strong>No tienes deudas registradas.</strong></p>
+        <p>Cuando añadas un pasivo en Balance, aquí verás tu plan para liquidarlo.</p>
+        <button type="button" className="btn btn--sm" onClick={() => navegarA('balance')}>Ir a Balance</button>
+      </div>
     );
   }
-
-  const { plan } = estado;
-  const { proyeccion, deuda_objetivo, orden_avalancha, orden_bola_nieve } = plan;
-  const deudasOrdenadas = estrategia === 'Avalanche' ? orden_avalancha : orden_bola_nieve;
-
-  if (proyeccionVacia(proyeccion)) {
-    return <p className="deuda-section__aviso">{MENSAJE_SIN_DEUDAS}</p>;
-  }
-
-  const filas = filasDeTablaProyeccion(proyeccion, moneda);
-  const metricas = metricasDePlan(proyeccion, moneda);
-
+  const deudas = control.estrategia === 'Avalanche' ? orden_avalancha : orden_bola_nieve;
   return (
-    <Fragment>
-      <PanelEstrategia
-        estrategia={estrategia}
-        extra={extra}
-        onCambioEstrategia={onCambioEstrategia}
-        onCambioExtra={onCambioExtra}
-      />
-      <ListaDeudas
-        deudas={deudasOrdenadas}
-        deudaObjetivo={deuda_objetivo}
-        estrategia={estrategia}
-      />
-      <MetricasPlan metricas={metricas} />
-      <TablaProyeccion filas={filas} />
-      <section className="deuda-section__tarjeta" aria-label="Gráfica de proyección">
-        <h3 className="deuda-section__subtitulo">Evolución: pagos y saldo restante</h3>
-        <DeudaChart proyeccion={proyeccion} />
-      </section>
-    </Fragment>
+    <>
+      <MetricasPlan metricas={metricasDePlan(proyeccion, moneda)} />
+      <div className="rejilla deuda-section__fila">
+        <PanelEstrategia control={control} />
+        <ListaDeudas deudas={deudas} deudaObjetivo={deuda_objetivo} estrategia={control.estrategia} />
+      </div>
+      <VistaGraficaTabla titulo="Pagos y saldo restante" grafica={<DeudaChart proyeccion={proyeccion} />}
+        tabla={<TablaProyeccion filas={filasDeTablaProyeccion(proyeccion, moneda)} />} />
+    </>
   );
 }

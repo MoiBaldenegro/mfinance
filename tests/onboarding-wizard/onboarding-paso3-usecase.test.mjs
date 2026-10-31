@@ -12,8 +12,8 @@ const DEUDA_PATH = join('src', 'components', 'onboarding', 'DeudaSection.tsx');
 const PROY_PATH = join('src', 'components', 'onboarding', 'ProyeccionSection.tsx');
 const PREVIEW_PATH = join('src', 'components', 'onboarding', 'PreviewSection.tsx');
 const CSS_PATH = join('src', 'styles', 'onboarding-paso-deuda-proyeccion.css');
-const DEUDA_CSS = join('src', 'styles', 'deuda-section.css');
-const PROY_CSS = join('src', 'styles', 'proyeccion-section.css');
+const DEUDA_CSS = join('src', 'styles', 'onboarding-deuda.css');
+const PROY_CSS = join('src', 'styles', 'onboarding-proyeccion.css');
 const PREVIEW_CSS = join('src', 'styles', 'preview-section.css');
 const WIZARD_PATH = join('src', 'components', 'onboarding', 'OnboardingWizard.tsx');
 const SNAPSHOT_PORT = join('src', 'domain', 'ports', 'snapshot-port.ts');
@@ -150,7 +150,7 @@ describe('DeudaSection — sección deuda (REQ-26-02, 26-03)', () => {
 
   it('importa hoja de estilos', () => {
     const contenido = readFileSync(DEUDA_PATH, 'utf8');
-    assert.match(contenido, /import\s+['"]\.\.\/\.\.\/styles\/deuda-section\.css['"]/);
+    assert.match(contenido, /import\s+['"]\.\.\/\.\.\/styles\/onboarding-deuda\.css['"]/);
   });
 
   it('no tiene CSS embebido', () => {
@@ -164,14 +164,17 @@ describe('DeudaSection — sección deuda (REQ-26-02, 26-03)', () => {
     assert.match(contenido, /Avalanche/);
     assert.match(contenido, /Snowball/);
     assert.match(contenido, /radio/);
-    assert.match(contenido, /checked=.*Avalanche/);
+    assert.match(contenido, /checked=\{paso3\.estrategia_deuda === e\.valor\}/);
+    const padre = readFileSync(join('src', 'components', 'onboarding', 'OnboardingPasoDeudaProyeccion.tsx'), 'utf8');
+    assert.match(padre, /estrategia_deuda: 'Avalanche'/, 'Avalancha por defecto');
   });
 
   it('campo pago extra mensual ≥0 formateado moneda', () => {
     const contenido = readFileSync(DEUDA_PATH, 'utf8');
     assert.match(contenido, /pago_extra|pagoExtra|pago extra/);
-    assert.match(contenido, /formatoMoneda/);
+    assert.match(contenido, /simboloDe\(moneda\)|formatoMoneda/);
     assert.match(contenido, /min="0"/);
+    assert.match(contenido, /Math\.max\(0,/);
   });
 
   it('Archivo ≤100 líneas', () => {
@@ -183,7 +186,7 @@ describe('DeudaSection — sección deuda (REQ-26-02, 26-03)', () => {
   it('CSS ≤100 líneas', () => {
     const contenido = readFileSync(DEUDA_CSS, 'utf8');
     const lineas = contenido.split('\n').length;
-    assert.ok(lineas <= 100, `deuda-section.css tiene ${lineas} líneas, debe ser ≤100`);
+    assert.ok(lineas <= 100, `onboarding-deuda.css tiene ${lineas} líneas, debe ser ≤100`);
   });
 });
 
@@ -194,7 +197,7 @@ describe('ProyeccionSection — sección supuestos (REQ-26-04, 26-07, 26-08)', (
 
   it('importa hoja de estilos', () => {
     const contenido = readFileSync(PROY_PATH, 'utf8');
-    assert.match(contenido, /import\s+['"]\.\.\/\.\.\/styles\/proyeccion-section\.css['"]/);
+    assert.match(contenido, /import\s+['"]\.\.\/\.\.\/styles\/onboarding-proyeccion\.css['"]/);
   });
 
   it('no tiene CSS embebido', () => {
@@ -243,7 +246,7 @@ describe('ProyeccionSection — sección supuestos (REQ-26-04, 26-07, 26-08)', (
   it('CSS ≤100 líneas', () => {
     const contenido = readFileSync(PROY_CSS, 'utf8');
     const lineas = contenido.split('\n').length;
-    assert.ok(lineas <= 100, `proyeccion-section.css tiene ${lineas} líneas, debe ser ≤100`);
+    assert.ok(lineas <= 100, `onboarding-proyeccion.css tiene ${lineas} líneas, debe ser ≤100`);
   });
 });
 
@@ -324,8 +327,8 @@ it('Paso 3 renderiza OnboardingPasoDeudaProyeccion (no placeholder)', () => {
 
   it('Paso 3 NO bloquea Siguiente (paso opcional)', () => {
     const contenido = readFileSync(WIZARD_PATH, 'utf8');
-    assert.match(contenido, /currentStep === 3/);
-    assert.match(contenido, /return true/);
+    // Solo el paso 1 puede invalidar «Siguiente».
+    assert.match(contenido, /pasoValido = currentStep !== 1 \|\| esPaso1Completo\(pasoActual\)/);
   });
 
   it('pasa paso1Data al componente paso 3', () => {

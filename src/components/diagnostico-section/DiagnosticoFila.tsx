@@ -3,7 +3,7 @@
 import type { FilaTabla, CambiosFila } from '../../domain/use-cases/diagnostico-tabla.ts';
 import type { PropsTabla } from './DiagnosticoTabla.tsx';
 import { EXPENSE_CATEGORIES, EXPENSE_CATEGORY_LABELS } from '../../domain/entities/catalogs.ts';
-import '../../styles/diagnostico-tabla.css';
+import '../../styles/diagnostico.css';
 type AccionesFila = Pick<PropsTabla, 'alEditar' | 'alConfirmar' | 'alDescartar' | 'alReabrir'>;
 
 export function celdaFecha(fila: FilaTabla, editable: boolean, alEditar: PropsTabla['alEditar']) {
@@ -76,7 +76,7 @@ export function categoria(fila: FilaTabla, editable: boolean, alEditar: PropsTab
 export function botones(fila: FilaTabla, acciones: AccionesFila) {
   if (fila.estado !== 'pendiente') {
     return (
-      <button type="button" className="diagnostico-tabla__boton"
+      <button type="button" className="btn btn--sm"
         onClick={() => acciones.alReabrir(fila.id)}>
         Editar
       </button>
@@ -87,11 +87,11 @@ export function botones(fila: FilaTabla, acciones: AccionesFila) {
   return (
     <>
       <button type="button" disabled={sinCategoria} title={titulo}
-        className="diagnostico-tabla__boton diagnostico-tabla__boton--ok"
+        className="btn btn--sm btn--primario"
         onClick={() => acciones.alConfirmar(fila.id)}>
         Confirmar
       </button>
-      <button type="button" className="diagnostico-tabla__boton diagnostico-tabla__boton--mal"
+      <button type="button" className="btn btn--sm btn--fantasma"
         onClick={() => acciones.alDescartar(fila.id)}>
         Descartar
       </button>

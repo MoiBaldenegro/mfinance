@@ -16,6 +16,7 @@ mod conciliacion_conciliado_tests;
 mod conciliacion_movimientos_tests;
 mod conciliacion_historico_tests;
 mod conciliacion_edge_tests;
+mod deuda_motor_realista_tests;
 mod deuda_proyeccion_tests;
 mod deuda_tests;
 mod diagnostico_confirmar_acumulacion_tests;

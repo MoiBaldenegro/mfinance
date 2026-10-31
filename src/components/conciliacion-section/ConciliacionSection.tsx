@@ -1,62 +1,52 @@
-// REQ-13-01..07: sección Conciliación — lista de cuentas con saldo
-// inicial, movimientos, saldo teórico, campo "saldo real" editable,
-// diferencia, estado conciliado/descuadrada, campo ajuste, botón confirmar;
-// histórico mensual navegable; mensaje confirmación ES cuando todas conciliadas.
+// Sección Conciliación: por cuenta, saldo inicial + movimientos frente al
+// saldo real del banco, con diferencia y estado; histórico por meses.
+import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
+import { etiquetaMes } from '../../domain/use-cases/etiqueta-mes.ts';
+import { CabeceraPagina } from '../ui/CabeceraPagina';
+import { SelectorMes } from '../ui/SelectorMes';
 import { CuentaConciliadaCard } from './components/CuentaConciliadaCard.tsx';
 import { ConciliacionHistorico } from './ConciliacionHistorico.tsx';
 import { useConciliacionSection } from './use-conciliacion-section.ts';
-import '../../styles/conciliacion-section.css';
+import '../../styles/conciliacion.css';
 
-export function ConciliacionSection() {
-  const {
-    mesSeleccionado, setMesSeleccionado, mostrarHistorico, setMostrarHistorico,
-    estadoConciliacion, estadoHistorico, agregarMovimiento, guardando,
-    errorAgregar, todasConciliadas: todasOk, conciliacion,
-  } = useConciliacionSection();
+const DESCRIPCION = 'Comprueba que lo registrado cuadra con el saldo real de cada cuenta en el banco.';
 
-  if (estadoConciliacion.nombre === 'cargando') {
-    return <section className="conciliacion-section"><div className="conciliacion-section__cargando">Cargando conciliación...</div></section>;
-  }
-  if (estadoConciliacion.nombre === 'error') {
-    return <section className="conciliacion-section"><div className="conciliacion-section__error">Error al cargar: {estadoConciliacion.error.message}</div></section>;
-  }
-
+export function ConciliacionSection({ snapshot }: { readonly snapshot: FinanceSnapshot }) {
+  const c = useConciliacionSection(snapshot);
+  const { cuentas } = c.conciliacion;
   return (
-    <section className="conciliacion-section">
-      <header className="conciliacion-section__header">
-        <h2 className="conciliacion-section__titulo">Conciliación</h2>
-        <div className="conciliacion-section__controles">
-          <label className="conciliacion-section__selector-mes">
-            <span>Mes:</span>
-            <input type="month" value={mesSeleccionado} onChange={(e) => setMesSeleccionado(e.target.value)} className="conciliacion-section__input-mes" />
-          </label>
-          <button type="button" className="conciliacion-section__btn-historico" onClick={() => setMostrarHistorico(!mostrarHistorico)}>
-            {mostrarHistorico ? 'Ocultar histórico' : 'Ver histórico'}
-          </button>
+    <section className="pagina conciliacion">
+      <CabeceraPagina titulo="Conciliación" descripcion={DESCRIPCION}>
+        <button type="button" className="btn" onClick={() => c.setMostrarHistorico(!c.mostrarHistorico)}
+          aria-expanded={c.mostrarHistorico}>
+          {c.mostrarHistorico ? 'Ocultar histórico' : 'Histórico'}
+        </button>
+        <SelectorMes mes={c.mesSeleccionado} alCambiar={c.setMesSeleccionado} etiqueta="Mes a conciliar" />
+      </CabeceraPagina>
+      {c.mostrarHistorico ? (
+        <ConciliacionHistorico estado={c.estadoHistorico} mesActual={c.mesSeleccionado}
+          onSeleccionarMes={c.setMesSeleccionado} onCerrar={() => c.setMostrarHistorico(false)} />
+      ) : null}
+      {c.estadoConciliacion.nombre === 'cargando' ? <p className="estado-carga">Cargando conciliación…</p> : null}
+      {c.estadoConciliacion.nombre === 'error' ? (
+        <p className="aviso aviso--error" role="alert">No se pudo cargar la conciliación: {c.estadoConciliacion.error.message}</p>
+      ) : null}
+      {c.estadoConciliacion.nombre === 'listo' && cuentas.length === 0 ? (
+        <p className="estado-vacio">No hay extractos de cuenta que conciliar en {etiquetaMes(c.mesSeleccionado)}.</p>
+      ) : null}
+      {c.todasConciliadas && cuentas.length > 0 ? (
+        <p className="aviso aviso--exito" role="status">
+          Todas las cuentas de {etiquetaMes(c.mesSeleccionado)} están conciliadas.
+        </p>
+      ) : null}
+      {cuentas.length > 0 ? (
+        <div className="rejilla rejilla--2 conciliacion__cuentas">
+          {cuentas.map((cuenta) => (
+            <CuentaConciliadaCard key={cuenta.cuenta} cuenta={cuenta} onAgregarMovimiento={c.agregarMovimiento}
+              guardando={c.guardando} errorAgregar={c.errorAgregar} />
+          ))}
         </div>
-      </header>
-
-      {mostrarHistorico && <ConciliacionHistorico estado={estadoHistorico} mesActual={mesSeleccionado} onSeleccionarMes={setMesSeleccionado} onCerrar={() => setMostrarHistorico(false)} />}
-
-      <div className="conciliacion-section__cuentas">
-        {conciliacion.cuentas.length === 0 ? (
-          <p className="conciliacion-section__vacio">No hay cuentas para conciliar en {mesSeleccionado}.</p>
-        ) : (
-          conciliacion.cuentas.map((cuenta) => (
-            <CuentaConciliadaCard key={cuenta.cuenta} cuenta={cuenta} onAgregarMovimiento={agregarMovimiento} guardando={guardando} errorAgregar={errorAgregar} />
-          ))
-        )}
-      </div>
-
-      {todasOk && conciliacion.cuentas.length > 0 && (
-        <div className="conciliacion-section__confirmacion">
-          <span className="conciliacion-section__icono">✓</span>
-          <span>¡Todas las cuentas están conciliadas! Estado persistido correctamente.</span>
-          <button type="button" className="conciliacion-section__btn-confirmar" onClick={() => alert('¡Todas las cuentas están conciliadas! Estado persistido correctamente.')}>
-            Confirmar cierre
-          </button>
-        </div>
-      )}
+      ) : null}
     </section>
   );
 }

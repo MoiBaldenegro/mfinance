@@ -6,7 +6,6 @@ import type { EscenarioEstrategia } from '../../../domain/entities/simulador-pla
 import { DEBT_STRATEGIES, DEBT_STRATEGY_LABELS } from '../../../domain/entities/catalogs.ts';
 import { formatoMoneda } from '../../../domain/use-cases/formato-moneda.ts';
 import { usarMoneda } from '../../../hooks/use-moneda.ts';
-import '../../../styles/simulador-plan.css';
 
 interface Props {
   readonly creditos: readonly CreditoSimulado[];
@@ -47,39 +46,39 @@ function TarjetaEscenario(
 export function PlanSandbox({ creditos, estrategia, escenarios, onEstrategia, onQuitar, onComparar }: Props) {
   const moneda = usarMoneda();
   return (
-    <section className="simulador-plan" aria-label="Plan sobre varios créditos simulados">
-      <h4 className="simulador-plan__titulo">Comparativa por estrategia</h4>
-      <fieldset className="simulador-plan__estrategias">
-        {DEBT_STRATEGIES.map((valor) => (
-          <label key={valor}>
-            <input
-              type="radio"
-              name="simulador-estrategia"
-              checked={estrategia === valor}
-              onChange={() => onEstrategia(valor)}
-            />
-            <span>{DEBT_STRATEGY_LABELS[valor]}</span>
-          </label>
-        ))}
-      </fieldset>
+    <section className="card simulador-plan" aria-label="Plan sobre varios créditos simulados">
+      <div className="card__cabecera">
+        <h3 className="card__titulo">Comparativa por estrategia</h3>
+        <div className="segmentado" role="radiogroup" aria-label="Estrategia de la comparativa">
+          {DEBT_STRATEGIES.map((valor) => (
+            <button key={valor} type="button" role="radio" className="segmentado__opcion"
+              aria-checked={estrategia === valor} onClick={() => onEstrategia(valor)}>
+              {DEBT_STRATEGY_LABELS[valor]}
+            </button>
+          ))}
+        </div>
+      </div>
       {creditos.length > 0 && (
         <ul className="simulador-plan__lista">
           {creditos.map((credito, indice) => (
             <li key={`${credito.nombre}-${indice}`}>
               {credito.nombre}: {formatoMoneda(credito.importe, moneda)} a {credito.plazo_meses} meses
               ({credito.tasa_interes_anual} %).{' '}
-              <button type="button" onClick={() => onQuitar(indice)}>
+              <button type="button" className="btn btn--fantasma btn--sm" onClick={() => onQuitar(indice)}>
                 Quitar
               </button>
             </li>
           ))}
         </ul>
       )}
-      <button type="button" className="simulador-boton" onClick={onComparar} disabled={creditos.length === 0}>
+      {creditos.length === 0 ? (
+        <p className="card__descripcion">Calcula un crédito y pulsa «Añadir este crédito a la comparativa» para compararlo aquí.</p>
+      ) : null}
+      <button type="button" className="btn btn--primario simulador__accion" onClick={onComparar} disabled={creditos.length === 0}>
         Comparar estrategias
       </button>
       {escenarios !== null && (
-        <div className="simulador-plan__rejilla">{escenarios.map((e) => TarjetaEscenario(e, e.estrategia === estrategia, moneda))}</div>
+        <div className="rejilla rejilla--2">{escenarios.map((e) => TarjetaEscenario(e, e.estrategia === estrategia, moneda))}</div>
       )}
     </section>
   );

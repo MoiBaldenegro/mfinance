@@ -2,7 +2,7 @@
 // que cambia el snapshot publicado (REQ-09-05). Glue de UI: el cálculo
 // vive en el backend y las transformaciones en use-cases.
 import { useEffect, useState } from 'react';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { PlanDeuda } from '../../domain/entities/plan-deuda.ts';
 
@@ -14,11 +14,13 @@ export type EstadoPlanDeuda =
 const MOTIVO_POR_OMISION = 'No se pudo calcular el plan de deuda.';
 
 export function usePlanDeuda(snapshot: FinanceSnapshot): EstadoPlanDeuda {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [estado, setEstado] = useState<EstadoPlanDeuda>({ nombre: 'calculando' });
 
   useEffect(() => {
     let vigente = true;
-    setEstado({ nombre: 'calculando' });
+    // Conserva el plan anterior mientras se recalcula (sin parpadeo).
+    setEstado((previo) => (previo.nombre === 'listo' ? previo : { nombre: 'calculando' }));
     snapshotPort
       .planDeuda()
       .then((plan) => {

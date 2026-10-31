@@ -10,7 +10,7 @@ import { SRC, archivosTs, relativa } from './utils.mjs';
 const todosLosArchivos = archivosTs(SRC);
 
 describe('REQ-05-06: sin CSS embebido en componentes', () => {
-  it('cada .tsx visual importa su hoja desde src/styles y esa hoja existe', () => {
+  it('las hojas que importa cada .tsx existen en src/styles', () => {
     const problemas = [];
     for (const ruta of todosLosArchivos) {
       if (!ruta.endsWith('.tsx')) continue;
@@ -25,15 +25,15 @@ describe('REQ-05-06: sin CSS embebido en componentes', () => {
       const hoja = contenido.match(
         /import\s+["']([^"']*styles\/[a-z0-9-]+\.css)["']/,
       );
-      if (!hoja) {
-        problemas.push(`${relativa(ruta)}: no importa hoja de src/styles`);
-        continue;
+      // Los componentes que solo usan primitivas compartidas (styles/ui)
+      // no necesitan hoja propia; si importan una, debe existir.
+      if (hoja) {
+        const rutaHoja = join(
+          SRC,
+          hoja[1].replace(/^\.\.\/\.\.\//, '').replace(/^\.\.\//, ''),
+        );
+        if (!existsSync(rutaHoja)) problemas.push(`${relativa(ruta)}: hoja inexistente`);
       }
-      const rutaHoja = join(
-        SRC,
-        hoja[1].replace(/^\.\.\/\.\.\//, '').replace(/^\.\.\//, ''),
-      );
-      if (!existsSync(rutaHoja)) problemas.push(`${relativa(ruta)}: hoja inexistente`);
       // Permitir style={{ '--custom-prop': value }} para variables CSS dinámicas
 // y style={{ width: '...%' }} para barras de progreso (excepción documentada).
 const styleMatches = contenido.match(/style=\{\{[^}]*\}\}/g) ?? [];

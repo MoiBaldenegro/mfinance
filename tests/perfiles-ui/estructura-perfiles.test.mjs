@@ -65,7 +65,7 @@ describe('pureza hexagonal de los módulos nuevos (REQ-22-01)', () => {
   it('los componentes nuevos no invocan invoke directamente', () => {
     for (const ruta of [
       'src/components/shell/AppShell.tsx',
-      'src/components/shell/HeaderBar.tsx',
+      'src/components/shell/BarraLateral.tsx',
       'src/components/ajustes-section/GestionPerfiles.tsx',
     ]) {
       assert.doesNotMatch(leer(ruta), /invoke\s*\(/, ruta);
@@ -74,16 +74,16 @@ describe('pureza hexagonal de los módulos nuevos (REQ-22-01)', () => {
 });
 
 describe('REQ-22-02: indicador permanente del titular en la cabecera', () => {
-  it('HeaderBar muestra «Perfil:» a partir de un titular recibido', () => {
-    const cabecera = leer('src/components/shell/HeaderBar.tsx');
-    assert.match(cabecera, /titular/);
+  it('la barra lateral muestra «Perfil:» con el titular activo', () => {
+    const cabecera = leer('src/components/shell/BarraLateral.tsx');
+    assert.match(cabecera, /usarPerfiles/);
     assert.ok(cabecera.includes('Perfil:'));
   });
 
   it('AppShell alimenta el titular y deriva la moneda del snapshot sin lógica extra (REQ-22-07)', () => {
     const shell = leer('src/components/shell/AppShell.tsx');
     assert.match(shell, /monedaDeSnapshot\(snapshot\)/);
-    assert.match(shell, /usarPerfiles|PerfilContext/);
+    assert.match(shell, /BarraLateral/);
   });
 
   it('existe el hook de perfiles con su contexto compartido', () => {

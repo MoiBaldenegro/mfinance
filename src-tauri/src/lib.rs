@@ -1,4 +1,3 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 pub mod application;
 pub mod commands;
 pub mod domain;
@@ -27,11 +26,6 @@ use infrastructure::comprobantes_fs::ComprobantesFsRepository;
 use infrastructure::json_repository::JsonSnapshotRepository;
 use infrastructure::pdf_extractor::ExtractorPdfExtract;
 
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 /// Estado gestionado: perfiles/migración/seed (REQ-21-04/05) más
 /// comprobantes bajo la carpeta del perfil activo (REQ-21-07).
 fn estado_inicial(base: PathBuf) -> Result<commands::AppState, String> {
@@ -56,14 +50,17 @@ fn estado_inicial(base: PathBuf) -> Result<commands::AppState, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            let base = app.path().document_dir()?.join("mfinance");
+            // MFINANCE_DATA_DIR permite aislar los datos (QA, demos) sin
+            // tocar Documents/mfinance del usuario.
+            let base = match std::env::var_os("MFINANCE_DATA_DIR") {
+                Some(ruta) => PathBuf::from(ruta),
+                None => app.path().document_dir()?.join("mfinance"),
+            };
             app.manage(estado_inicial(base)?);
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
             load_state,
             save_state,
             export_json,

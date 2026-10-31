@@ -1,0 +1,5 @@
+# Normaliza finales de línea: los validadores del arnés y los tests parsean con '\n'.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.icns binary

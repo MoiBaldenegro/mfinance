@@ -1,0 +1,64 @@
+/* Primitivas de maquetación: página de sección, cabecera, tarjetas. */
+.pagina {
+  display: grid;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: var(--contenido-max);
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.pagina__cabecera {
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-5);
+}
+.pagina__titulos { display: grid; gap: var(--space-1); min-width: 0; }
+.pagina__titulo { font-size: var(--fuente-tamano-2xl); font-weight: var(--fuente-peso-regular); }
+.pagina__descripcion { max-width: 72ch; color: var(--color-muted); }
+.pagina__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+.card {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: var(--borde);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.card--compacta { padding: var(--space-4); gap: var(--space-3); }
+.card--hundida { background: var(--color-sunken); box-shadow: none; }
+
+.card__cabecera {
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: space-between; gap: var(--space-2) var(--space-4);
+}
+.card__titulo { font-family: var(--fuente-titulos); font-size: var(--fuente-tamano-md); font-weight: var(--fuente-peso-regular); letter-spacing: 0.01em; }
+.card__descripcion { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+
+.rejilla { display: grid; gap: var(--space-4); min-width: 0; }
+.rejilla--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rejilla--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rejilla--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.rejilla--auto { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+@media (max-width: 1000px) {
+  .rejilla--3, .rejilla--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .rejilla--2, .rejilla--3, .rejilla--4 { grid-template-columns: minmax(0, 1fr); }
+}
+
+.separador { height: var(--borde-ancho); margin: 0; border: 0; background: var(--color-border); }
+
+.texto-muted { color: var(--color-muted); }
+.texto-sm { font-size: var(--fuente-tamano-sm); }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.positivo { color: var(--color-positive); }
+.negativo { color: var(--color-negative); }
+.solo-lectores {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}

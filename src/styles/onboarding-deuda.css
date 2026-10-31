@@ -1,0 +1,23 @@
+/* Paso 3: estrategia de deuda como tarjetas de opción + pago extra. */
+.ob-deuda { display: grid; gap: var(--space-3); }
+.ob-deuda__subtitulo { font-size: var(--fuente-tamano-md); }
+.ob-deuda__opciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.ob-deuda__opcion {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--transicion-rapida), background var(--transicion-rapida);
+}
+.ob-deuda__opcion:hover { border-color: var(--color-subtle); }
+.ob-deuda__opcion:has(input:checked) { border-color: var(--color-primary); background: var(--color-primary-bg); }
+.ob-deuda__opcion input { margin-top: var(--space-1); }
+.ob-deuda__opcion-texto { display: grid; gap: var(--space-1); }
+.ob-deuda__opcion-texto span { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+.ob-deuda__extra { max-width: 22rem; }
+
+@media (max-width: 640px) {
+  .ob-deuda__opciones { grid-template-columns: minmax(0, 1fr); }
+}

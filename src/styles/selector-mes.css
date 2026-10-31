@@ -1,0 +1,25 @@
+/* Selector de mes compartido: grupo compacto flecha | campo | flecha. */
+.selector-mes {
+  display: inline-flex; align-items: stretch;
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-input-bg);
+  overflow: hidden;
+}
+
+.selector-mes__flecha {
+  min-height: var(--control-alto);
+  width: var(--control-alto); padding: 0;
+  border: 0; border-radius: 0;
+  background: transparent; color: var(--color-muted);
+}
+.selector-mes__flecha:hover:not(:disabled) { background: var(--color-surface-hover); color: var(--color-text); }
+
+.selector-mes__campo {
+  min-width: 11rem;
+  border: 0; border-radius: 0;
+  border-inline: var(--borde);
+  background: transparent;
+  text-align: center;
+}
+.selector-mes__campo:focus-visible { box-shadow: inset 0 0 0 2px var(--color-primary); }

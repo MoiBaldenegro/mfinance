@@ -1,6 +1,6 @@
 // Montaje compartido de la integración real: entorno sin DOM, providers y
 // consumidores reales, y bombeo conjunto hasta que todo queda estable.
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 globalThis.document = {
   documentElement: { style: { setProperty() {}, getPropertyValue: () => '' } },
@@ -16,7 +16,7 @@ globalThis.window ??= {
   localStorage: { getItem: () => null, setItem() {}, removeItem() {} },
 };
 
-const raiz = 'C:/Users/Moises/Desktop/mi_tauri_app/sd_web_astro/mfinance';
+const raiz = fileURLToPath(new URL('../../..', import.meta.url)).replace(/[\\/]$/, '');
 const u = (ruta) => pathToFileURL(`${raiz}${ruta}`).href;
 const { crearMontaje, publicarContexto } = await import('./renderizador-real.mjs');
 const { SeccionActivaProvider } = await import(u('/src/hooks/use-seccion-activa.ts'));

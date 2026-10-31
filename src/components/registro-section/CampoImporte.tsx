@@ -38,6 +38,7 @@ export function CampoImporte({
         {etiqueta}
       </label>
       <span className="campo-importe__control">
+        <span className="campo-importe__prefijo" aria-hidden="true">{simbolo}</span>
         <input
           id={id}
           className="campo-importe__entrada"
@@ -49,8 +50,8 @@ export function CampoImporte({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? idError : undefined}
           onChange={(evento) => alCambiar(clave, evento.target.value)}
+          placeholder="0.00"
         />
-        <span className="campo-importe__sufijo" aria-hidden="true">{simbolo}</span>
       </span>
       {error ? (
         <p className="campo-importe__error" id={idError} role="alert">

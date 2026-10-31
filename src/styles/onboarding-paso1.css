@@ -1,146 +1,74 @@
-/* REQ-24-12: estilos solo con tokens.css */
-.onboarding-paso1 {
-  display: grid;
-  gap: var(--space-4);
-}
+/* Paso 1 del onboarding: moneda segmentada y chips seleccionables.
+   Los inputs nativos quedan ocultos (solo-lectores); el foco y el estado
+   marcado se pintan sobre la etiqueta con :has(). */
+.onboarding-paso1 { display: grid; gap: var(--space-6); }
 
-.onboarding-paso1__titulo {
-  margin: 0;
-  font-size: var(--fuente-tamano-lg);
-  color: var(--color-text);
+.onboarding-paso1__leyenda {
+  margin-bottom: var(--space-1);
+  font-weight: var(--fuente-peso-semibold);
 }
+.onboarding-paso1__grupo { display: grid; gap: var(--space-2); }
 
-.onboarding-paso1__campo {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.onboarding-paso1__etiqueta {
-  font-size: var(--fuente-tamano-sm);
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.onboarding-paso1__requerido {
-  color: var(--color-negative);
-}
-
-.onboarding-paso1__input,
-.onboarding-paso1__select {
-  padding: var(--space-2) var(--space-3);
-  font: inherit;
-  color: var(--color-text);
-  background: var(--color-bg);
-  border: var(--space-1) solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.onboarding-paso1__input:disabled,
-.onboarding-paso1__select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.onboarding-paso1__grupo {
-  display: grid;
-  gap: var(--space-2);
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
-.onboarding-paso1__legend {
-  font-size: var(--fuente-tamano-sm);
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.onboarding-paso1__ayuda {
-  margin: 0;
-  font-size: var(--fuente-tamano-xs);
-  color: var(--color-muted);
-}
-
-.onboarding-paso1__checkboxes {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: var(--space-2);
-}
-
-.onboarding-paso1__checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--fuente-tamano-sm);
-  color: var(--color-text);
+/* Moneda */
+.onboarding-paso1__monedas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.onboarding-paso1__moneda {
+  position: relative;
+  display: grid; justify-items: center; align-content: center;
+  min-height: var(--control-alto);
+  padding: var(--space-1) var(--space-2);
   cursor: pointer;
+  line-height: var(--altura-linea-compacta);
 }
-
-.onboarding-paso1__checkbox-label input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--color-primary);
+.onboarding-paso1__moneda:has(input:checked) {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: var(--shadow-card);
 }
+.onboarding-paso1__moneda:has(input:focus-visible) { box-shadow: var(--anillo-foco); }
+.onboarding-paso1__moneda-nombre { color: var(--color-subtle); font-size: var(--fuente-tamano-xs); }
 
-.onboarding-paso1__error {
-  margin: 0;
-  font-size: var(--fuente-tamano-xs);
-  color: var(--color-negative);
+/* Chips */
+.onboarding-paso1__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.onboarding-paso1__chip {
+  position: relative;
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  min-height: var(--control-alto);
+  padding: 0 var(--space-4) 0 var(--space-3);
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  font-weight: var(--fuente-peso-medium);
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transicion-rapida), border-color var(--transicion-rapida), color var(--transicion-rapida);
 }
-
-.onboarding-paso1__saltar {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-3);
+.onboarding-paso1__chip:hover { border-color: var(--color-subtle); color: var(--color-text); }
+.onboarding-paso1__chip-marca {
+  display: grid; place-items: center;
+  width: var(--space-4); height: var(--space-4);
+  border: var(--borde-ancho) solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  color: transparent;
+  transition: inherit;
+}
+.onboarding-paso1__chip:has(input:checked) {
+  border-color: var(--color-primary);
   background: var(--color-primary-bg);
-  border-radius: var(--radius-md);
-  border: var(--space-1) solid var(--color-border);
+  color: var(--color-text);
 }
-
-.onboarding-paso1__btn-saltar {
-  padding: var(--space-2) var(--space-4);
-  font: inherit;
-  color: var(--color-primary);
-  background: transparent;
-  border: var(--space-1) solid var(--color-primary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: background var(--transicion-rapida), color var(--transicion-rapida);
-}
-
-.onboarding-paso1__btn-saltar:hover:not(:disabled) {
+.onboarding-paso1__chip:has(input:checked) .onboarding-paso1__chip-marca {
+  border-color: var(--color-primary);
   background: var(--color-primary);
-  color: var(--color-on-primary);
+  color: var(--color-primary-contrast);
 }
+.onboarding-paso1__chip:has(input:focus-visible) { box-shadow: var(--anillo-foco); }
+.onboarding-paso1__chip:has(input:disabled) { opacity: 0.6; cursor: not-allowed; }
 
-.onboarding-paso1__btn-saltar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.onboarding-paso1__saltar-ayuda {
-  margin: 0;
-  font-size: var(--fuente-tamano-xs);
-  color: var(--color-muted);
-}
-
+/* Estado del paso */
 .onboarding-paso1__validez {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
+  display: flex; align-items: center; gap: var(--space-2);
+  color: var(--color-subtle);
   font-size: var(--fuente-tamano-sm);
 }
-
-.onboarding-paso1__validez--ok {
-  background: var(--color-positive-bg);
-  color: var(--color-positive);
-  border: var(--space-1) solid var(--color-positive);
-}
-
-.onboarding-paso1__validez-falta {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-  border: var(--space-1) solid var(--color-warning);
-}
+.onboarding-paso1__validez--ok { color: var(--color-positive); }

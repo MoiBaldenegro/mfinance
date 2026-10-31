@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mfinance · Tus finanzas personales, claras y en tu equipo</title>
+  <meta name="description" content="mfinance es una app de escritorio de finanzas personales: registro mensual, PyG, balance y patrimonio, plan de deuda, inversiones, indicadores y cierre de mes guiado. Tus datos se quedan en tu equipo.">
+  <meta name="theme-color" content="#0f1215" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="mfinance · Tus finanzas personales, claras y en tu equipo">
+  <meta property="og:description" content="Registro mensual, PyG, patrimonio, plan de deuda e inversiones en una app de escritorio. Sin cuentas ni nube.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="fonts/cal-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Tema antes de pintar para evitar el parpadeo.
+    (function () {
+      var t = localStorage.getItem('mf-tema');
+      if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'claro' : 'oscuro';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+  <script src="main.js" defer></script>
+</head>
+<body>
+  <!-- Iconos de trazo (los mismos de la app) -->
+  <svg width="0" height="0" class="sprite" aria-hidden="true">
+    <symbol id="i-registro" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 3v4M16 3v4M4 10h16M8 14h3M8 17h6"/></symbol>
+    <symbol id="i-pyg" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+    <symbol id="i-balance" viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0zM8 21h8"/></symbol>
+    <symbol id="i-deuda" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM3 10h18M7 15h4"/></symbol>
+    <symbol id="i-inversiones" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></symbol>
+    <symbol id="i-indicadores" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 1 9-9M12 12l5-5M12 3v2M3 12h2"/></symbol>
+    <symbol id="i-conciliacion" viewBox="0 0 24 24"><path d="M4 7h13l-3-3M20 17H7l3 3"/></symbol>
+    <symbol id="i-cierre" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></symbol>
+    <symbol id="i-diagnostico" viewBox="0 0 24 24"><path d="M14 3H6v18h12V7zM14 3v4h4M9 13h6M9 17h4"/></symbol>
+    <symbol id="i-ajustes" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+    <symbol id="i-sol" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/></symbol>
+    <symbol id="i-luna" viewBox="0 0 24 24"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></symbol>
+    <symbol id="i-descargar" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></symbol>
+    <symbol id="i-candado" viewBox="0 0 24 24"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4M12 15v2"/></symbol>
+    <symbol id="i-carpeta" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3z"/></symbol>
+    <symbol id="i-nube" viewBox="0 0 24 24"><path d="M7 18a5 5 0 0 1-.6-10A6 6 0 0 1 18 9a4.5 4.5 0 0 1-.5 9zM4 4l16 16"/></symbol>
+    <symbol id="i-perfiles" viewBox="0 0 24 24"><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7M18 14a6 6 0 0 1 4 7"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4.5 1.5-4.5-2.5-6-3m12 5v-3.5a3 3 0 0 0-.9-2.4c3-.3 6.1-1.5 6.1-6.6a5.2 5.2 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.6s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.6 0C5.8 1.9 4.7 2.2 4.7 2.2a4.8 4.8 0 0 0-.1 3.6A5.2 5.2 0 0 0 3.2 9.4c0 5.1 3.1 6.3 6.1 6.6a3 3 0 0 0-.9 2.4V21"/></symbol>
+    <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </svg>
+
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <header class="nav" data-nav>
+    <div class="contenedor nav__fila">
+      <a class="marca" href="#" aria-label="mfinance, inicio">
+        <svg class="marca__isotipo" width="34" height="34" viewBox="0 0 32 32" aria-hidden="true">
+          <rect class="marca__fondo" width="32" height="32" rx="9"/>
+          <path class="marca__trazo" d="M8 23v-8.5a3.5 3.5 0 0 1 7 0V23m0-8.5a3.5 3.5 0 0 1 7 0V19l3.5-3.5"/>
+          <circle class="marca__moneda" cx="24.5" cy="8.5" r="2.6"/>
+        </svg>
+        <span class="marca__nombre">mfinance</span>
+      </a>
+      <nav class="nav__enlaces" aria-label="Secciones">
+        <a href="#funciones">Funciones</a>
+        <a href="#deuda">Deuda</a>
+        <a href="#empezar">Cómo empieza</a>
+        <a href="#privacidad">Privacidad</a>
+        <a href="#preguntas">Preguntas</a>
+      </nav>
+      <div class="nav__acciones">
+        <button class="boton-icono" type="button" data-tema aria-label="Cambiar a tema claro">
+          <svg class="ico ico--sol"><use href="#i-sol"/></svg>
+          <svg class="ico ico--luna"><use href="#i-luna"/></svg>
+        </button>
+        <a class="boton boton--primario boton--sm" href="https://github.com/MoiBaldenegro/mfinance/releases/latest">
+          <svg class="ico"><use href="#i-descargar"/></svg> Descargar
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero__brillo" aria-hidden="true"></div>
+      <div class="contenedor hero__texto">
+        <p class="etiqueta revelar"><span class="punto"></span> App de escritorio · Windows · 100 % local</p>
+        <h1 class="hero__titulo revelar">Tu dinero, <span class="resaltado">claro</span> como un cierre de mes.</h1>
+        <p class="hero__sub revelar">Registra ingresos y gastos, mira tu PyG y tu patrimonio, planifica la salida de tus deudas y proyecta tus inversiones. Todo en una app rápida que guarda tus datos <strong>en tu equipo</strong>, no en la nube de nadie.</p>
+        <div class="hero__cta revelar">
+          <a class="boton boton--primario boton--lg" href="https://github.com/MoiBaldenegro/mfinance/releases/latest">
+            <svg class="ico"><use href="#i-descargar"/></svg> Descargar para Windows
+          </a>
+          <a class="boton boton--fantasma boton--lg" href="https://github.com/MoiBaldenegro/mfinance">
+            <svg class="ico"><use href="#i-github"/></svg> Ver el código
+          </a>
+        </div>
+        <ul class="hero__meta revelar" aria-label="Características rápidas">
+          <li>Gratis</li><li>Sin cuentas</li><li>MXN · USD · EUR</li><li>Tema oscuro y claro</li>
+        </ul>
+      </div>
+
+      <!-- Maqueta de la app -->
+      <div class="contenedor">
+        <figure class="ventana revelar" aria-label="Vista previa de mfinance: registro de octubre con KPIs, gráfica de ingresos y gastos e indicadores">
+          <div class="ventana__barra">
+            <span></span><span></span><span></span>
+            <p>mfinance — Octubre 2026</p>
+          </div>
+          <div class="ventana__cuerpo">
+            <aside class="app-lateral" aria-hidden="true">
+              <div class="app-lateral__marca">
+                <svg width="22" height="22" viewBox="0 0 32 32"><rect class="marca__fondo" width="32" height="32" rx="9"/><path class="marca__trazo" d="M8 23v-8.5a3.5 3.5 0 0 1 7 0V23m0-8.5a3.5 3.5 0 0 1 7 0V19l3.5-3.5"/><circle class="marca__moneda" cx="24.5" cy="8.5" r="2.6"/></svg>
+                <span>mfinance</span>
+              </div>
+              <ul>
+                <li class="activo"><svg class="ico"><use href="#i-registro"/></svg>Registro</li>
+                <li><svg class="ico"><use href="#i-pyg"/></svg>PyG</li>
+                <li><svg class="ico"><use href="#i-balance"/></svg>Balance</li>
+                <li><svg class="ico"><use href="#i-deuda"/></svg>Deuda</li>
+                <li><svg class="ico"><use href="#i-inversiones"/></svg>Inversiones</li>
+                <li><svg class="ico"><use href="#i-indicadores"/></svg>Indicadores</li>
+                <li><svg class="ico"><use href="#i-conciliacion"/></svg>Conciliación</li>
+                <li><svg class="ico"><use href="#i-cierre"/></svg>Cierre</li>
+                <li><svg class="ico"><use href="#i-ajustes"/></svg>Ajustes</li>
+              </ul>
+            </aside>
+            <div class="app-main">
+              <div class="app-main__cabecera">
+                <div>
+                  <p class="app-main__ruta">Registro</p>
+                  <p class="app-main__titulo">Octubre 2026</p>
+                </div>
+                <span class="chip chip--ok">Mes abierto</span>
+              </div>
+              <div class="kpis">
+                <div class="kpi"><p>Ingresos</p><strong data-contar="4850">4.850,00 €</strong><span class="sube">+6,2 %</span></div>
+                <div class="kpi"><p>Gastos</p><strong data-contar="3120">3.120,00 €</strong><span class="baja">−2,4 %</span></div>
+                <div class="kpi"><p>Ahorro</p><strong data-contar="1730">1.730,00 €</strong><span class="sube">35,7 %</span></div>
+                <div class="kpi kpi--marca"><p>Patrimonio</p><strong data-contar="48260">48.260,00 €</strong><span class="sube">+1.730 €</span></div>
+              </div>
+              <div class="app-paneles">
+                <div class="panel">
+                  <div class="panel__cabecera"><p>Ingresos vs gastos</p><span class="leyenda"><i class="l1"></i>Ingresos <i class="l2"></i>Gastos</span></div>
+                  <svg class="grafica" viewBox="0 0 320 140" preserveAspectRatio="none" role="img" aria-label="Barras de ingresos y gastos de mayo a octubre">
+                    <g class="grafica__rejilla"><line x1="0" y1="20" x2="320" y2="20"/><line x1="0" y1="60" x2="320" y2="60"/><line x1="0" y1="100" x2="320" y2="100"/><line x1="0" y1="130" x2="320" y2="130"/></g>
+                    <g class="grafica__barras">
+                      <rect class="b1" x="14"  y="46" width="16" height="84" rx="3"/><rect class="b2" x="32"  y="62" width="16" height="68" rx="3"/>
+                      <rect class="b1" x="66"  y="40" width="16" height="90" rx="3"/><rect class="b2" x="84"  y="58" width="16" height="72" rx="3"/>
+                      <rect class="b1" x="118" y="44" width="16" height="86" rx="3"/><rect class="b2" x="136" y="50" width="16" height="80" rx="3"/>
+                      <rect class="b1" x="170" y="36" width="16" height="94" rx="3"/><rect class="b2" x="188" y="60" width="16" height="70" rx="3"/>
+                      <rect class="b1" x="222" y="32" width="16" height="98" rx="3"/><rect class="b2" x="240" y="56" width="16" height="74" rx="3"/>
+                      <rect class="b1" x="274" y="24" width="16" height="106" rx="3"/><rect class="b2" x="292" y="62" width="16" height="68" rx="3"/>
+                    </g>
+                  </svg>
+                  <div class="grafica__meses"><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Sep</span><span>Oct</span></div>
+                </div>
+                <div class="panel">
+                  <div class="panel__cabecera"><p>Indicadores</p></div>
+                  <ul class="semaforo">
+                    <li><i class="ok"></i>Tasa de ahorro<b>35,7 %</b></li>
+                    <li><i class="ok"></i>Fondo de emergencia<b>6,1 meses</b></li>
+                    <li><i class="aviso"></i>Endeudamiento<b>28 %</b></li>
+                    <li><i class="ok"></i>Gasto fijo<b>41 %</b></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- FUNCIONES -->
+    <section class="seccion" id="funciones">
+      <div class="contenedor">
+        <header class="seccion__cabecera revelar">
+          <p class="etiqueta">Todo en un mismo sitio</p>
+          <h2>Diez secciones, una sola foto de tus finanzas.</h2>
+          <p>Cada pantalla responde una pregunta concreta: ¿cuánto entró?, ¿cuánto valgo?, ¿cuándo termino de pagar?, ¿voy bien?</p>
+        </header>
+
+        <div class="bento">
+          <article class="tarjeta tarjeta--ancha revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-registro"/></svg></div>
+            <h3>Registro mensual</h3>
+            <p>Anota ingresos y gastos por categoría, mes a mes. El resumen fijo al pie te dice al momento cómo vas.</p>
+            <div class="mini-registro" aria-hidden="true">
+              <div><span>Nómina</span><b class="pos">+3.900,00 €</b></div>
+              <div><span>Freelance</span><b class="pos">+950,00 €</b></div>
+              <div><span>Alquiler</span><b class="neg">−1.050,00 €</b></div>
+              <div><span>Supermercado</span><b class="neg">−412,30 €</b></div>
+            </div>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-pyg"/></svg></div>
+            <h3>PyG y proyección</h3>
+            <p>Tu cuenta de pérdidas y ganancias histórica y proyectada a 12 meses, en gráfica o en tabla.</p>
+            <svg class="mini-linea" viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true"><path class="area" d="M0 50 L30 44 L60 46 L90 36 L120 30 L150 24 L200 12 L200 60 L0 60Z"/><path class="linea" d="M0 50 L30 44 L60 46 L90 36 L120 30 L150 24"/><path class="linea linea--proy" d="M150 24 L200 12"/></svg>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-balance"/></svg></div>
+            <h3>Balance y patrimonio</h3>
+            <p>Activos menos pasivos, y cómo evoluciona tu patrimonio neto con cada cierre.</p>
+            <div class="mini-balance" aria-hidden="true"><span style="--p:72%" class="activos"></span><span style="--p:28%" class="pasivos"></span></div>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-inversiones"/></svg></div>
+            <h3>Inversiones</h3>
+            <p>Renta fija, variable y finca raíz con interés compuesto y aportes mensuales.</p>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-indicadores"/></svg></div>
+            <h3>Indicadores con semáforo</h3>
+            <p>Ahorro, endeudamiento, fondo de emergencia… en verde, ámbar o rojo, con los umbrales que tú elijas.</p>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-cierre"/></svg></div>
+            <h3>Cierre de mes guiado</h3>
+            <p>Un asistente paso a paso consolida el mes y guarda la foto para comparar después.</p>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-conciliacion"/></svg></div>
+            <h3>Conciliación y extractos PDF</h3>
+            <p>Lee el extracto de tu banco en PDF y cuadra lo registrado con lo que realmente pasó por la cuenta. Las diferencias saltan a la vista.</p>
+            <div class="mini-concilia" aria-hidden="true">
+              <span class="ok">✓ 42 movimientos cuadran</span><span class="aviso">2 por revisar</span>
+            </div>
+          </article>
+          <article class="tarjeta revelar">
+            <div class="tarjeta__icono"><svg class="ico"><use href="#i-perfiles"/></svg></div>
+            <h3>Varios perfiles</h3>
+            <p>Personal, pareja, negocio: cada perfil con su moneda y sus datos.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEUDA -->
+    <section class="seccion seccion--alterna" id="deuda">
+      <div class="contenedor dividido">
+        <div class="revelar">
+          <p class="etiqueta">Plan de deuda</p>
+          <h2>Sal de deudas con un plan, no con fe.</h2>
+          <p class="parrafo-grande">Elige estrategia y mfinance calcula el orden de pago, los meses que faltan y los intereses que te ahorras. El simulador te deja comparar créditos antes de firmar.</p>
+          <div class="estrategias" role="tablist" aria-label="Estrategia de pago">
+            <button type="button" role="tab" aria-selected="true" data-estrategia="avalancha">Avalancha</button>
+            <button type="button" role="tab" aria-selected="false" data-estrategia="bola">Bola de nieve</button>
+          </div>
+          <p class="estrategia-desc" data-desc>Primero la deuda con el <strong>interés más alto</strong>. Es la que menos intereses te cuesta en total.</p>
+        </div>
+        <div class="plan revelar" aria-live="polite">
+          <div class="plan__cabecera"><p>Orden de pago</p><span data-meses>Libre de deudas en <b>23 meses</b></span></div>
+          <ol class="plan__lista" data-lista>
+            <li data-id="tarjeta"><span class="plan__n"></span><div><b>Tarjeta de crédito</b><small>2.400 € · 24,9 % TAE</small></div><span class="plan__barra" style="--p:35%"></span></li>
+            <li data-id="personal"><span class="plan__n"></span><div><b>Préstamo personal</b><small>900 € · 11,2 % TAE</small></div><span class="plan__barra" style="--p:13%"></span></li>
+            <li data-id="coche"><span class="plan__n"></span><div><b>Préstamo coche</b><small>6.800 € · 7,5 % TAE</small></div><span class="plan__barra" style="--p:100%"></span></li>
+          </ol>
+          <div class="plan__pie"><span>Intereses totales</span><b data-intereses>1.184 €</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CÓMO EMPIEZA -->
+    <section class="seccion" id="empezar">
+      <div class="contenedor">
+        <header class="seccion__cabecera revelar">
+          <p class="etiqueta">Primeros cinco minutos</p>
+          <h2>Un asistente te deja todo listo.</h2>
+          <p>La primera vez, mfinance te acompaña en cinco pasos. Los opcionales se pueden saltar y completar después.</p>
+        </header>
+        <ol class="pasos">
+          <li class="paso revelar"><span class="paso__n">1</span><h3>Lo básico</h3><p>Tu nombre, tu moneda (MXN, USD o EUR) y qué quieres controlar.</p></li>
+          <li class="paso revelar"><span class="paso__n">2</span><h3>Tu balance</h3><p>Activos, pasivos e inversiones con los que partes hoy.</p></li>
+          <li class="paso revelar"><span class="paso__n">3</span><h3>Deuda y proyección</h3><p>Tu estrategia de pago y los supuestos de crecimiento.</p></li>
+          <li class="paso revelar"><span class="paso__n">4</span><h3>Metas <em>opcional</em></h3><p>Umbrales de tus indicadores y un diario de metas.</p></li>
+          <li class="paso revelar"><span class="paso__n">5</span><h3>Resumen</h3><p>Revisa todo y empieza a registrar.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- PRIVACIDAD -->
+    <section class="seccion seccion--alterna" id="privacidad">
+      <div class="contenedor">
+        <div class="privacidad revelar">
+          <div class="privacidad__candado" aria-hidden="true"><svg class="ico"><use href="#i-candado"/></svg></div>
+          <div>
+            <p class="etiqueta">Privacidad por diseño</p>
+            <h2>Tus números son tuyos. Punto.</h2>
+            <p class="parrafo-grande">mfinance no tiene servidores ni te pide una cuenta. Todo se guarda en archivos en tu propio equipo, que puedes copiar, respaldar o llevarte cuando quieras.</p>
+          </div>
+        </div>
+        <div class="garantias">
+          <div class="garantia revelar"><svg class="ico"><use href="#i-carpeta"/></svg><h3>En tu carpeta</h3><p>Los datos viven en <code>Documentos/mfinance</code>. Respaldarlos es copiar una carpeta.</p></div>
+          <div class="garantia revelar"><svg class="ico"><use href="#i-nube"/></svg><h3>Sin nube</h3><p>Funciona sin conexión. No hay registro, ni suscripción, ni sincronización obligatoria.</p></div>
+          <div class="garantia revelar"><svg class="ico"><use href="#i-github"/></svg><h3>Código a la vista</h3><p>Puedes leer exactamente qué hace con tus datos en el repositorio.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECNOLOGÍA -->
+    <section class="seccion">
+      <div class="contenedor tecnologia revelar">
+        <div>
+          <p class="etiqueta">Ligera de verdad</p>
+          <h2>Nativa, rápida y pequeña.</h2>
+          <p>Construida con <strong>Tauri 2</strong> y un backend en <strong>Rust</strong>: usa el motor web del sistema en vez de cargar un navegador entero. La interfaz está hecha con <strong>React 19</strong> y <strong>TypeScript</strong>, con cientos de pruebas automáticas cuidando los cálculos.</p>
+        </div>
+        <ul class="stack" aria-label="Tecnologías">
+          <li><b>Tauri 2</b><span>Escritorio</span></li>
+          <li><b>Rust</b><span>Backend</span></li>
+          <li><b>React 19</b><span>Interfaz</span></li>
+          <li><b>TypeScript</b><span>Dominio</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- PREGUNTAS -->
+    <section class="seccion seccion--alterna" id="preguntas">
+      <div class="contenedor contenedor--estrecho">
+        <header class="seccion__cabecera revelar">
+          <p class="etiqueta">Preguntas frecuentes</p>
+          <h2>Lo que suele preguntarse.</h2>
+        </header>
+        <div class="faq">
+          <details class="revelar"><summary>¿Cuánto cuesta?</summary><p>Nada. Descargas el instalador y listo: sin suscripciones ni funciones de pago.</p></details>
+          <details class="revelar"><summary>¿Se conecta a mi banco?</summary><p>No. mfinance no pide credenciales bancarias. Puedes registrar a mano o importar el extracto en PDF que descargas de tu banco para conciliarlo.</p></details>
+          <details class="revelar"><summary>¿En qué sistemas funciona?</summary><p>El instalador es para Windows 10 y 11 (usa WebView2, que ya viene con el sistema). Como está hecha con Tauri, también se puede compilar para macOS y Linux desde el código.</p></details>
+          <details class="revelar"><summary>¿Qué monedas admite?</summary><p>Peso mexicano, dólar estadounidense y euro. Cada perfil tiene su propia moneda.</p></details>
+          <details class="revelar"><summary>¿Cómo hago una copia de seguridad?</summary><p>Copia la carpeta <code>Documentos/mfinance</code> a otro disco o a la nube que tú elijas. Para restaurar, vuelve a ponerla en su sitio.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="seccion">
+      <div class="contenedor">
+        <div class="cta-final revelar">
+          <div class="cta-final__brillo" aria-hidden="true"></div>
+          <h2>Empieza este mes con las cuentas claras.</h2>
+          <p>Instálala, completa el asistente y haz tu primer cierre.</p>
+          <a class="boton boton--claro boton--lg" href="https://github.com/MoiBaldenegro/mfinance/releases/latest">
+            <svg class="ico"><use href="#i-descargar"/></svg> Descargar mfinance
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor pie__fila">
+      <a class="marca marca--pie" href="#">
+        <svg class="marca__isotipo" width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect class="marca__fondo" width="32" height="32" rx="9"/><path class="marca__trazo" d="M8 23v-8.5a3.5 3.5 0 0 1 7 0V23m0-8.5a3.5 3.5 0 0 1 7 0V19l3.5-3.5"/><circle class="marca__moneda" cx="24.5" cy="8.5" r="2.6"/></svg>
+        <span class="marca__nombre">mfinance</span>
+      </a>
+      <p>Finanzas personales en tu escritorio. © <span data-anio>2026</span> Moises Baldenegro.</p>
+      <a href="https://github.com/MoiBaldenegro/mfinance" class="pie__enlace"><svg class="ico"><use href="#i-github"/></svg> GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

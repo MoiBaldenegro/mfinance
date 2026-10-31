@@ -1,6 +1,7 @@
-// REQ-25-01/07/10: Padre del Paso 2 - Balance inicial (≤100 líneas)
-import { useMemo, useCallback } from 'react';
-import { usarMoneda } from '../../hooks/use-moneda.ts';
+// REQ-25-01/07/10: Paso 2 — Balance inicial. Tres acordeones (activos,
+// pasivos, inversiones) y el patrimonio neto resultante.
+import { formatoMoneda } from '../../domain/use-cases/formato-moneda.ts';
+import type { Moneda } from '../../domain/entities/moneda.ts';
 import { ActivosSection } from './ActivosSection.tsx';
 import { PasivosSection } from './PasivosSection.tsx';
 import { InversionesSection } from './InversionesSection.tsx';
@@ -10,39 +11,27 @@ import '../../styles/onboarding-paso-balance.css';
 interface Props {
   readonly datos: Paso2Data | null;
   readonly alCambiar: (paso2: Paso2Data) => void;
+  readonly moneda: Moneda;
   readonly deshabilitado: boolean;
 }
 
-export function OnboardingPasoBalance({ datos, alCambiar, deshabilitado }: Props) {
-  const moneda = usarMoneda();
+const VACIO: Paso2Data = { activos: [], pasivos: [], inversiones: [] };
 
-  const paso2 = useMemo(() => datos ?? { activos: [], pasivos: [], inversiones: [] }, [datos]);
-
-  const manejarCambio = useCallback((nuevos: Paso2Data) => {
-    alCambiar(nuevos);
-  }, [alCambiar]);
-
-  const hayDatos = useMemo(
-    () => paso2.activos.length > 0 || paso2.pasivos.length > 0 || paso2.inversiones.length > 0,
-    [paso2],
-  );
+export function OnboardingPasoBalance({ datos, alCambiar, moneda, deshabilitado }: Props) {
+  const paso2 = datos ?? VACIO;
+  const activos = paso2.activos.reduce((s, a) => s + a.valor_actual, 0);
+  const pasivos = paso2.pasivos.reduce((s, p) => s + p.saldo_pendiente, 0);
+  const patrimonio = activos - pasivos;
 
   return (
-    <section className="onboarding-paso-balance">
-      <h3 className="onboarding-paso-balance__titulo">Paso 2: Balance inicial (opcional)</h3>
-      <p className="onboarding-paso-balance__ayuda">
-        Registra tus activos, pasivos e inversiones actuales. Puedes saltar este paso y completarlo después.
+    <div className="onboarding-paso-balance">
+      <ActivosSection datos={paso2} alCambiar={alCambiar} moneda={moneda} deshabilitado={deshabilitado} />
+      <PasivosSection datos={paso2} alCambiar={alCambiar} moneda={moneda} deshabilitado={deshabilitado} />
+      <InversionesSection datos={paso2} alCambiar={alCambiar} moneda={moneda} deshabilitado={deshabilitado} />
+      <p className="onboarding-paso-balance__patrimonio" role="status">
+        <span>Patrimonio neto inicial</span>
+        <strong className={`num ${patrimonio < 0 ? 'negativo' : ''}`}>{formatoMoneda(patrimonio, moneda)}</strong>
       </p>
-
-      <ActivosSection datos={paso2} alCambiar={manejarCambio} moneda={moneda} deshabilitado={deshabilitado} />
-      <PasivosSection datos={paso2} alCambiar={manejarCambio} moneda={moneda} deshabilitado={deshabilitado} />
-      <InversionesSection datos={paso2} alCambiar={manejarCambio} moneda={moneda} deshabilitado={deshabilitado} />
-
-      {!hayDatos && (
-        <div className="onboarding-paso-balance__vacio-global" role="status">
-          <p>No hay datos de balance registrados. El resumen aparecerá aquí al añadir elementos.</p>
-        </div>
-      )}
-    </section>
+    </div>
   );
 }

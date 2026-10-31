@@ -9,7 +9,6 @@ import {
 import { useSnapshot } from '../shell/SnapshotProvider.tsx';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import { useReapertura } from './use-reapertura.ts';
-import '../../styles/wizard-cierre.css';
 
 interface Props {
   readonly mes: string;
@@ -25,26 +24,26 @@ export function PanelMesCerrado({ mes, snapshot }: Props) {
   const total = Object.values(assessment?.presupuesto_siguiente ?? {})
     .reduce<number>((suma, valor) => suma + (valor ?? 0), 0);
   return (
-    <div className="mes-cerrado">
-      <p className="mes-cerrado__aviso" role="alert">{avisoMesCerrado(mes)}</p>
+    <section className="card mes-cerrado" aria-label="Mes cerrado">
+      <p className="aviso aviso--exito" role="status">{avisoMesCerrado(mes)}</p>
       {assessment ? (
-        <p className="mes-cerrado__detalle">
+        <p className="card__descripcion">
           Cerrado el {assessment.fecha_cierre} · presupuesto del mes
           siguiente: <strong>{formatoMoneda(total, moneda)}</strong> ·{' '}
           {assessment.indicadores.length} indicadores archivados.
         </p>
       ) : null}
       {avisoReapertura ? (
-        <p className="mes-cerrado__error" role="alert">{avisoReapertura}</p>
+        <p className="aviso aviso--error" role="alert">{avisoReapertura}</p>
       ) : null}
       <button
         type="button"
-        className="mes-cerrado__boton"
+        className="btn mes-cerrado__accion"
         disabled={ocupado}
         onClick={() => void reabrir(mes)}
       >
         {ocupado ? 'Reabriendo…' : 'Reabrir mes'}
       </button>
-    </div>
+    </section>
   );
 }

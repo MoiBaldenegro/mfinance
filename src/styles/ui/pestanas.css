@@ -1,0 +1,54 @@
+/* Pestañas de sección: subrayado de la activa sobre una línea base. */
+.pestanas { display: grid; gap: var(--space-5); min-width: 0; }
+.pestanas__lista {
+  display: flex; gap: var(--space-1);
+  border-bottom: var(--borde);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pestanas__tab {
+  position: relative;
+  min-height: var(--control-alto);
+  padding: 0 var(--space-3);
+  border: 0; border-radius: var(--radius-md) var(--radius-md) 0 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-weight: var(--fuente-peso-medium);
+  white-space: nowrap;
+}
+.pestanas__tab:hover:not(:disabled) { background: transparent; color: var(--color-text); }
+.pestanas__tab::after {
+  content: '';
+  position: absolute; left: var(--space-2); right: var(--space-2); bottom: calc(var(--borde-ancho) * -1);
+  height: var(--borde-ancho-fuerte);
+  border-radius: var(--radius-full);
+  background: transparent;
+  transition: background var(--transicion-rapida);
+}
+.pestanas__tab[aria-selected='true'] { color: var(--color-text); }
+.pestanas__tab[aria-selected='true']::after { background: var(--color-primary); }
+.pestanas__insignia {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+  color: var(--color-muted);
+  font-size: var(--fuente-tamano-xs);
+}
+.pestanas__panel { display: grid; gap: var(--space-5); min-width: 0; }
+.pestanas__panel:focus-visible { box-shadow: none; }
+.pestanas__panel[hidden] { display: none; }
+
+/* Pestañas anidadas (sub-vistas dentro de una pestaña): píldoras sin línea. */
+.pestanas__panel .pestanas__lista { gap: var(--space-2); border-bottom: 0; }
+.pestanas__panel .pestanas__tab {
+  min-height: var(--control-alto-sm);
+  border: var(--borde); border-radius: var(--radius-full);
+  font-size: var(--fuente-tamano-sm);
+}
+.pestanas__panel .pestanas__tab::after { display: none; }
+.pestanas__panel .pestanas__tab[aria-selected='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+  color: var(--color-primary-text);
+}
+.pestanas__panel .pestanas { gap: var(--space-4); }

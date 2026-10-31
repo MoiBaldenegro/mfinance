@@ -1,18 +1,37 @@
-/* Hoja del placeholder de Cierre (REQ-05-05/06): solo tokens. */
-.cierre-section {
-  display: grid;
-  gap: var(--space-4);
-  padding: var(--space-5);
-  background: var(--color-surface);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
+/* Sección Cierre: asistente + consejos lado a lado, pasos numerados. */
+.cierre-section__fila { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; }
+@media (max-width: 1100px) {
+  .cierre-section__fila { grid-template-columns: minmax(0, 1fr); }
 }
 
-.cierre-section__titulo {
-  margin: 0;
+.pasos-cierre { display: flex; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.pasos-cierre__paso {
+  flex: 1; display: flex; align-items: center; gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: var(--borde-ancho-fuerte) solid var(--color-border);
+  color: var(--color-subtle); font-size: var(--fuente-tamano-sm);
 }
+.pasos-cierre__paso--hecho { border-bottom-color: var(--color-primary); color: var(--color-muted); }
+.pasos-cierre__paso--actual { border-bottom-color: var(--color-primary); color: var(--color-text); font-weight: var(--fuente-peso-semibold); }
+.pasos-cierre__numero {
+  flex: none; display: grid; place-items: center;
+  width: 22px; height: 22px; border-radius: var(--radius-full);
+  background: var(--color-surface-hover); font-size: var(--fuente-tamano-xs);
+}
+.pasos-cierre__paso--hecho .pasos-cierre__numero,
+.pasos-cierre__paso--actual .pasos-cierre__numero { background: var(--color-primary); color: var(--color-primary-contrast); }
 
-.cierre-section__resumen {
-  margin: 0;
-  color: var(--color-muted);
+.paso-cierre { display: grid; gap: var(--space-4); }
+.paso-cierre__titulo { font-size: var(--fuente-tamano-lg); }
+.paso-cierre__campos { display: grid; gap: var(--space-3); grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.paso-cierre__total { font-size: var(--fuente-tamano-md); }
+.paso-cierre__resumen { display: grid; gap: var(--space-2); margin: 0; padding-left: var(--space-5); color: var(--color-muted); }
+.paso-cierre__kpis { margin: 0; }
+.paso-cierre__kpis dd { margin: 0; }
+.paso-cierre__accion,
+.mes-cerrado__accion { justify-self: start; }
+
+.cierre-wizard__navegacion {
+  display: flex; justify-content: space-between; gap: var(--space-2);
+  padding-top: var(--space-4); border-top: var(--borde);
 }

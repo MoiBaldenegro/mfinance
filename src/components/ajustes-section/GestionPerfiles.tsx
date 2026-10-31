@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { perfilPort } from '../../adapters/perfil-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import { crearPerfil } from '../../domain/use-cases/crear-perfil.ts';
 import { usarPerfiles } from '../../hooks/use-perfil.ts';
 import { useSnapshot } from '../shell/SnapshotProvider';
@@ -22,6 +22,7 @@ interface WizardState {
   readonly metasIniciales?: readonly GoalEntry[];
 }
 export function GestionPerfiles() {
+  const { perfil: perfilPort } = usarPuertos();
   const { perfiles, activo, avisoCarga, fijarActivo, refrescar } = usarPerfiles();
   const { recargar, cargarParaCambio, esCargaVigente, generacionActual, publicarSnapshot,
     mostrarError, registrarReintento, mostrarFalloPerfil } = useSnapshot();
@@ -76,9 +77,9 @@ export function GestionPerfiles() {
     );
   }
   return (
-    <div className="gestion-perfiles">
-      <span className="ajustes-section__tema-etiqueta">Perfiles</span>
-      {avisoCarga ? <p className="gestion-perfiles__aviso" role="alert">{avisoCarga}</p> : null}
+    <section className="card gestion-perfiles" aria-label="Perfiles">
+      <h2 className="card__titulo">Perfiles</h2>
+      {avisoCarga ? <p className="aviso aviso--error" role="alert">{avisoCarga}</p> : null}
       <ul className="gestion-perfiles__lista">
         {perfiles.map((perfil) => (
           <PerfilFila key={perfil.id} perfil={perfil} esActivo={perfil.id === activo?.id}
@@ -87,12 +88,12 @@ export function GestionPerfiles() {
         ))}
       </ul>
       <form className="gestion-perfiles__alta" onSubmit={(e) => void darDeAlta(e)}>
-        <input className="gestion-perfiles__campo" value={nombre}
+        <input className="gestion-perfiles__campo" maxLength={60} value={nombre}
           placeholder="Nombre del nuevo perfil" aria-label="Nombre del nuevo perfil"
           onChange={(e) => setNombre(e.target.value)} />
-        <button type="submit" className="gestion-perfiles__crear">Crear perfil</button>
+        <button type="submit" className="btn" disabled={nombre.trim() === ''}>Crear perfil</button>
       </form>
-      {aviso ? <p className="gestion-perfiles__aviso" role="alert">{aviso}</p> : null}
-    </div>
+      {aviso ? <p className="aviso aviso--error" role="alert">{aviso}</p> : null}
+    </section>
   );
 }

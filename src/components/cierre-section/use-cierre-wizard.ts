@@ -15,7 +15,7 @@ import {
   type ErrorCampo,
 } from '../../domain/use-cases/validacion-importes.ts';
 import { mesDeTrabajo } from '../../domain/use-cases/resumenes-flujo.ts';
-import { cierrePort } from '../../adapters/cierre-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 
 type EstadoCarga =
   | { readonly nombre: 'cargando' }
@@ -26,6 +26,7 @@ export function useCierreWizard(
   snapshot: FinanceSnapshot,
   aplicarSnapshot: (nuevo: FinanceSnapshot) => void,
 ) {
+  const { cierre: cierrePort } = usarPuertos();
   const mes = mesDeTrabajo(snapshot);
   const [estado, setEstado] = useState<EstadoCarga>({ nombre: 'cargando' });
   const [wizard, setWizard] = useState(crearWizard());

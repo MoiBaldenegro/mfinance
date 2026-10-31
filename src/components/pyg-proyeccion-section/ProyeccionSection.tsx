@@ -8,7 +8,7 @@ import type { SupuestosProyeccion } from '../../domain/entities/pyg-proyeccion.t
 import { usePygProyeccion } from './use-pyg-proyeccion.ts';
 import { PanelesProyeccion } from './PanelesProyeccion.tsx';
 import { supuestosPorDefecto } from '../../domain/use-cases/pyg-proyeccion-supuestos.ts';
-import '../../styles/proyeccion-section.css';
+import '../../styles/proyeccion-pyg.css';
 
 interface Props {
   readonly snapshot: FinanceSnapshot;
@@ -32,12 +32,10 @@ export function ProyeccionSection({ snapshot }: Props) {
   };
 
   return (
-    <section className="proyeccion-section">
-      <h2 className="proyeccion-section__titulo">Proyección</h2>
-      <p className="proyeccion-section__ayuda">
-        Proyecta 12 meses de PyG y balance futuro aplicando variaciones
-        porcentuales mensuales sobre cada fuente de ingreso y categoría de
-        gasto, partiendo de tu histórico real.
+    <section className="proyeccion-pyg" aria-label="Proyección a 12 meses">
+      <p className="texto-muted proyeccion-pyg__intro">
+        Aplica una variación mensual a cada ingreso y gasto, partiendo de tu
+        histórico real, y observa tu PyG y tu patrimonio futuros.
       </p>
       <PanelesProyeccion
         estado={estado}

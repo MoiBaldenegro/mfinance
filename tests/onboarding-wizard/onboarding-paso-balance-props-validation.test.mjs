@@ -71,9 +71,13 @@ describe('F25 — Componentes paso 2: props, validación y formateo', () => {
   });
 
   describe('Paso opcional - resumen vacío si sin datos (REQ-25-07)', () => {
-    it('OnboardingPasoBalance muestra estado vacío cuando no hay datos', () => {
-      const contenido = readFileSync(join(COMPONENTS_DIR, 'OnboardingPasoBalance.tsx'), 'utf-8');
-      assert.ok(contenido.includes('vacio-global') || contenido.includes('Sin datos') || contenido.includes('vacío'), 'Debe mostrar estado vacío');
+    it('activos y pasivos muestran un estado vacío propio cuando no hay datos', () => {
+      for (const seccion of ['ActivosSection.tsx', 'PasivosSection.tsx']) {
+        const contenido = readFileSync(join(COMPONENTS_DIR, seccion), 'utf-8');
+        assert.match(contenido, /vacio="Aún no has añadido/, `${seccion} sin estado vacío`);
+      }
+      const lista = readFileSync(join(COMPONENTS_DIR, 'BalanceComun.tsx'), 'utf-8');
+      assert.match(lista, /filas\.length === 0/);
     });
   });
 });

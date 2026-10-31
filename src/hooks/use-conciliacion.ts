@@ -2,7 +2,7 @@
 // Delega en el puerto inyectado vía SnapshotProvider; expone estado
 // y acciones para la UI.
 import { useCallback, useState } from 'react';
-import { snapshotPort } from '../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../app/puertos.ts';
 import type { ConciliacionMensual } from '../domain/entities/conciliacion-mensual.ts';
 import type { HistoricoConciliacion } from '../domain/entities/conciliacion-mensual.ts';
 import type { FinanceSnapshot } from '../domain/entities/finance-snapshot.ts';
@@ -20,10 +20,12 @@ type EstadoHistorico =
 
 /** Hook para la conciliación de un mes específico. */
 export function useConciliacion(mes: string) {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [estado, setEstado] = useState<EstadoConciliacion>({ nombre: 'cargando' });
 
   const cargar = useCallback(async () => {
-    setEstado({ nombre: 'cargando' });
+    // Conserva los datos visibles mientras se recarga el mismo mes.
+    setEstado((previo) => (previo.nombre === 'listo' && previo.conciliacion.mes === mes ? previo : { nombre: 'cargando' }));
     try {
       const conciliacion = await snapshotPort.conciliacionMensual(mes);
       setEstado({ nombre: 'listo', conciliacion });
@@ -38,6 +40,7 @@ export function useConciliacion(mes: string) {
 
 /** Hook para el histórico de conciliación. */
 export function useHistoricoConciliacion() {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [estado, setEstado] = useState<EstadoHistorico>({ nombre: 'cargando' });
 
   const cargar = useCallback(async () => {
@@ -59,19 +62,22 @@ export function useAgregarMovimientoConciliacion(
   mes: string,
   onSnapshotActualizado: (snapshot: FinanceSnapshot) => void,
 ) {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const agregar = useCallback(
-    async (cuenta: string, movimiento: { fecha: string; concepto: string; importe: number }) => {
+    async (cuenta: string, movimiento: { fecha: string; concepto: string; importe: number }): Promise<boolean> => {
       setGuardando(true);
       setError(null);
       try {
         const snapshot = await snapshotPort.conciliacionAgregarMovimiento(mes, cuenta, movimiento);
         onSnapshotActualizado(snapshot);
+        return true;
       } catch (err: unknown) {
         const e = err as SnapshotLoadError;
         setError(e.message ?? 'Error al agregar movimiento');
+        return false;
       } finally {
         setGuardando(false);
       }

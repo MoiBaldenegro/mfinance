@@ -1,0 +1,37 @@
+/* Sección Conciliación: tarjetas por cuenta, movimientos e histórico. */
+.conciliacion__cuentas { align-items: start; }
+@media (max-width: 1100px) {
+  .conciliacion__cuentas { grid-template-columns: minmax(0, 1fr); }
+}
+
+.cuenta-conciliada { align-content: start; }
+.cuenta-conciliada__resumen {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3); margin: 0;
+}
+.cuenta-conciliada__resumen dt { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+.cuenta-conciliada__resumen dd { margin: 0; font-size: var(--fuente-tamano-lg); font-weight: var(--fuente-peso-semibold); }
+.cuenta-conciliada__movimientos > summary { cursor: pointer; font-weight: var(--fuente-peso-medium); margin-bottom: var(--space-2); }
+.cuenta-conciliada__nuevo { justify-self: start; }
+
+.movimiento-lista { display: grid; margin: 0; padding: 0; list-style: none; }
+.movimiento-lista__item {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3); align-items: center;
+  padding: var(--space-2) 0; border-bottom: var(--borde);
+}
+.movimiento-lista__item:last-child { border-bottom: 0; }
+.movimiento-lista__fecha { color: var(--color-muted); font-size: var(--fuente-tamano-sm); }
+.movimiento-lista__concepto { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.movimiento-formulario {
+  display: grid; gap: var(--space-3);
+  grid-template-columns: 9.5rem minmax(0, 1fr) 9rem;
+  padding: var(--space-4);
+  background: var(--color-sunken); border: var(--borde); border-radius: var(--radius-md);
+}
+.movimiento-formulario__fila { grid-column: 1 / -1; }
+.movimiento-formulario__acciones { display: flex; justify-content: flex-end; gap: var(--space-2); }
+
+.historico-meses { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.historico-meses__mes[aria-pressed='true'] { border-color: var(--color-primary); }

@@ -3,7 +3,7 @@
 // puerto. Glue de UI: nunca toca pasivos reales ni persiste nada.
 import { useCallback, useState } from 'react';
 import type { CreditoSimulado, SimulacionComparada } from '../../../domain/entities/simulador-credito.ts';
-import { simuladorPort } from '../../../adapters/simulador-ipc-adapter.ts';
+import { usarPuertos } from '../../../app/puertos.ts';
 import {
   validarPeticionSimulacion,
 } from '../../../domain/use-cases/simulador-validaciones.ts';
@@ -37,6 +37,7 @@ const CAMPOS_INICIALES: CamposSimulador = {
 };
 
 export function useSimulador() {
+  const { simulador: simuladorPort } = usarPuertos();
   const [campos, setCampos] = useState<CamposSimulador>(CAMPOS_INICIALES);
   const [estado, setEstado] = useState<EstadoSimulacion>({ nombre: 'inactivo' });
   const [mensajeError, setMensajeError] = useState<string | null>(null);

@@ -55,3 +55,19 @@ export function validarInversion(aporteMensual: number, valorActual: number): st
   if (valorActual < 0) return 'El valor actual no puede ser negativo';
   return undefined;
 }
+const ETIQUETAS_FAMILIA_PROYECCION: Readonly<Record<string, string>> = {
+  renta_fija: 'Renta fija',
+  renta_variable: 'Renta variable',
+  finca_raiz: 'Finca raíz',
+};
+
+/** «finca_raiz» (clave de la proyección) → «Finca raíz». */
+export function etiquetaFamiliaProyeccion(familia: string): string {
+  return ETIQUETAS_FAMILIA_PROYECCION[familia] ?? familia;
+}
+
+/** Texto editable → número ≥ 0; vacío o inválido cuenta como 0. */
+export function importeDeTexto(texto: string): number {
+  const valor = Number(texto.trim().replace(',', '.'));
+  return Number.isFinite(valor) && valor > 0 ? valor : 0;
+}

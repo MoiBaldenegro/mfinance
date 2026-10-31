@@ -38,11 +38,13 @@ function seccionListado(
   etiquetas: Record<string, string>,
 ): ResumenSeccion {
   const lista = claves ?? [];
+  // Los datos guardan las claves en minúsculas; el catálogo, en PascalCase.
+  const porClave = new Map(Object.entries(etiquetas).map(([k, v]) => [k.toLowerCase(), v]));
   return {
     id,
     titulo,
     completo: lista.length > 0,
-    lineas: [`Seleccionadas: ${lista.map((c) => etiquetas[c] ?? c).join(', ') || 'ninguna'}`],
+    lineas: [`Seleccionadas: ${lista.map((c) => porClave.get(c.toLowerCase()) ?? c).join(', ') || 'ninguna'}`],
   };
 }
 

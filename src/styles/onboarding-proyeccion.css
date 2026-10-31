@@ -1,0 +1,11 @@
+/* Paso 3: tabla de supuestos de proyección. */
+.ob-proyeccion { display: grid; gap: var(--space-3); }
+.ob-proyeccion__cabecera { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-2) var(--space-4); }
+.ob-proyeccion__subtitulo { margin-bottom: var(--space-1); font-size: var(--fuente-tamano-md); }
+.ob-proyeccion__input {
+  width: 7rem;
+  min-height: var(--control-alto-sm);
+  padding: var(--space-1) var(--space-2);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

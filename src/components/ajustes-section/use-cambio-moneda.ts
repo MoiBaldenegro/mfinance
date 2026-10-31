@@ -3,7 +3,7 @@
 // persiste por el puerto existente (save_state) y publica el snapshot
 // nuevo para que toda la app reformatee al instante (REQ-20-02).
 import { useCallback, useState } from 'react';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { Moneda } from '../../domain/entities/moneda.ts';
 import { cambiarMoneda } from '../../domain/use-cases/cambiar-moneda.ts';
@@ -16,6 +16,7 @@ export function useCambioMoneda(
   snapshot: FinanceSnapshot,
   aplicarSnapshot: (snapshot: FinanceSnapshot) => void,
 ) {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [aviso, setAviso] = useState<string | null>(null);
 
   const cambiar = useCallback(

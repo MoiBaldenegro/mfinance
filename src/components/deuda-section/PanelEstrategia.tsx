@@ -1,61 +1,41 @@
-// Panel de estrategia y pago extra para la sección Deuda.
-import type { DebtStrategy } from '../../domain/entities/catalogs.ts';
+// Estrategia de ataque (control segmentado) y pago extra mensual.
 import { DEBT_STRATEGIES, DEBT_STRATEGY_LABELS } from '../../domain/entities/catalogs.ts';
-import {
-  ETIQUETA_MONEDA,
-  simboloDe,
-} from '../../domain/entities/moneda.ts';
+import { simboloDe } from '../../domain/entities/moneda.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
-import '../../styles/deuda-estrategia.css';
+import type { useEstrategiaDeuda } from './use-estrategia-deuda.ts';
+
+const EXPLICACION = {
+  Avalanche: 'Primero la deuda con la tasa más alta: pagas menos intereses.',
+  Snowball: 'Primero la deuda más pequeña: victorias rápidas que motivan.',
+} as const;
 
 interface Props {
-  readonly estrategia: DebtStrategy;
-  readonly extra: number;
-  readonly onCambioEstrategia: (nueva: DebtStrategy) => void;
-  readonly onCambioExtra: (nuevo: number) => void;
+  readonly control: ReturnType<typeof useEstrategiaDeuda>;
 }
 
-export function PanelEstrategia({
-  estrategia,
-  extra,
-  onCambioEstrategia,
-  onCambioExtra,
-}: Props) {
-  const moneda = usarMoneda();
-  const simbolo = simboloDe(moneda);
+export function PanelEstrategia({ control }: Props) {
+  const simbolo = simboloDe(usarMoneda());
   return (
-    <section className="deuda-section__tarjeta" aria-label="Estrategia y pago extra">
-      <h3 className="deuda-section__subtitulo">Estrategia de ataque</h3>
-      <fieldset className="deuda-section__estrategia">
-        <legend>Elige cómo atacar tus deudas</legend>
-        {DEBT_STRATEGIES.map((strat) => (
-          <label key={strat} className="deuda-section__radio">
-            <input
-              type="radio"
-              name="debt-strategy"
-              value={strat}
-              checked={estrategia === strat}
-              onChange={() => onCambioEstrategia(strat)}
-            />
-            <span className="deuda-section__radio-label">{DEBT_STRATEGY_LABELS[strat]}</span>
-          </label>
+    <section className="card" aria-label="Estrategia y pago extra">
+      <h2 className="card__titulo">Estrategia</h2>
+      <div className="segmentado" role="radiogroup" aria-label="Estrategia de pago">
+        {DEBT_STRATEGIES.map((opcion) => (
+          <button key={opcion} type="button" role="radio" className="segmentado__opcion"
+            aria-checked={control.estrategia === opcion} disabled={control.guardando}
+            onClick={() => control.cambiarEstrategia(opcion)}>
+            {DEBT_STRATEGY_LABELS[opcion]}
+          </button>
         ))}
-      </fieldset>
-      <div className="deuda-section__extra">
-        <label htmlFor="extra-pago" className="deuda-section__extra-label">
-          Pago extra mensual ({simbolo}):
-        </label>
-        <input
-          id="extra-pago"
-          type="number"
-          step="0.01"
-          min="0"
-          value={extra}
-          onChange={(e) => onCambioExtra(Number(e.target.value) || 0)}
-          className="deuda-section__extra-input"
-          aria-label={`Pago extra mensual en ${ETIQUETA_MONEDA[moneda].toLowerCase()}`}
-        />
       </div>
+      <p className="card__descripcion">{EXPLICACION[control.estrategia]}</p>
+      <label className="campo">
+        <span className="campo__etiqueta">Pago extra mensual ({simbolo})</span>
+        <input type="number" min="0" step="0.01" value={control.textoExtra}
+          onChange={(e) => control.editarExtra(e.target.value)}
+          onBlur={control.confirmarExtra}
+          onKeyDown={(e) => { if (e.key === 'Enter') control.confirmarExtra(); }} />
+        <span className="campo__ayuda">Se suma al pago mínimo y va a la deuda objetivo. Se aplica al salir del campo.</span>
+      </label>
     </section>
   );
 }

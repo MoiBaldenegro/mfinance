@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
+import { usarPuertos } from '../../app/puertos.ts';
 import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { Perfil } from '../../domain/entities/perfil.ts';
 import type { OnboardingStatus } from '../../domain/entities/onboarding/index.ts';
@@ -44,6 +44,7 @@ function estadoDeResultado(resultado: ResultadoPerfilActivo): EstadoSnapshot {
 }
 
 export function SnapshotProvider({ children }: { readonly children: ReactNode }) {
+  const { snapshot: snapshotPort } = usarPuertos();
   const [estado, setEstado] = useState<EstadoSnapshot>({ nombre: 'cargando' });
   const rollbackEnCurso = useRef(false);
   const controlador = useRef(crearControladorSnapshot(snapshotPort, estadoDeResultado,

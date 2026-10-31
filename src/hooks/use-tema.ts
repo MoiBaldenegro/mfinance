@@ -7,5 +7,5 @@ import { suscribirse, temaActual } from '../lib/estado-tema.ts';
 
 /** Tema activo reactivo: 'oscuro' | 'claro'. */
 export function usarTema() {
-  return useSyncExternalStore(suscribirse, temaActual);
+  return useSyncExternalStore(suscribirse, temaActual, temaActual);
 }

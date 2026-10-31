@@ -1,6 +1,5 @@
 // Resumen de ahorro del escenario optimizado (REQ-15-04): meses e
 // intereses ahorrados en euros, con color positivo de los tokens.
-import '../../../styles/simulador-ahorro.css';
 
 interface Props {
   readonly mesesAhorrados: number;
@@ -11,16 +10,16 @@ interface Props {
 export function ResumenAhorro({ mesesAhorrados, interesesAhorrados, hayAhorro }: Props) {
   if (!hayAhorro) {
     return (
-      <p className="simulador-ahorro simulador-ahorro--vacio">
+      <p className="aviso">
         Añade un extra mensual o extraordinario para comparar el ahorro.
       </p>
     );
   }
   return (
-    <p className="simulador-ahorro" role="status">
+    <p className="aviso aviso--exito" role="status">
       Con la optimización liquidas <strong>{mesesAhorrados}</strong>{' '}
       {mesesAhorrados === 1 ? 'mes antes' : 'meses antes'} y ahorras{' '}
-      <strong className="simulador-ahorro__cifra">{interesesAhorrados}</strong> en
+      <strong>{interesesAhorrados}</strong> en
       intereses.
     </p>
   );

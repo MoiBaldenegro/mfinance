@@ -33,7 +33,9 @@ describe('Patrón extraído — AcordeonSeccion (REQ-34-02)', () => {
     const c = leer(ACORDEON);
     assert.match(c, /<details/);
     assert.match(c, /\bopen\b/); // atributo open inicial
-    assert.doesNotMatch(c, /open=\{[a-zA-Z]/); // nunca open={variable}
+    // open solo desde un valor inicial que el padre fija una vez al montar,
+    // nunca desde estado que alterne en cada render.
+    assert.doesNotMatch(c, /open=\{(?!abiertoInicial\})[a-zA-Z]/);
     assert.doesNotMatch(c, /useState|onToggle/); // sin estado ni handler de toggle
   });
 

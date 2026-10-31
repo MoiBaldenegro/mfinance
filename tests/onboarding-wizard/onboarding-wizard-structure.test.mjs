@@ -23,5 +23,5 @@ describe('OnboardingPaso1 — estructura (REQ-24-06/07/08/09/12/14)', () => {
   it('valida ≥1 fuente ingreso', () => { const c = readFileSync(PASO1_PATH, 'utf8'); assert.match(c, /tieneFuentes/); assert.match(c, /al menos una fuente de ingreso/); });
   it('valida ≥1 categoría gasto', () => { const c = readFileSync(PASO1_PATH, 'utf8'); assert.match(c, /tieneCategorias/); assert.match(c, /al menos una categoría de gasto/); });
   it('bloquea Siguiente si inválido', () => { const c = readFileSync(PASO1_PATH, 'utf8'); assert.match(c, /pasoValido/); assert.match(c, /onboarding-paso1__validez/); });
-  it('botón Saltar onboarding', () => { const c = readFileSync(PASO1_PATH, 'utf8'); assert.match(c, /Saltar onboarding/); assert.match(c, /onboarding-paso1__btn-saltar/); });
+  it('el paso 1 no duplica el botón Saltar del pie del asistente', () => { const c = readFileSync(PASO1_PATH, 'utf8'); assert.doesNotMatch(c, /onboarding-paso1__btn-saltar/); });
 });

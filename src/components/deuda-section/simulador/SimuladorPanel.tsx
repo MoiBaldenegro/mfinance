@@ -10,7 +10,8 @@ import { TarjetaEscenario } from './TarjetaEscenario.tsx';
 import { ResumenAhorro } from './ResumenAhorro.tsx';
 import { TablaAmortizacion } from './TablaAmortizacion.tsx';
 import { PlanSandbox } from './PlanSandbox.tsx';
-import '../../../styles/simulador-credito.css';
+import { Pestanas } from '../../ui/Pestanas.tsx';
+import '../../../styles/simulador.css';
 
 export function SimuladorPanel() {
   const moneda = usarMoneda();
@@ -26,16 +27,8 @@ export function SimuladorPanel() {
     void plan.calcularPlan(Number.isFinite(extra) ? extra : 0);
   };
 
-  return (
-    <section className="simulador-panel" aria-label="Simulador de créditos">
-      <header className="simulador-panel__cabecera">
-        <h3>Simulador de créditos</h3>
-        <span className="simulador-badge">Sandbox · no afecta tu balance</span>
-      </header>
-      <p className="simulador-panel__ayuda">
-        Laboratorio de crédito hipotético: calcula cuota intereses y amortización,
-        compara el escenario base con un pago optimizado y pruébalo antes de comprometerte.
-      </p>
+  const credito = (
+    <div className="simulador__modo">
       <FormularioCredito
         campos={simulador.campos}
         onCampo={simulador.actualizarCampo}
@@ -49,20 +42,26 @@ export function SimuladorPanel() {
             interesesAhorrados={comparativaDesdeSimulacion(estado.comparada, moneda).interesesAhorrados}
             hayAhorro={comparativaDesdeSimulacion(estado.comparada, moneda).hayAhorro}
           />
-          <div className="simulador-rejilla">
+          <div className="rejilla rejilla--2">
             <TarjetaEscenario titulo="Base" metricas={comparativaDesdeSimulacion(estado.comparada, moneda).base} destacada={false} />
             <TarjetaEscenario titulo="Optimizado" metricas={comparativaDesdeSimulacion(estado.comparada, moneda).optimizado} destacada />
           </div>
-          <TablaAmortizacion titulo="Base" filas={filasTablaAmortizacion(estado.comparada.base, moneda)} />
-          <TablaAmortizacion titulo="Optimizado" filas={filasTablaAmortizacion(estado.comparada.optimizado, moneda)} />
-          <button type="button" className="simulador-boton" onClick={añadirAlPlan}>
+          <div className="rejilla rejilla--2 simulador__tablas">
+            <TablaAmortizacion titulo="Base" filas={filasTablaAmortizacion(estado.comparada.base, moneda)} />
+            <TablaAmortizacion titulo="Optimizado" filas={filasTablaAmortizacion(estado.comparada.optimizado, moneda)} />
+          </div>
+          <button type="button" className="btn simulador__accion" onClick={añadirAlPlan}>
             Añadir este crédito a la comparativa
           </button>
         </>
       )}
       {estado.nombre === 'error' && (
-        <p className="simulador-error" role="alert">{estado.motivo}</p>
+        <p className="aviso aviso--error" role="alert">{estado.motivo}</p>
       )}
+    </div>
+  );
+  const comparar = (
+    <div className="simulador__modo">
       <PlanSandbox
         creditos={plan.creditos}
         estrategia={plan.estrategia}
@@ -72,8 +71,20 @@ export function SimuladorPanel() {
         onComparar={compararEstrategias}
       />
       {plan.estado.nombre === 'error' && (
-        <p className="simulador-error" role="alert">{plan.estado.motivo}</p>
+        <p className="aviso aviso--error" role="alert">{plan.estado.motivo}</p>
       )}
+    </div>
+  );
+  return (
+    <section className="simulador" aria-label="Simulador de créditos">
+      <p className="simulador__intro">
+        <span className="badge badge--info">No afecta tu balance</span>
+        <span className="texto-muted">Prueba créditos hipotéticos antes de comprometerte.</span>
+      </p>
+      <Pestanas id="simulador" etiqueta="Modos del simulador" pestanas={[
+        { id: 'credito', titulo: 'Un crédito', contenido: credito },
+        { id: 'comparar', titulo: 'Comparar créditos', insignia: plan.creditos.length ? String(plan.creditos.length) : undefined, contenido: comparar },
+      ]} />
     </section>
   );
 }

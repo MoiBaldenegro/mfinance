@@ -8,9 +8,9 @@ import { datosDeGraficaProyeccion, type SerieGraficaProyeccion } from '../../dom
 import type { ProyeccionPyg } from '../../domain/entities/pyg-proyeccion.ts';
 import { Chart } from '../../lib/chart-setup.ts';
 import { conAlpha, coloresDeEjes, token } from '../../lib/chart-colores.ts';
+import { etiquetaMesCorta } from '../../domain/use-cases/etiqueta-mes.ts';
 import { usarTema } from '../../hooks/use-tema.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
-import '../../styles/grafica-proyeccion.css';
 
 interface Props {
   readonly proyeccion: ProyeccionPyg;
@@ -75,8 +75,11 @@ export function ProyeccionChart({ proyeccion }: Props) {
             // Marca visualmente la frontera histórico → proyectado.
             ticks: {
               color: ejes.ticks,
-              callback: (valor, index) =>
-                index === ultimaHistorica ? `${String(valor)} ★` : String(valor),
+              // En ejes de categorías el valor es el índice: se resuelve la etiqueta.
+              callback(valor, index) {
+                const mes = etiquetaMesCorta(this.getLabelForValue(Number(valor)));
+                return index === ultimaHistorica ? `${mes} (real)` : mes;
+              },
             },
           },
           y: {
@@ -93,7 +96,7 @@ export function ProyeccionChart({ proyeccion }: Props) {
   }, [proyeccion, tema, moneda]);
 
   return (
-    <div className="grafica-proyeccion">
+    <div className="grafica">
       <canvas ref={lienzo} role="img" aria-label="Gráfica de proyección por mes" />
     </div>
   );

@@ -2,12 +2,15 @@
 // de PDFs, análisis del lote y tabla revisable. Renderiza y delega: el
 // parseo ocurre íntegro en el backend (veredicto humano).
 import { useState } from 'react';
-import { MonthSelector } from '../registro-section/MonthSelector.tsx';
+import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
+import { mesDeTrabajo } from '../../domain/use-cases/resumenes-flujo.ts';
+import { CabeceraPagina } from '../ui/CabeceraPagina';
+import { SelectorMes } from '../ui/SelectorMes';
 import { useDiagnostico } from './use-diagnostico.ts';
 import { DiagnosticoSubida } from './DiagnosticoSubida.tsx';
 import { DiagnosticoInforme } from './DiagnosticoInforme.tsx';
 import { DiagnosticoTabla } from './DiagnosticoTabla.tsx';
-import '../../styles/diagnostico-section.css';
+import '../../styles/diagnostico.css';
 
 function mesActual(): string {
   const hoy = new Date();
@@ -15,20 +18,15 @@ function mesActual(): string {
 }
 
 /** Sección Diagnóstico: subir → analizar → revisar → actualizar. */
-export function DiagnosticoSection() {
-  const [mes, setMes] = useState(mesActual());
+export function DiagnosticoSection({ snapshot }: { readonly snapshot: FinanceSnapshot }) {
+  const [mes, setMes] = useState(() => mesDeTrabajo(snapshot) ?? mesActual());
   const diagnostico = useDiagnostico(mes);
   return (
-    <section className="diagnostico-section">
-      <h2 className="diagnostico-section__titulo">Diagnóstico</h2>
-      <p className="diagnostico-section__ayuda">
-        Sube los extractos PDF del mes y el backend extraerá fecha,
-        comercio e importe; revisa cada movimiento antes de incorporarlo.
-      </p>
-      <div className="diagnostico-section__mes">
-        <span className="diagnostico-section__mes-etiqueta">Mes</span>
-        <MonthSelector mes={mes} alCambiar={setMes} />
-      </div>
+    <section className="pagina diagnostico-section">
+      <CabeceraPagina titulo="Diagnóstico"
+        descripcion="Sube los extractos PDF del banco: extraemos fecha, comercio e importe y tú revisas cada movimiento antes de incorporarlo.">
+        <SelectorMes mes={mes} alCambiar={setMes} etiqueta="Mes de los extractos" />
+      </CabeceraPagina>
       <DiagnosticoSubida
         seleccionados={diagnostico.seleccionados}
         preparando={diagnostico.preparando}
@@ -37,7 +35,7 @@ export function DiagnosticoSection() {
         alAnalizar={diagnostico.analizar}
       />
       {diagnostico.error !== null && (
-        <p className="estado-vacio diagnostico-section__error">
+        <p className="aviso aviso--error" role="alert">
           {diagnostico.error}
         </p>
       )}

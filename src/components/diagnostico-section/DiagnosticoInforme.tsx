@@ -6,23 +6,23 @@ import type {
   ResultadoLote,
 } from '../../domain/entities/diagnostico.ts';
 import { resumenLote } from '../../domain/use-cases/diagnostico-informe-resumen.ts';
-import '../../styles/diagnostico-informe.css';
+import '../../styles/diagnostico.css';
 
 interface Props {
   readonly informe: ResultadoLote;
 }
 
 const CLASES_ESTADO: Record<EstadoArchivo, string> = {
-  Analizado: 'diagnostico-informe__estado--ok',
-  Ilegible: 'diagnostico-informe__estado--aviso',
-  Corrupto: 'diagnostico-informe__estado--mal',
-  Fallido: 'diagnostico-informe__estado--mal',
+  Analizado: 'badge--positivo',
+  Ilegible: 'badge--aviso',
+  Corrupto: 'badge--negativo',
+  Fallido: 'badge--negativo',
 };
 
 const CLASES_COHERENCIA: Record<Coherencia, string> = {
-  Verificada: 'diagnostico-informe__coherencia--verificada',
-  Discrepancia: 'diagnostico-informe__coherencia--discrepancia',
-  NoVerificable: 'diagnostico-informe__coherencia--no-verificable',
+  Verificada: 'badge--positivo',
+  Discrepancia: 'badge--aviso',
+  NoVerificable: '',
 };
 
 const ETIQUETAS_COHERENCIA: Record<Coherencia, string> = {
@@ -35,21 +35,21 @@ const ETIQUETAS_COHERENCIA: Record<Coherencia, string> = {
 export function DiagnosticoInforme({ informe }: Props) {
   const resumen = resumenLote(informe);
   return (
-    <div className="diagnostico-informe">
-      <h3 className="diagnostico-informe__titulo">
+    <section className="card diagnostico-informe" aria-label="Resultado del análisis">
+      <h2 className="card__titulo">
         Informe del lote ({resumen.analizados}/{resumen.total} analizados)
-      </h3>
+      </h2>
       <ul className="diagnostico-informe__lista">
         {informe.archivos.map((archivo) => (
           <li key={archivo.archivo} className="diagnostico-informe__item">
-            <span className={`diagnostico-informe__estado ${CLASES_ESTADO[archivo.estado]}`}>
+            <span className={`badge ${CLASES_ESTADO[archivo.estado]}`}>
               {archivo.estado}
             </span>
             <span className="diagnostico-informe__nombre">{archivo.archivo}</span>
             <span className="diagnostico-informe__mensaje">{archivo.mensaje}</span>
             {archivo.coherencia !== null && (
               <span
-                className={`diagnostico-informe__coherencia ${CLASES_COHERENCIA[archivo.coherencia]}`}
+                className={`badge ${CLASES_COHERENCIA[archivo.coherencia]}`}
               >
                 {ETIQUETAS_COHERENCIA[archivo.coherencia]}
               </span>
@@ -57,6 +57,6 @@ export function DiagnosticoInforme({ informe }: Props) {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

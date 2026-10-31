@@ -8,9 +8,9 @@ import { datosDeGraficaBalanceFuturo, type SerieGraficaBalanceFuturo } from '../
 import type { BalanceFuturo } from '../../domain/entities/pyg-proyeccion.ts';
 import { Chart } from '../../lib/chart-setup.ts';
 import { conAlpha, coloresDeEjes, token } from '../../lib/chart-colores.ts';
+import { etiquetaMesCorta } from '../../domain/use-cases/etiqueta-mes.ts';
 import { usarTema } from '../../hooks/use-tema.ts';
 import { usarMoneda } from '../../hooks/use-moneda.ts';
-import '../../styles/grafica-balance-futuro.css';
 
 interface Props {
   readonly balance: BalanceFuturo;
@@ -71,11 +71,13 @@ export function BalanceFuturoChart({ balance }: Props) {
         scales: {
           x: {
             grid: { display: false },
-            // Marca visualmente la frontera histórico → proyectado.
+            // Etiqueta de categoría (no índice); marca el último mes real.
             ticks: {
               color: ejes.ticks,
-              callback: (valor, index) =>
-                index === ultimaHistorica ? `${String(valor)} ★` : String(valor),
+              callback(valor, index) {
+                const mes = etiquetaMesCorta(this.getLabelForValue(Number(valor)));
+                return index === ultimaHistorica ? `${mes} (real)` : mes;
+              },
             },
           },
           y: {
@@ -92,7 +94,7 @@ export function BalanceFuturoChart({ balance }: Props) {
   }, [balance, tema, moneda]);
 
   return (
-    <div className="grafica-balance-futuro">
+    <div className="grafica">
       <canvas ref={lienzo} role="img"
         aria-label="Gráfica de balance futuro: activos, pasivos y patrimonio por mes" />
     </div>

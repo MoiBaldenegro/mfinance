@@ -30,11 +30,18 @@ where
     let onboarding_status = perfil_activo.onboarding_status;
 
     // Cargar el snapshot del perfil activo
-    let snapshot = repo.load().map_err(|error| {
-        PerfilError::Persistencia(format!(
-            "no se pudo cargar el snapshot del perfil activo: {error}"
-        ))
-    })?;
+    // El snapshot se siembra al completar el onboarding (REQ-30-03): un
+    // perfil que aún no lo completó arranca con uno vacío. Si ya lo
+    // completó, la ausencia del archivo sí es un error.
+    let snapshot = match repo.load() {
+        Ok(snapshot) => snapshot,
+        Err(_) if onboarding_status != OnboardingStatus::Completed => FinanceSnapshot::new(),
+        Err(error) => {
+            return Err(PerfilError::Persistencia(format!(
+                "no se pudo cargar el snapshot del perfil activo: {error}"
+            )))
+        }
+    };
 
     Ok(PerfilActivoConOnboarding {
         snapshot,

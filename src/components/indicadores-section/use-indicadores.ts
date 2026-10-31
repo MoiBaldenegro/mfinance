@@ -1,31 +1,27 @@
-// Hook para obtener los indicadores semáforo del backend.
-// Usa la lógica pura de indicadores-logic y se refresca con el SnapshotProvider.
+// Indicadores del semáforo: se piden al backend y se recalculan cada vez
+// que cambia el snapshot publicado. Errores visibles, nunca silenciosos.
 import { useEffect, useState } from 'react';
+import { usarPuertos } from '../../app/puertos.ts';
+import type { FinanceSnapshot } from '../../domain/entities/finance-snapshot.ts';
 import type { Indicadores } from '../../domain/entities/indicadores.ts';
-import { snapshotPort } from '../../adapters/snapshot-ipc-adapter.ts';
-import { INDICADORES_INICIALES, cargarIndicadores } from '../../domain/use-cases/indicadores-logic.ts';
+import { cargarIndicadores } from '../../domain/use-cases/indicadores-logic.ts';
 
-/**
- * Hook que obtiene los 4 indicadores semáforo del backend.
- * Se refresca automáticamente cuando el SnapshotProvider llama a recargar.
- * @returns Objeto con los 4 indicadores + función recargar
- */
-export function useIndicadores(): Indicadores & { recargar: () => Promise<void> } {
-  const [indicadores, setIndicadores] = useState<Indicadores>(INDICADORES_INICIALES);
+export type EstadoIndicadores =
+  | { readonly nombre: 'cargando' }
+  | { readonly nombre: 'listo'; readonly indicadores: Indicadores }
+  | { readonly nombre: 'error'; readonly motivo: string };
 
-  const cargar = async () => {
-    try {
-      const data = await cargarIndicadores(snapshotPort);
-      setIndicadores(data);
-    } catch (_e) {
-      // En caso de error, mantener estado de carga
-    }
-  };
-
+export function useIndicadores(snapshot: FinanceSnapshot): EstadoIndicadores {
+  const { snapshot: snapshotPort } = usarPuertos();
+  const [estado, setEstado] = useState<EstadoIndicadores>({ nombre: 'cargando' });
   useEffect(() => {
-    cargar();
-  }, []);
-
-  // Exponer función de recarga para que SnapshotProvider la use
-  return Object.assign(indicadores, { recargar: cargar });
+    let vigente = true;
+    cargarIndicadores(snapshotPort)
+      .then((indicadores) => { if (vigente) setEstado({ nombre: 'listo', indicadores }); })
+      .catch((e: unknown) => {
+        if (vigente) setEstado({ nombre: 'error', motivo: e instanceof Error ? e.message : 'No se pudieron calcular los indicadores' });
+      });
+    return () => { vigente = false; };
+  }, [snapshot]);
+  return estado;
 }

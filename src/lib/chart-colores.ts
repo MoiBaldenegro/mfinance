@@ -1,6 +1,7 @@
 // Utilidades de color para las gráficas Chart.js de la app: lectura de
 // tokens CSS de :root y derivación de variantes con alpha a partir de
 // hex #rrggbb. Glue de UI: vive en lib/, nunca en el dominio.
+import { Chart } from './chart-setup.ts';
 
 /** Lee el valor resuelto de una custom property de :root (sin espacios). */
 export function token(nombre: string): string {
@@ -19,8 +20,9 @@ export function conAlpha(color: string, alpha: number): string {
 
 /** Colores de rejilla y etiquetas de los ejes según el tema activo. */
 export function coloresDeEjes(): { readonly grid: string; readonly ticks: string } {
-  return {
-    grid: token('--chart-grid'),
-    ticks: token('--chart-ticks'),
-  };
+  const ejes = { grid: token('--chart-grid'), ticks: token('--chart-ticks') };
+  // Leyendas y textos por defecto siguen al tema activo en cada redibujado.
+  Chart.defaults.color = ejes.ticks;
+  Chart.defaults.font.family = token('--font-sans') || 'system-ui';
+  return ejes;
 }
