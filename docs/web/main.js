@@ -26,7 +26,7 @@
   alDesplazar();
 
   // Contadores de los KPI de la maqueta
-  var formato = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+  var formato = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', useGrouping: 'always' });
   function contar(el) {
     var fin = Number(el.dataset.contar);
     if (sinMovimiento) return;
