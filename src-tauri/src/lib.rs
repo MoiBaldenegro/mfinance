@@ -50,6 +50,8 @@ fn estado_inicial(base: PathBuf) -> Result<commands::AppState, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             // MFINANCE_DATA_DIR permite aislar los datos (QA, demos) sin
             // tocar Documents/mfinance del usuario.

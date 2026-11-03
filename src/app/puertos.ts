@@ -2,6 +2,7 @@
 // de las interfaces del dominio; las implementaciones las decide el
 // composition root (./composicion.ts) o un test con dobles.
 import { createContext, useContext } from 'react';
+import type { ActualizadorPort } from '../domain/ports/actualizador-port.ts';
 import type { CierrePort } from '../domain/ports/cierre-port.ts';
 import type { DiagnosticoPort } from '../domain/ports/diagnostico-port.ts';
 import type { OnboardingPort } from '../domain/ports/onboarding-port.ts';
@@ -17,6 +18,7 @@ export interface Puertos {
   readonly diagnostico: DiagnosticoPort;
   readonly simulador: SimuladorPort;
   readonly onboarding: OnboardingPort;
+  readonly actualizador: ActualizadorPort;
 }
 
 /** Por defecto, los adaptadores reales; un Provider puede sustituirlos. */
