@@ -423,6 +423,9 @@ git diff --stat
 name: release
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 permissions:
@@ -477,16 +480,19 @@ git commit -m "feat: configurar auto-updater"
 git push -u origin feat/autoupdater
 ```
 
-- [ ] **37. Ejecutar el workflow manualmente.**
+- [ ] **37. Publicar el tag de la versión.** El tag dispara el workflow:
 
 ```bash
-gh workflow run release.yml --ref feat/autoupdater
-gh run watch
+git tag v1.1.0
+git push origin v1.1.0
 ```
+
+También se puede lanzar a mano desde **Actions → release → Run workflow**.
 
 - [ ] **38. Revisar el borrador de release.** Debe contener:
   - `mfinance_..._x64-setup.exe`
-  - `mfinance_..._x64-setup.exe.sig`
+  - `mfinance_..._x64-setup.nsis.zip`
+  - `mfinance_..._x64-setup.nsis.zip.sig`
   - `latest.json`
 
 - [ ] **39. Verificar que `latest.json` tenga la firma y URL correctas.** La
