@@ -424,8 +424,8 @@ name: release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -480,11 +480,11 @@ git commit -m "feat: configurar auto-updater"
 git push -u origin feat/autoupdater
 ```
 
-- [ ] **37. Publicar el tag de la versión.** El tag dispara el workflow:
+- [ ] **37. Hacer push a `main`.** El push dispara el workflow y `tauri-action`
+  crea el tag `v__VERSION__` y el borrador del release:
 
 ```bash
-git tag v1.1.0
-git push origin v1.1.0
+git push origin main
 ```
 
 También se puede lanzar a mano desde **Actions → release → Run workflow**.
