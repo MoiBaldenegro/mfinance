@@ -1,5 +1,6 @@
 // Composition root del frontend: ÚNICO módulo que elige las
 // implementaciones concretas (adaptadores IPC de Tauri) de cada puerto.
+import { actualizadorPort } from '../adapters/actualizador-tauri-adapter.ts';
 import { cierrePort } from '../adapters/cierre-ipc-adapter.ts';
 import { diagnosticoPort } from '../adapters/diagnostico-ipc-adapter.ts';
 import { onboardingPort } from '../adapters/onboarding-adapter.ts';
@@ -14,4 +15,5 @@ export const puertosDeProduccion = {
   diagnostico: diagnosticoPort,
   simulador: simuladorPort,
   onboarding: onboardingPort,
+  actualizador: actualizadorPort,
 } as const;

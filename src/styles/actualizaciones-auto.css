@@ -1,0 +1,65 @@
+/* Aviso automático de actualizaciones: capa modal centrada sobre la app. */
+.actualizaciones-auto {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialogo);
+  display: grid;
+  place-content: center;
+  padding: var(--space-6);
+  background: var(--color-overlay);
+}
+
+.actualizaciones-auto__superficie {
+  display: grid;
+  gap: var(--space-4);
+  width: min(100vw - var(--space-7), 34rem);
+  padding: var(--space-5);
+  border: var(--borde);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--sombra-lg);
+}
+
+.actualizaciones-auto__superficie:focus { outline: none; }
+
+.actualizaciones-auto__titulo { font-size: var(--fuente-tamano-lg); }
+
+.actualizaciones-auto__contenido {
+  display: grid;
+  gap: var(--space-3);
+  color: var(--color-muted);
+}
+
+.actualizaciones-auto__contenido strong { color: var(--color-text); }
+
+.actualizaciones-auto__notas {
+  max-height: 12rem;
+  overflow: auto;
+  padding: var(--space-3) var(--space-4);
+  border: var(--borde);
+  border-radius: var(--radius-md);
+  background: var(--color-sunken);
+  white-space: pre-wrap;
+}
+
+.actualizaciones-auto__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: end;
+  gap: var(--space-2);
+}
+
+.actualizaciones-auto__progreso {
+  width: 100%;
+  height: var(--space-2);
+  accent-color: var(--color-primary);
+}
+
+.actualizaciones-auto__error {
+  padding: var(--space-3) var(--space-4);
+  border: var(--borde);
+  border-left: var(--borde-ancho-fuerte) solid var(--color-negative);
+  border-radius: var(--radius-md);
+  background: var(--color-negative-bg);
+  color: var(--color-text);
+}

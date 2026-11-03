@@ -8,6 +8,7 @@ import {
 } from "./components/shell/SnapshotProvider";
 import { PerfilProvider } from "./components/shell/PerfilProvider";
 import { AjustesRecuperacion } from "./components/ajustes-recuperacion/AjustesRecuperacion";
+import { ActualizacionesAuto } from "./components/actualizaciones/ActualizacionesAuto";
 import {
   SeccionActivaProvider,
   usarSeccionActiva,
@@ -68,6 +69,7 @@ export default function App() {
       <PerfilProvider>
         <SnapshotProvider>
           <Contenido />
+          <ActualizacionesAuto />
         </SnapshotProvider>
       </PerfilProvider>
     </SeccionActivaProvider>
