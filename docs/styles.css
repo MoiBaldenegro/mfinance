@@ -330,6 +330,7 @@ strong { color: var(--text); font-weight: 600; }
 .pie__fila { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
 .marca--pie { color: var(--text); }
 .marca--pie .marca__nombre { font-size: 1.2rem; }
+.pie__enlaces { display: flex; align-items: center; gap: 1.2rem; }
 .pie__enlace { display: inline-flex; align-items: center; gap: .4rem; transition: color .2s; }
 .pie__enlace:hover { color: var(--text); }
 

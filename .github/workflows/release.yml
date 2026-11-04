@@ -48,3 +48,20 @@ jobs:
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
           args: ''
+
+      # Tras publicar, la landing (GitHub Pages desde docs/) pasa a enlazar el
+      # instalador nuevo. Es idempotente: si la versión no cambió, no hay commit.
+      # El push con GITHUB_TOKEN no vuelve a disparar este workflow, pero sí
+      # el despliegue de Pages.
+      - name: Enlazar la nueva versión en la web
+        shell: bash
+        run: |
+          node scripts/sync-web-version.mjs
+          if git diff --quiet -- docs; then exit 0; fi
+          version=$(node -p "require('./package.json').version")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs
+          git commit -m "chore(web): enlazar la descarga de v$version"
+          git pull --rebase origin main
+          git push origin HEAD:main
