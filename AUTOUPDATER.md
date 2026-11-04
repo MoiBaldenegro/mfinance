@@ -465,7 +465,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'mfinance v__VERSION__'
           releaseBody: 'Instalador y actualización automática de mfinance v__VERSION__.'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
@@ -481,7 +481,7 @@ git push -u origin feat/autoupdater
 ```
 
 - [ ] **37. Hacer push a `main`.** El push dispara el workflow y `tauri-action`
-  crea el tag `v__VERSION__` y el borrador del release:
+  crea el tag `v__VERSION__` y publica el release:
 
 ```bash
 git push origin main
@@ -489,7 +489,7 @@ git push origin main
 
 También se puede lanzar a mano desde **Actions → release → Run workflow**.
 
-- [ ] **38. Revisar el borrador de release.** Debe contener:
+- [ ] **38. Revisar el release publicado.** Debe contener:
   - `mfinance_..._x64-setup.exe`
   - `mfinance_..._x64-setup.nsis.zip`
   - `mfinance_..._x64-setup.nsis.zip.sig`
@@ -498,8 +498,8 @@ También se puede lanzar a mano desde **Actions → release → Run workflow**.
 - [ ] **39. Verificar que `latest.json` tenga la firma y URL correctas.** La
   `signature` debe coincidir con el contenido del `.sig`.
 
-- [ ] **40. Publicar el release.** `latest.json` no es visible en
-  `releases/latest` mientras el release sea borrador.
+- [ ] **40. Confirmar que `latest.json` responde en `releases/latest`.** Al
+  publicarse automáticamente, la URL del updater queda activa al terminar.
 
 ---
 

@@ -43,7 +43,7 @@ jobs:
           tagName: v__VERSION__
           releaseName: 'mfinance v__VERSION__'
           releaseBody: 'Instalador y actualización automática de mfinance v__VERSION__.'
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           uploadUpdaterJson: true
           updaterJsonPreferNsis: true
